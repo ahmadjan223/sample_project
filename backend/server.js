@@ -17,38 +17,54 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => console.log(err));
 
 // Define a simple schema and model
-const ItemSchema = new mongoose.Schema({
-    name: String
-});
-
-const Item = mongoose.model('Item', ItemSchema);
-
-// Root route
-app.get('/', (req, res) => {
-    res.send('Welcome to the backend server!');
-});
-
-// REST API routes
-app.get('/api/items', async (req, res) => {
+// Define a schema and model for Fields
+const FieldSchema = new mongoose.Schema({
+    fieldNumber: Number,
+    cords: [
+      {
+        cord1: { type: [Number] },
+        cord2: { type: [Number] },
+        cord3: { type: [Number] },
+        cord4: { type: [Number] },
+      }
+    ]
+  });
+  
+  const Field = mongoose.model('Field', FieldSchema);
+  
+// Route to save fields data to the database
+app.post('/api/fields', async (req, res) => {
     try {
-        const items = await Item.find();
-        res.json(items);
+      const { fields } = req.body;
+  
+      // Create Field documents for each field
+      const fieldDocuments = fields.map((field, index) => ({
+        fieldNumber: index + 1,
+        cords: {
+          cord1: field[0] ? [field[0].lng, field[0].lat] : [null, null],
+          cord2: field[1] ? [field[1].lng, field[1].lat] : [null, null],
+          cord3: field[2] ? [field[2].lng, field[2].lat] : [null, null],
+          cord4: field[3] ? [field[3].lng, field[3].lat] : [null, null],
+        }
+      }));
+  
+      await Field.insertMany(fieldDocuments);
+  
+      res.status(201).json({ message: 'Fields saved successfully!' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-});
-
-app.post('/api/items', async (req, res) => {
+  });
+  // Route to reset the database
+app.post('/api/reset', async (req, res) => {
     try {
-        const newItem = new Item({
-            name: req.body.name
-        });
-        const item = await newItem.save();
-        res.status(201).json(item);
+      await Field.deleteMany(); // Remove all documents from the Field collection
+      res.status(200).json({ message: 'Database reset successfully!' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-});
+  });
+  
 
 // Start the server
 const port = process.env.PORT || 3000;

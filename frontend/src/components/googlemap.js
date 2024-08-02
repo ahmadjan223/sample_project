@@ -19,7 +19,9 @@ const center = {
 };
 
 const MyComponent = () => {
-const apiKey = 'AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q';
+  const fieldCount = 5;
+  const markerCount = 4;
+  const apiKey = "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q";
 
   const [map, setMap] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
@@ -29,6 +31,7 @@ const apiKey = 'AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q';
   const [addingMode, setAddingMode] = useState(false);
   const [notification, setNotification] = useState(null);
   const inputRef = useRef(null);
+  const [mapKey, setMapKey] = useState(0);
 
   const onLoad = useCallback((map) => {
     const bounds = new window.google.maps.LatLngBounds(center);
@@ -56,15 +59,16 @@ const apiKey = 'AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q';
       console.log("Autocomplete is not loaded yet!");
     }
   };
+
   const drawPolylines = (updatedMarkers) => {
     const newPolylines = [];
     const numMarkers = updatedMarkers.length;
-  
+
     // Process markers in groups of markerCount
     for (let i = 0; i < numMarkers; i += markerCount) {
       // Extract the current group of up to markerCount markers
       const group = updatedMarkers.slice(i, i + markerCount);
-  
+
       // Draw polylines for the current group
       if (group.length === 2) {
         newPolylines.push({
@@ -92,10 +96,9 @@ const apiKey = 'AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q';
         });
       }
     }
-  
+
     return newPolylines;
   };
-  
 
   // Function to handle marker addition
   const handleAddMarker = (newMarker) => {
@@ -106,66 +109,138 @@ const apiKey = 'AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q';
       setPolylines(newPolylines);
 
       if (updatedMarkers.length % markerCount === 0) {
-        
         updateFieldsAndClearMarkers(updatedMarkers);
       }
 
       return updatedMarkers;
     });
   };
-const fieldCount =5;
-const markerCount =4
- // Function to update fields and clear markers
-const updateFieldsAndClearMarkers = (updatedMarkers) => {
-  setFields((currentFields) => {
-    if (currentFields.length <= fieldCount) { // Limit fields to 3
-      const newField = updatedMarkers.slice(-markerCount); // Get only the last markerCount markers
-      return [...currentFields, newField];
-    } else {
-      alert('Maximum of 5 fields allowed.');
-      return currentFields;
-    }
-  });
 
-  setAddingMode(false); // Exit adding mode
-  showNotification('Field saved! Click "Add Location" to start a new field.');
-};
+  // Function to update fields and clear markers
+  const updateFieldsAndClearMarkers = (updatedMarkers) => {
+    setFields((currentFields) => {
+      if (currentFields.length <= fieldCount) {
+        // Limit fields to 5
+        const newField = updatedMarkers.slice(-markerCount); // Get only the last markerCount markers
+        return [...currentFields, newField];
+      } else {
+        alert("Maximum of 5 fields allowed.");
+        return currentFields;
+      }
+    });
 
-
-  // Function to handle notifications
-  const showNotification = (message) => {
-    setNotification(message);
-    setTimeout(() => setNotification(null), 5000); // Hide after 5 seconds
+    // console.log(fields)
+    setAddingMode(false); // Exit adding mode
+    showNotification('Field saved! Click "Add Location" to start a new field.');
   };
 
+  // Function to handle notifications
+  const showNotification = (message, timeout = 1000) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), timeout); // Use the provided timeout
+  };
+  
+
+  // Function to handle map click
   const handleMapClick = (event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     if (addingMode) {
       const newMarker = { lat, lng };
 
-      if (markers.length % markerCount < markerCount) { // Check if there are fewer than markerCount markers
+      if (markers.length % markerCount < markerCount) {
+        // Check if there are fewer than markerCount markers
         handleAddMarker(newMarker);
         showNotification(`Latitude: ${lat}, Longitude: ${lng}`);
       } else {
-        alert('Maximum of 4 markers allowed.');
+        alert("Maximum of 4 markers allowed.");
       }
     }
   };
-  const handleAddLocation = () => {
 
-    setAddingMode(true); // Enable adding mode
+  // Function to handle adding a new location
+  const handleAddLocation = () => {
+    console.log("Adding. . . ");
+    if (fields.length < fieldCount) {
+      setAddingMode(true);
+    } else {
+      setAddingMode(false);
+      showNotification(`You have already added ${fieldCount} fields`);
+    }
+  };
+
+  const sendToDatabase = async () => {
+    fields.forEach((field, fieldIndex) => {
+      console.log(`Field: ${fieldIndex + 1}`);
+
+      field.forEach((marker, markerIndex) => {
+        console.log(`Cord${markerIndex + 1}: (${marker.lng}, ${marker.lat})`);
+      });
+
+      // If there are fewer than 4 coordinates, fill in with placeholders
+      for (let i = field.length; i < 4; i++) {
+        console.log(`Cord${i + 1}: (N/A, N/A)`);
+      }
+
+      console.log(""); // Add a blank line for separation
+    });
+    try {
+      const response = await fetch("http://localhost:3000/api/fields", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fields }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+        setFields([]);
+        // setMarkers([]);
+        // setPolylines([]);
+        // setMapKey(prevKey => prevKey + 1);
+        showNotification("Fields saved successfully!",5000);
+      } else {
+        console.error("Failed to save fields");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const resetDatabase = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/reset", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+        // Optionally, clear fields and markers in the UI
+        setFields([]);
+        setMarkers([]);
+        setPolylines([]);
+        setMapKey(prevKey => prevKey + 1);
+        showNotification("Database reset successfully!",5000);
+      } else {
+        console.error("Failed to reset database");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
     <LoadScript
-      googleMapsApiKey={apiKey}// Use environment variable
+      googleMapsApiKey={apiKey} // Use environment variable
       libraries={["places"]}
     >
       <div style={{ display: "flex", height: "100vh" }}>
         {/* Map Container */}
         <div style={{ flex: 1, position: "relative" }}>
           <GoogleMap
+            key={mapKey}
             mapContainerStyle={containerStyle}
             center={center}
             zoom={15} // Adjust zoom level as needed
@@ -232,7 +307,9 @@ const updateFieldsAndClearMarkers = (updatedMarkers) => {
         <Sidebar
           fields={fields}
           onAddLocation={handleAddLocation}
+          onSendToDatabase={sendToDatabase}
           addingMode={addingMode}
+          onResetDatabase={resetDatabase}
         />
 
         {/* Notification */}
