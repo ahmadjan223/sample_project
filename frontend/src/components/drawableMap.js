@@ -187,7 +187,7 @@ const DrawableMap = () => {
     // Clear the state arrays
     setDrawnPolygons([]);
     setPolygons([]);
-  };
+  };//just to commit
 
   return isLoaded ? (
     <div className="map-container" style={{ position: "relative" }}>
