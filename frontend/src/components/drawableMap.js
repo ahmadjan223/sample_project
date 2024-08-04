@@ -175,7 +175,7 @@ const DrawableMap = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  };//comment just to make a commit and push to db
 
   const clearMap = () => {
     // Create a copy of the drawnPolygons array
