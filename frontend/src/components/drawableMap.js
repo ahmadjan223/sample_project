@@ -88,19 +88,18 @@ const DrawableMap = () => {
     }
   };
 
-  const createSamplePolygon = () => {
-    const samplePolygon = [
-      { lat: 28.625137, lng: 79.820603 },
-      { lat: 28.626137, lng: 79.821603 },
-      { lat: 28.627137, lng: 79.822603 },
-      { lat: 28.625137, lng: 79.823603 },
-    ];
-    setPolygons([...polygons, samplePolygon]);
-  };
 
   const addPolygonToArray = (newPolygon) => {
     setPolygons([...polygons, newPolygon]);
   };
+  //fucntion to be defined
+  const DisplayPolygon=()=>{
+    const data =  [];
+    setPolygons(data);
+  }
+  const sendToDb = () => {
+    const data = polygons;
+  }
 
   useEffect(() => {
     console.log(polygons);
@@ -141,14 +140,9 @@ const DrawableMap = () => {
           transform: "translateX(-50%)",
         }}
       >
+        <button onClick={sendToDb}>send polygon to db</button>
+        <button onClick={DisplayPolygon}>Display all polygons</button>
         <button onClick={resetMap}>Reset Map</button>
-        <button onClick={createSamplePolygon}>Create Sample Polygon</button>
-        <button onClick={() => addPolygonToArray([
-          { lat: 28.624137, lng: 79.819603 },
-          { lat: 28.625137, lng: 79.820603 },
-          { lat: 28.626137, lng: 79.821603 },
-          { lat: 28.624137, lng: 79.822603 },
-        ])}>Add Polygon to Array</button>
       </div>
     </div>
   ) : null;
