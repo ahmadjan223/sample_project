@@ -69,10 +69,13 @@ app.get('/api/load-polygons', async (req, res) => {
 
 // Google authentication routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
+//handling /auth/google/callback
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/dashboard'); // Redirect after successful login
+    const user = req.user;
+    const redirectUrl = `http://localhost:3001/dashboard?name=${encodeURIComponent(user.displayName)}&id=${encodeURIComponent(user.id)}&image=${encodeURIComponent(user.image)}`;
+    res.redirect(redirectUrl);
 });
+
 
 app.get('/api/logout', (req, res) => {
     req.logout();

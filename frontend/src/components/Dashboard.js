@@ -1,13 +1,14 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import DrawableMap from './drawableMap'
+import React from 'react';
 
-const Dashboard = () => {
-  return (
-    <div>
-      <DrawableMap></DrawableMap>
-    </div>
-  )
+const Dashboard = ({ user }) => {
+    return (
+        <div>
+            <h1>Welcome to the Dashboard</h1>
+            <p>You are logged in as {user.displayName}</p>
+            <p>Your user ID is {user.id}</p>
+            <img src={user.image} alt={user.displayName} />
+        </div>
+    );
 }
 
-export default Dashboard
+export default Dashboard;
