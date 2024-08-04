@@ -30,34 +30,31 @@ const Field = mongoose.model('Field');
 // Route to save fields data to the database
 app.post('/api/fields', async (req, res) => {
     try {
-      const { fields } = req.body;
-  
-      // Create Field documents for each field
-      const fieldDocuments = fields.map((field, index) => ({
-        fieldNumber: index + 1,
-        cords: {
-          cord1: field[0] ? [field[0].lng, field[0].lat] : [null, null],
-          cord2: field[1] ? [field[1].lng, field[1].lat] : [null, null],
-          cord3: field[2] ? [field[2].lng, field[2].lat] : [null, null],
-          cord4: field[3] ? [field[3].lng, field[3].lat] : [null, null],
-        }
-      }));
-  
-      await Field.insertMany(fieldDocuments);
-  
-      res.status(201).json({ message: 'Fields saved successfully!' });
+        const { polygons } = req.body;
+
+        // Create Polygon documents for each polygon
+        const polygonDocuments = polygons.map(polygon => ({
+            coordinates: polygon
+        }));
+
+        await Polygon.insertMany(polygonDocuments);
+
+        res.status(201).json({ message: 'Polygons saved successfully!' });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
+});
+
+// Route to reset the database
 });
 
 // Route to reset the database
 app.post('/api/reset', async (req, res) => {
     try {
-      await Field.deleteMany(); // Remove all documents from the Field collection
-      res.status(200).json({ message: 'Database reset successfully!' });
+        await Polygon.deleteMany(); // Remove all documents from the Polygon collection
+        res.status(200).json({ message: 'Database reset successfully!' });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
