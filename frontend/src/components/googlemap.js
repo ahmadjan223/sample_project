@@ -19,7 +19,7 @@ const center = {
 };
 
 const MyComponent = () => {
-  const fieldCount = 5;
+  const fieldCount = 10;
   const markerCount = 4;
   const apiKey = "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q";
 
