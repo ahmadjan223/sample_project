@@ -1,3 +1,4 @@
+import Sidenav from "./sidenav";
 import React, { useState, useEffect } from "react";
 import {
   DrawingManager,
@@ -6,52 +7,25 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 
-const libraries = ["places", "drawing"];
+const libraries = ["places", "drawing"];  // Declare 'libraries' before using it
 
 const DrawableMap = () => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
-  const [polygonDrawn, setPolygonDrawn] = useState(false); // Track if a polygon has been drawn
   const [drawnPolygons, setDrawnPolygons] = useState([]);
-
+  const [polygons, setPolygons] = useState([]);
+  const [fieldNames, setFieldNames] = useState([]);
+  const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
+  
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
     libraries,
   });
 
-  const [polygons, setPolygons] = useState([
-    [
-      { lat: 33.639552, lng: 72.987401 },
-      { lat: 33.640592, lng: 72.986661 },
-      { lat: 33.640246, lng: 72.985916 },
-      { lat: 33.639241, lng: 72.986796 },
-    ],
-    [
-      { lat: 33.640003, lng: 72.98579 },
-      { lat: 33.639619, lng: 72.986093 },
-      { lat: 33.639328, lng: 72.985487 },
-      { lat: 33.639614, lng: 72.985155 },
-    ],
-    [
-      { lat: 33.639485, lng: 72.986128 },
-      { lat: 33.639105, lng: 72.986423 },
-      { lat: 33.638828, lng: 72.985812 },
-      { lat: 33.639145, lng: 72.985533 },
-    ],
-    [
-      { lat: 33.640512, lng: 72.988068 },
-      { lat: 33.640218, lng: 72.987343 },
-      { lat: 33.639771, lng: 72.987681 },
-      { lat: 33.640048, lng: 72.988411 },
-    ],
-  ]);
-
   const defaultCenter = {
     lat: 33.639777,
     lng: 72.985718,
   };
-
-  const [center, setCenter] = useState(defaultCenter);
 
   const containerStyle = {
     width: "100%",
@@ -75,46 +49,78 @@ const DrawableMap = () => {
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   };
-
-  const onOverlayComplete = (event) => {
+  const onOverlayComplete = async (event) => {
     const newPolygon = event.overlay;
     const newPolygonPath = newPolygon
-      .getPath()
-      .getArray()
-      .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
+        .getPath()
+        .getArray()
+        .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
 
-    // Add the new polygon to the state
-    setPolygons((prevPolygons) => [...prevPolygons, newPolygonPath]);
+    // Prompt the user for a name
+    const name = prompt("Enter a name for this field:");
 
-    // Store the drawn polygon in the array
-    setDrawnPolygons((prevDrawnPolygons) => [...prevDrawnPolygons, newPolygon]);
+    if (name && !fieldNames.includes(name)) {
+        setFieldNames((prevFieldNames) => [...prevFieldNames, name]);
+        setPolygons((prevPolygons) => [...prevPolygons, { path: newPolygonPath, name }]);
+        setDrawnPolygons((prevDrawnPolygons) => [...prevDrawnPolygons, newPolygon]);
 
-    // Remove the drawing mode
-    if (drawingManager) {
-      drawingManager.setOptions({
-        drawingControl: false,
-        drawingControlOptions: {
-          drawingModes: [], // Disable all drawing modes
-        },
-      });
+        // Save to database
+        sendSinglePolygonToDb(newPolygonPath, name);
+
+        // Log polygons
+        logPolygons();
+    } else if (fieldNames.includes(name)) {
+        alert("The name is already taken. Please choose a different name.");
+        // Remove the new polygon from the map if name is not unique
+        newPolygon.setMap(null);
     }
-  };
+
+    if (drawingManager) {
+        drawingManager.setOptions({
+            drawingControl: false,
+            drawingControlOptions: {
+                drawingModes: [],
+            },
+        });
+    }
+};
+
+const sendSinglePolygonToDb = async (coordinates, name) => {
+  try {
+      const response = await fetch('http://localhost:3000/api/save-single-polygon', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              coordinates,
+              name,
+          }),
+      });
+
+      if (response.ok) {
+          const result = await response.json();
+          console.log(result.message);
+      } else {
+          console.error('Failed to save polygon.');
+      }
+  } catch (error) {
+      console.error('Error:', error);
+  }
+};
 
   const sendToDb = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/save-polygons", {
+      const response = await fetch("http://localhost:3000/api/fields", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ polygons }), // Adjust the payload if necessary
+        body: JSON.stringify({ polygons }),
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log(result.message);
-        // setPolygons([]); // Clear polygons after successful save
-        console.log("Polygons saved successfully!"); // Show notification on success
+        console.log("Polygons saved successfully!");
       } else {
         console.error("Failed to save polygons");
       }
@@ -125,12 +131,66 @@ const DrawableMap = () => {
 
   const logPolygons = () => {
     console.log("Current polygons:", polygons);
+    return polygons.map((polygon, index) => ({
+      index: index + 1,
+      name: polygon.name,
+    }));
   };
 
   useEffect(() => {
-    console.log("use effect logging")
-    console.log(polygons);
-  }, [polygons]);
+    if (isLoaded) {
+      loadFromDB();
+    }
+  }, [isLoaded]);
+
+  const loadFromDB = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/load-polygons");
+
+      if (response.ok) {
+        const result = await response.json();
+        const transformedPolygons = result.map((polygon) => ({
+          path: polygon.coordinates.map((coord) => ({
+            lat: coord.lat,
+            lng: coord.lng,
+          })),
+          name: polygon.name
+        }));
+
+        setPolygons(transformedPolygons);
+        logPolygons();
+      } else {
+        console.error("Failed to load polygons");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const clearMap = () => {
+    drawnPolygons.forEach((polygon) => polygon.setMap(null));
+    setDrawnPolygons([]);
+    setPolygons([]);
+    setFieldNames([]);
+  };
+
+  const handleFieldClick = (index) => {
+    if (selectedFieldIndex === index) {
+      setSelectedFieldIndex(null);
+      // Hide the selected polygon from the map
+      drawnPolygons.forEach((polygon, i) => {
+        if (i === index) {
+          polygon.setMap(null);
+        }
+      });
+    } else {
+      setSelectedFieldIndex(index);
+      // Show the selected polygon on the map
+      if (drawnPolygons[index]) {
+        drawnPolygons[index].setMap(map);
+      }
+    }
+  };
 
   const resetDB = async () => {
     try {
@@ -141,7 +201,7 @@ const DrawableMap = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
-        console.log("Database reset successfully!", 5000);
+        console.log("Database reset successfully!");
       } else {
         console.error("Failed to reset database");
       }
@@ -150,92 +210,44 @@ const DrawableMap = () => {
     }
   };
 
-  const loadFromDB = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/load-polygons");
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(result); // Directly log the result which should be an array of polygons
-        console.log("Polygons loaded successfully!");
-        const transformedPolygons = result.map((polygon) =>
-          polygon.coordinates.map((coord) => ({
-            lat: coord.lat,
-            lng: coord.lng,
-          }))
-        );
-
-        setPolygons(transformedPolygons);
-        transformedPolygons.forEach((polygon, index) => {
-          console.log(`Polygon ${index + 1}:`, polygon);
-        });
-      } else {
-        console.error("Failed to load polygons");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };//comment just to make a commit and push to db
-
-  const clearMap = () => {
-    // Create a copy of the drawnPolygons array
-    const polygonsToClear = [...drawnPolygons];
-
-    // Remove all polygons from the map
-    drawnPolygons.forEach((polygon) => polygon.setMap(null));
-
-    // Clear the state arrays
-    setDrawnPolygons([]);
-    setPolygons([]);
-  };
-
   return isLoaded ? (
-    <div className="map-container" style={{ position: "relative" }}>
-      <GoogleMap
-        zoom={18}
-        center={center}
-        onLoad={(map) => {
-          console.log("Google Maps is loaded");
-          setMap(map);
-        }}
-        mapContainerStyle={containerStyle}
-        onTilesLoaded={() => setCenter(defaultCenter)} // Reset to defaultCenter if needed
-      >
-        <DrawingManager
-          onLoad={(drawingManager) => {
-            console.log("Drawing manager is loaded");
-            setDrawingManager(drawingManager);
+    <div style={{ display: "flex" }}>
+      <Sidenav
+        logPolygons={logPolygons}
+        resetDB={resetDB}
+        sendToDb={sendToDb}
+        loadFromDB={loadFromDB}
+        clearMap={clearMap}
+        selectedFieldIndex={selectedFieldIndex}
+        onFieldClick={handleFieldClick}
+      />
+      <div className="map-container" style={{ flex: 1, position: "relative" }}>
+        <GoogleMap
+          zoom={18}
+          center={defaultCenter}
+          onLoad={(map) => {
+            console.log("Google Maps is loaded");
+            setMap(map);
           }}
-          onOverlayComplete={onOverlayComplete}
-          options={{
-            ...drawingManagerOptions,
-            drawingControl: !polygonDrawn, // Enable drawing controls when polygon is not drawn
-            drawingControlOptions: {
-              position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-              drawingModes: polygonDrawn
-                ? []
-                : [window.google.maps.drawing.OverlayType.POLYGON], // Allow polygon drawing if not drawn
-            },
-          }}
-        />
-
-        {polygons.map((polygon, index) => (
-          <Polygon key={index} paths={polygon} options={polygonOptions} />
-        ))}
-      </GoogleMap>
-      <div
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <button onClick={logPolygons}>Log Polygons</button>
-        <button onClick={resetDB}>Reset DB</button>
-        <button onClick={sendToDb}>Send Polygon to DB</button>
-        <button onClick={loadFromDB}>Load From DB</button>
-        <button onClick={clearMap}>clearMap</button>
+          mapContainerStyle={containerStyle}
+        >
+          <DrawingManager
+            onLoad={(drawingManager) => {
+              console.log("Drawing manager is loaded");
+              setDrawingManager(drawingManager);
+            }}
+            onOverlayComplete={onOverlayComplete}
+            options={drawingManagerOptions}
+          />
+          {polygons.map((polygon, index) => (
+            <Polygon
+              key={index}
+              paths={polygon.path}
+              options={polygonOptions}
+              visible={selectedFieldIndex === index}
+            />
+          ))}
+        </GoogleMap>
       </div>
     </div>
   ) : null;
