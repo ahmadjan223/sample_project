@@ -126,14 +126,6 @@ const DrawableMap = () => {
   const logPolygons = () => {
     console.log("Current polygons:", polygons);
   };
-  //fucntion to be defined
-  const DisplayPolygon=()=>{
-    const data =  [];
-    setPolygons(data);
-  }
-  const sendToDb = () => {
-    const data = polygons;
-  }
 
   useEffect(() => {
     console.log("use effect logging")

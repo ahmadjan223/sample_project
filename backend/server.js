@@ -7,6 +7,7 @@ const passport = require('passport');
 const session = require('express-session');
 require('./models/User'); // Ensure the User model is imported and registered
 require('./models/Field'); // Ensure the Field model is imported and registered
+require('./models/Polygon'); // Ensure the Polygon model is imported and registered
 require('./passport'); // Import Passport configuration
 
 const app = express();
@@ -24,8 +25,9 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected...'))
     .catch(err => console.log(err));
 
-// Import Field model
+// Import models
 const Field = mongoose.model('Field');
+const Polygon = mongoose.model('Polygon');
 
 // Route to save fields data to the database
 app.post('/api/fields', async (req, res) => {
@@ -46,13 +48,20 @@ app.post('/api/fields', async (req, res) => {
 });
 
 // Route to reset the database
-});
-
-// Route to reset the database
 app.post('/api/reset', async (req, res) => {
     try {
         await Polygon.deleteMany(); // Remove all documents from the Polygon collection
         res.status(200).json({ message: 'Database reset successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Route to get all polygons from the database
+app.get('/api/load-polygons', async (req, res) => {
+    try {
+        const polygons = await Polygon.find();
+        res.status(200).json(polygons);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
