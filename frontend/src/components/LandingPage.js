@@ -6,6 +6,8 @@ const LandingPage = () => {
     window.location.href = 'http://localhost:3000/auth/google'; // Replace with your backend URL if it's different
   };
 
+  
+
   return (
     <div style={styles.container}>
       <h1>Welcome to Our App</h1>

@@ -50,23 +50,60 @@ app.post("/api/fields", async (req, res) => {
   }
 });
 
-// Route to save a single polygon to the database
 app.post('/api/save-single-polygon', async (req, res) => {
-    const { coordinates, name } = req.body;
+  const { coordinates, name, userId } = req.body;
 
-    try {
-        // Create a new Polygon document
-        const newPolygon = new Polygon({
-            coordinates,
-            name
-        });
-
-        await newPolygon.save();
-
-        res.status(201).json({ message: 'Polygon saved successfully!' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  try {
+    // Validate input
+    if (!coordinates || !name || !userId) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
+
+    // Create a new polygon with the userId
+    const polygon = new Polygon({
+      coordinates,
+      name,
+      userId, // Add userId to the polygon data
+    });
+
+    await polygon.save();
+    res.status(200).json({ message: 'Polygon saved successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+
+
+// Route to reset the database for a specific user
+app.post('/api/reset/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Delete polygons that match the userId
+    const result = await Polygon.deleteMany({ userId });
+
+    res.status(200).json({ message: `Database reset for user ${userId}.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to get all polygons from the database
+app.get('/api/load-polygons/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find polygons that match the userId
+    const polygons = await Polygon.find({ userId });
+
+    res.status(200).json(polygons);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 
@@ -76,14 +113,14 @@ app.patch('/api/update-field/:name', async (req, res) => {
     const { name: newName } = req.body;
 
     try {
-        const polygon = await Polygon.findOne({ name });
+      const polygon = await Polygon.findOne({ name });
         if (!polygon) {
             return res.status(404).json({ message: 'Field not found' });
         }
 
         polygon.name = newName;
         await polygon.save();
-
+        
         res.status(200).json({ message: 'Field updated successfully!' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -93,13 +130,13 @@ app.patch('/api/update-field/:name', async (req, res) => {
 // Route to delete a field
 app.delete('/api/delete-field/:name', async (req, res) => {
     const { name } = req.params;
-
+    
     try {
         const result = await Polygon.deleteOne({ name });
         if (result.deletedCount === 0) {
             return res.status(404).json({ message: 'Field not found' });
         }
-
+        
         res.status(200).json({ message: 'Field deleted successfully!' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -107,26 +144,14 @@ app.delete('/api/delete-field/:name', async (req, res) => {
 });
 
 
-// Route to reset the database
-app.post("/api/reset", async (req, res) => {
-  try {
-    await Polygon.deleteMany(); // Remove all documents from the Polygon collection
-    res.status(200).json({ message: "Database reset successfully!" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
-// Route to get all polygons from the database
-app.get("/api/load-polygons", async (req, res) => {
-  try {
-    const polygons = await Polygon.find();
-    res.status(200).json(polygons);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Google authentication routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -138,9 +163,14 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
 });
 
 
-app.get("/api/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
+app.get('/api/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).json({ message: 'Logout failed' });
+    }
+    res.redirect('//localhost:3001'); // Adjust the redirect path as needed
+  });
 });
 
 app.get("/api/current_user", (req, res) => {
