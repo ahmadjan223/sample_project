@@ -1,4 +1,3 @@
-import Sidenav from "./sidenav";
 import React, { useState, useEffect } from "react";
 import {
   DrawingManager,
@@ -6,6 +5,7 @@ import {
   Polygon,
   useJsApiLoader,
 } from "@react-google-maps/api";
+import Sidenav from "./sidenav";
 
 const libraries = ["places", "drawing"];
 
@@ -85,7 +85,6 @@ const DrawableMap = ({ user }) => {
   };
 
   const sendSinglePolygonToDb = async (coordinates, name, userId) => {
-    console.log('Sending polygon to database:', name, coordinates, userId);
     try {
       const response = await fetch('http://localhost:3000/api/save-single-polygon', {
         method: 'POST',
@@ -132,9 +131,8 @@ const DrawableMap = ({ user }) => {
   };
 
   const logPolygons = () => {
-    console.log("Current polygons:", polygons);
     return polygons.map((polygon, index) => ({
-      index: index + 1,
+      index: index,
       name: polygon.name,
     }));
   };
@@ -145,10 +143,15 @@ const DrawableMap = ({ user }) => {
     }
   }, [isLoaded]);
 
+  useEffect(() => {
+    if (map) {
+      logPolygons();
+    }
+  }, [polygons, map]);
+
   const loadFromDB = async (userId) => {
     try {
       const response = await fetch(`http://localhost:3000/api/load-polygons/${encodeURIComponent(userId)}`);
-  
       if (response.ok) {
         const result = await response.json();
         const transformedPolygons = result.map((polygon) => ({
@@ -158,7 +161,6 @@ const DrawableMap = ({ user }) => {
           })),
           name: polygon.name
         }));
-  
         setPolygons(transformedPolygons);
         logPolygons();
       } else {
@@ -213,7 +215,7 @@ const DrawableMap = ({ user }) => {
   return isLoaded ? (
     <div style={{ display: "flex" }}>
       <Sidenav
-      isLoaded={isLoaded}
+        isLoaded={isLoaded}
         user={user}
         logPolygons={logPolygons}
         resetDB={() => resetDB(user.id)}
@@ -225,17 +227,15 @@ const DrawableMap = ({ user }) => {
       />
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         <GoogleMap
-          zoom={18}
+          zoom={17}
           center={defaultCenter}
           onLoad={(map) => {
-            console.log("Google Maps is loaded");
             setMap(map);
           }}
           mapContainerStyle={containerStyle}
         >
           <DrawingManager
             onLoad={(drawingManager) => {
-              console.log("Drawing manager is loaded");
               setDrawingManager(drawingManager);
             }}
             onOverlayComplete={onOverlayComplete}
