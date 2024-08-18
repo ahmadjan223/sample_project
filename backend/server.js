@@ -13,7 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const fieldRoutes = require('./routes/fieldRoutes');
 const connectDB = require('./config/db');
-const { getAccessToken } = require('./config/sentinelHubConfig');
+const { getAccessToken, downloadImagery } = require('./config/sentinelHubConfig');
 // code starts here
 const app = express();
 // Middleware
@@ -35,6 +35,7 @@ app.get('/test-token', async (req, res) => {
     res.status(500).send('Error obtaining token');
   }
 });
+// downloadImagery();
 
 // Route to save fields data to the database
 app.use(fieldRoutes);
