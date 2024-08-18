@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const fieldRoutes = require('./routes/fieldRoutes');
 const connectDB = require('./config/db');
+const { getAccessToken } = require('./config/sentinelHubConfig');
 // code starts here
 const app = express();
 // Middleware
@@ -25,6 +26,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 // MongoDB connection
 connectDB();
+//sentinel acess token
+app.get('/test-token', async (req, res) => {
+  try {
+    const token = await getAccessToken();
+    res.send(`Access Token: ${token}`);
+  } catch (error) {
+    res.status(500).send('Error obtaining token');
+  }
+});
+
 // Route to save fields data to the database
 app.use(fieldRoutes);
 // Google authentication routes
