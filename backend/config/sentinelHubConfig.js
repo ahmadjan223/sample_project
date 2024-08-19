@@ -26,8 +26,8 @@ const getAccessToken = async () => {
 // Function to construct the URL for WMS request
 const getWMSImageUrl = (accessToken) => {
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instance_id}`;
-  const layer = 'NATURAL-COLOR'; // Example layer
-  const bbox = '10.0,45.0,11.0,46.0'; // Bounding box coordinates
+  const layer = 'NDVI'; // Example layer
+  const bbox = '32.1,72.4,33.1,73.4'; // Bounding box coordinates
   const width = 512; // Image width
   const height = 512; // Image height
   const time = '2023-01-01/2023-01-31'; // Time range
@@ -40,7 +40,10 @@ const getWMSImageUrl = (accessToken) => {
 };
 
 // Function to get image URL
-const getImageUrl = async () => {
+const getImageUrl = async () => {/* The code snippet you provided is using a `try...catch` block in
+JavaScript to handle asynchronous code. Here's a breakdown of
+what's happening: */
+
   try {
     const accessToken = await getAccessToken();
     if (!accessToken) {
@@ -51,7 +54,7 @@ const getImageUrl = async () => {
     const wmsUrl = getWMSImageUrl(accessToken);
 
     // Log URL and make a request to test
-    console.log('Image URL:', wmsUrl);
+    console.log('Hardcoded:::', wmsUrl);
 
     // Optionally, you can make a request to the WMS URL to test if it's working
     const response = await axios.get(wmsUrl, {
