@@ -28,21 +28,22 @@ const getAccessToken = async () => {
     );
   }
 };
-
 // Function to construct the URL for WMS request
-const getWMSImageUrl = (accessToken, bbox) => {
+const getWMSImageUrl = (accessToken, bbox, geometry) => {
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instance_id}`;
-  const layer = "NDVI"; // Example layer
-  const width = 512; // Image width
-  const height = 512; // Image height
-  const time = "2024-01-01/2024-01-31"; // Time range
-  const format = "image/png"; // Image format
+  const layer = "NDVI";
+  const width = 512;
+  const height = 512;
+  const time = "2024-01-01/2024-01-31";
+  const format = "image/png";
 
   return (
     `${baseUrl}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
     `&LAYERS=${layer}&BBOX=${bbox}&WIDTH=${width}` +
     `&HEIGHT=${height}&FORMAT=${format}` +
-    `&TIME=${time}&CRS=EPSG:4326&SHOWLOGO=false`
+    `&TIME=${time}&CRS=EPSG:4326` +
+    `&GEOMETRY=${geometry}` + // Uncomment if needed
+    `&MAXCC=20&TRANSPARENT=TRUE&SHOWLOGO=false`
   );
 };
 
@@ -56,17 +57,22 @@ exports.getImageUrl = async (req, res) => {
     if (!Array.isArray(coordinates) || coordinates.length === 0) {
       throw new Error("Invalid coordinates format.");
     }
-
-    // Calculate BBOX values
     const lons = coordinates.map((coord) => coord.lng);
     const lats = coordinates.map((coord) => coord.lat);
     let minLon = Math.min(...lons);
     let maxLon = Math.max(...lons);
     let minLat = Math.min(...lats);
     let maxLat = Math.max(...lats);
+    const box = `${minLat},${minLon},${maxLat},${maxLon}`;
 
-    const bbox = `${minLat},${minLon},${maxLat},${maxLon}`;
-    // const bbox = "32.1,72.4,33.1,73.4";
+    let geomPoints = coordinates
+      .map((coord) => `${coord.lat} ${coord.lng}`)
+      .join(",");
+    geomPoints += `,${coordinates[0].lat} ${coordinates[0].lng}`;
+    const geometry = `POLYGON((${geomPoints}))`;
+
+    console.log(box);
+    console.log(geometry);
 
     // Obtain the access token
     const accessToken = await getAccessToken();
@@ -75,8 +81,9 @@ exports.getImageUrl = async (req, res) => {
     }
 
     // Construct WMS URL with access token and BBOX
-    const wmsUrl = getWMSImageUrl(accessToken, bbox);
-    console.log("BBOX:", bbox);
+    const wmsUrl = getWMSImageUrl(accessToken, box, geometry);
+
+    // console.log("BBOX:", bbox); // Ensure bbox is defined or move inside getWMSImageUrl
     console.log("Image URL:", wmsUrl);
 
     // Make a request to the WMS URL to fetch the image
@@ -90,6 +97,7 @@ exports.getImageUrl = async (req, res) => {
     // Respond with the WMS URL or the saved image path
     res.json({ imageUrl: wmsUrl });
   } catch (error) {
+    console.log("Coordinates at error:", coordinates);
     console.error("Error obtaining image URL:", error.message);
     res.status(500).json({ error: error.message });
   }

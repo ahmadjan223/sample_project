@@ -27,16 +27,21 @@ const getAccessToken = async () => {
 const getWMSImageUrl = (accessToken) => {
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instance_id}`;
   const layer = 'NDVI'; // Example layer
-  const bbox = '32.1,72.4,33.1,73.4'; // Bounding box coordinates
+  const bbox= '23.303643,42.679295,23.313643,42.699295' // Bounding box coordinates
   const width = 512; // Image width
   const height = 512; // Image height
   const time = '2023-01-01/2023-01-31'; // Time range
   const format = 'image/png'; // Image format
   
+  const geometry=encodeURIComponent("POLYGON((23.303643 42.696295,23.303643 42.699295,23.313643 42.699295,23.313643 42.679295,23.303643 42.696295))");
+
   return `${baseUrl}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
-         `&LAYERS=${layer}&BBOX=${bbox}&WIDTH=${width}` +
-         `&HEIGHT=${height}&FORMAT=${format}` +
-         `&TIME=${time}&CRS=EPSG:4326`;
+  `&LAYERS=${layer}&BBOX=${bbox}&WIDTH=${width}` +
+  `&HEIGHT=${height}&FORMAT=${format}` +
+  `&TIME=${time}&CRS=EPSG:4326` +
+  `&GEOMETRY=${geometry}` +
+  `&MAXCC=20&TRANSPARENT=TRUE&SHOWLOGO=false`;
+
 };
 
 // Function to get image URL
