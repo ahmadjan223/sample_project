@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { loadPolygon } from "./apiService";
 const Sidenav = ({
   user,
   logPolygons,
@@ -19,7 +20,7 @@ const Sidenav = ({
     if (isLoaded) {
       handleLogPolygons();
     }
-  });
+  },[]);
 
   const handleLogPolygons = () => {
     const polygons = logPolygons();
