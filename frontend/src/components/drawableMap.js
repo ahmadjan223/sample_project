@@ -225,6 +225,7 @@ const DrawableMap = ({ user }) => {
       const maxLon = Math.max(...lons);
       const minLat = Math.min(...lats);
       const maxLat = Math.max(...lats);
+      // alert(selectedPolygon)
 
       // Send coordinates to backend to get image URL
       try {
@@ -242,7 +243,7 @@ const DrawableMap = ({ user }) => {
         if (response.ok) {
           const data = await response.json();
           // Assuming `data.imageUrl` contains the image URL
-          window.open(data.imageUrl, "_blank");
+          // window.open(data.imageUrl, "_blank");
           displayImageLayerOnMap(data.imageUrl, minLat, minLon, maxLat, maxLon);
 
           // You can display the image URL as needed, e.g., set it in the state and display it in the UI.
