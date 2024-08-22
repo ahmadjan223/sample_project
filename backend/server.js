@@ -12,6 +12,7 @@ require("./models/Field"); // Ensure the Field model is imported and registered
 require("./models/Polygon"); // Ensure the Polygon model is imported and registered
 require("./config/passport"); // Import Passport configuration
 
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const fieldRoutes = require('./routes/fieldRoutes');

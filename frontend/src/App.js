@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
-import DrawableMap from './components/drawableMap';
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -17,7 +16,7 @@ const App = () => {
     }, []);
 
     if (user) {
-        return <DrawableMap user={user} />;
+        return <Dashboard user={user} />;
     }
 
     return <LandingPage></LandingPage>;
