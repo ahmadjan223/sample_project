@@ -15,11 +15,21 @@ const Dashboard = ({ user }) => {
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [fieldNames, setFieldNames] = useState([]);
+  const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
+
 
   useEffect(() => {
     DataFetch();
   }, []);
+  //for sentinel
+  useEffect(() => {
+    if(selectedFieldName){
+
+      handleFieldClick(selectedFieldName)
+    }
+  }, [selectedFieldName]);
+  
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
@@ -43,85 +53,66 @@ const Dashboard = ({ user }) => {
     setFieldNames([]);
   };
 
-  const handleFieldClick = async (index,name) => {
-    console.log(name)
-    if (selectedFieldIndex === index) {
-      setSelectedFieldIndex(null);
-      drawnPolygons.forEach((polygon, i) => {
-        if (i === index) {
-          polygon.setMap(null);
-        }
+  const handleFieldClick = async (name) => {
+    // Define a GeoJSON object for testing purposes
+    const selectedPolygon = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [72.95746253892514, 33.6566964018635],
+          [72.96556495277412, 33.661497251838135],
+          [72.97682594014998, 33.64869439510463],
+          [72.96432899400327, 33.64194927356759],
+          [72.95746253892514, 33.6566964018635]
+        ]
+      ]
+    };
+  
+    // Extract coordinates in the expected format
+    const coordinates = selectedPolygon.coordinates[0].map(([lng, lat]) => ({
+      lng,
+      lat
+    }));
+  
+    try {
+      const response = await fetch("http://localhost:3000/sentinel/getImageUrl", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ coordinates }), // Send the formatted coordinates
       });
-    } else {
-      setSelectedFieldIndex(index);
-      drawnPolygons.forEach((polygon, i) => {
-        polygon.setMap(i === index ? map : null);
-      });
-
-      // Show an alert with the coordinates of the selected field
-      const selectedPolygon = polygons[index];
-      const coordinates = selectedPolygon.path
-        .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
-        .join(", ");
-
-      const lons = selectedPolygon.path.map((coord) => coord.lng);
-      const lats = selectedPolygon.path.map((coord) => coord.lat);
-      const minLon = Math.min(...lons);
-      const maxLon = Math.max(...lons);
-      const minLat = Math.min(...lats);
-      const maxLat = Math.max(...lats);
-      // alert(selectedPolygon)
-
-      // Send coordinates to backend to get image URL
-      try {
-        const response = await fetch(
-          "http://localhost:3000/sentinel/getImageUrl",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ coordinates: selectedPolygon.path }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          // Assuming `data.imageUrl` contains the image URL
-          // window.open(data.imageUrl, "_blank");
-          displayImageLayerOnMap(data.imageUrl, minLat, minLon, maxLat, maxLon);
-
-          // You can display the image URL as needed, e.g., set it in the state and display it in the UI.
-        } else {
-          alert(
-            `The field could be too small for sentinel!
-          Coordinates of ${selectedPolygon.name}: ${coordinates}`
-          );
-          console.error("Error in backend response");
-        }
-      } catch (error) {
-        console.error("Error fetching image URL:", error.message);
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Image URL:", data.imageUrl);
+      } else {
+        const errorText = await response.text(); // Get detailed error message from response
+        console.error("Error in backend response:", errorText);
       }
+    } catch (error) {
+      console.error("Error fetching image URL:", error.message);
     }
   };
+  
+  
+  // const displayImageLayerOnMap = (imageUrl, minLat, minLon, maxLat, maxLon) => {
+  //   if (!map) {
+  //     console.error("Map is not loaded yet.");
+  //     return;
+  //   }
 
-  const displayImageLayerOnMap = (imageUrl, minLat, minLon, maxLat, maxLon) => {
-    if (!map) {
-      console.error("Map is not loaded yet.");
-      return;
-    }
+  //   const bounds = new window.google.maps.LatLngBounds(
+  //     new window.google.maps.LatLng(minLat, minLon), // SW corner
+  //     new window.google.maps.LatLng(maxLat, maxLon) // NE corner
+  //   );
 
-    const bounds = new window.google.maps.LatLngBounds(
-      new window.google.maps.LatLng(minLat, minLon), // SW corner
-      new window.google.maps.LatLng(maxLat, maxLon) // NE corner
-    );
-
-    const groundOverlay = new window.google.maps.GroundOverlay(
-      imageUrl,
-      bounds
-    );
-    groundOverlay.setMap(map);
-  };
+  //   const groundOverlay = new window.google.maps.GroundOverlay(
+  //     imageUrl,
+  //     bounds
+  //   );
+  //   groundOverlay.setMap(map);
+  // };
 
   const resetDB = async (userId) => {
     try {
@@ -155,8 +146,8 @@ const Dashboard = ({ user }) => {
           sendToDb(polygons);
         }}
         clearMap={clearMap}
-        selectedFieldIndex={selectedFieldIndex}
-        onFieldClick={handleFieldClick}
+        setSelectedFieldName={(name)=>{setSelectedFieldName(name);}}
+        // onFieldClick={handleFieldClick}
       />
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         {isLoaded && (

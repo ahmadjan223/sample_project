@@ -8,7 +8,7 @@ const SideNav
   user,
   resetDB,
   clearMap,
-  selectedFieldIndex,
+  setSelectedFieldName,
   onFieldClick,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
@@ -18,7 +18,10 @@ const SideNav
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
-    handlePolygons();
+    if(polygons){
+
+      handlePolygons();
+    }
   }, [polygons]);
 
   const handlePolygons = () => {
@@ -118,9 +121,9 @@ const SideNav
           <div key={field.name} className="field-item">
             <div
               className={`field-item-content ${
-                selectedFieldIndex === field.index ? "selected" : ""
+                true ? "selected" : ""
               }`}
-              onClick={() => onFieldClick(field.name,field.name)}
+              onClick={() => setSelectedFieldName(field.name)}
             >
               <div
                 className="field-name"
