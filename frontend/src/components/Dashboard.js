@@ -25,9 +25,9 @@ const Dashboard = ({ user }) => {
   //for sentinel
   useEffect(() => {
     if(selectedFieldName){
-
-      handleFieldClick(selectedFieldName)
+      
     }
+    handleFieldClick(selectedFieldName)
   }, [selectedFieldName]);
   
   //loading maps first and libs for drawing.
@@ -54,48 +54,29 @@ const Dashboard = ({ user }) => {
   };
 
   const handleFieldClick = async (name) => {
-    // Define a GeoJSON object for testing purposes
-    const selectedPolygon = {
-      type: "Polygon",
-      coordinates: [
-        [
-          [72.95746253892514, 33.6566964018635],
-          [72.96556495277412, 33.661497251838135],
-          [72.97682594014998, 33.64869439510463],
-          [72.96432899400327, 33.64194927356759],
-          [72.95746253892514, 33.6566964018635]
-        ]
-      ]
-    };
-  
-    // Extract coordinates in the expected format
-    const coordinates = selectedPolygon.coordinates[0].map(([lng, lat]) => ({
-      lng,
-      lat
-    }));
-  
-    try {
-      const response = await fetch("http://localhost:3000/sentinel/getImageUrl", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ coordinates }), // Send the formatted coordinates
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Image URL:", data.imageUrl);
-      } else {
-        const errorText = await response.text(); // Get detailed error message from response
-        console.error("Error in backend response:", errorText);
+    
+      const selectedPolygon = polygons.find((polygon) => polygon.name === name);
+      try {
+        const response = await fetch(
+          "http://localhost:3000/sentinel/getImageUrl",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ coordinates: selectedPolygon.path }),
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data.imageUrl);
+        }
+      } catch (error) {
+        console.error("Error fetching image URL:", error.message);
       }
-    } catch (error) {
-      console.error("Error fetching image URL:", error.message);
-    }
   };
-  
-  
+
   // const displayImageLayerOnMap = (imageUrl, minLat, minLon, maxLat, maxLon) => {
   //   if (!map) {
   //     console.error("Map is not loaded yet.");
