@@ -9,8 +9,7 @@ import Sidenav from "./sidenav";
 import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
 
 const libraries = ["places", "drawing"];
-
-const DrawableMap = ({ user }) => {
+const Dashboard = ({ user }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
@@ -282,4 +281,4 @@ const DrawableMap = ({ user }) => {
   ) : null;
 };
 
-export default DrawableMap;
+export default Dashboard;

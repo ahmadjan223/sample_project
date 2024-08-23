@@ -1,4 +1,4 @@
-export const sendSinglePolygonToDb = async (coordinates, name, userId) => {
+export const savePolygon = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
         "http://localhost:3000/api/save-single-polygon",

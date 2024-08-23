@@ -1,0 +1,75 @@
+.sidenav-container {
+    width: 250px;
+    height: 100vh;
+    background-color: #f4f4f4;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .user-info {
+    width: 100%;
+    background-color: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .user-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .user-name {
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .logout-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #f44336;
+  }
+  
+  .field-container {
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .field-item {
+    margin-bottom: 10px;
+  }
+  
+  .field-item-content {
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .field-item-content.selected {
+    background-color: #e0e0e0;
+  }
+  
+  .field-name {
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .field-details {
+    margin-top: 10px;
+  }
+  
+  .field-input {
+    margin-right: 10px;
+    padding: 5px;
+  }
+  
+  .btn-sm {
+    margin-right: 5px;
+  }

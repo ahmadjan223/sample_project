@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { loadPolygon } from "./apiService";
-const Sidenav = ({
+import "./SideNav.css";
+
+const SideNav
+ = ({
+  polygons,
+  isLoaded,
   user,
-  logPolygons,
   resetDB,
-  loadFromDB,
   clearMap,
   selectedFieldIndex,
   onFieldClick,
-  isLoaded,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [expandedField, setExpandedField] = useState(null);
@@ -17,14 +18,20 @@ const Sidenav = ({
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
-    if (isLoaded) {
-      handleLogPolygons();
-    }
-  },[]);
+    handleLogPolygons();
+  }, [polygons]);
+
+
+  const logPolygons = () => {
+    return polygons.map((polygon, index) => ({
+      index: index,
+      name: polygon.name,
+    }));
+  };
 
   const handleLogPolygons = () => {
-    const polygons = logPolygons();
-    const formattedPolygons = polygons.map((polygon, index) => ({
+    const response = logPolygons();
+    const formattedPolygons = response.map((polygon, index) => ({
       index: index,
       name: polygon.name || `Field ${index}`, // Use polygon.name if available
     }));
@@ -35,7 +42,7 @@ const Sidenav = ({
     setEditFieldName(name);
     setEditFieldIndex(polygonInfo.findIndex((field) => field.name === name));
 
-    await loadFromDB(user.id); // Ensure latest data is loaded
+    // await loadFromDB(user.id); // Ensure latest data is loaded
     handleLogPolygons();
   };
 
@@ -54,7 +61,7 @@ const Sidenav = ({
       clearMap();
 
       // Wait for loadFromDB to finish before calling handleLogPolygons
-      await loadFromDB(user.id);
+      // await loadFromDB(user.id);
       handleLogPolygons();
     } catch (error) {
       console.error("Error deleting field:", error);
@@ -85,7 +92,7 @@ const Sidenav = ({
       );
 
       // Wait for loadFromDB to finish before calling handleLogPolygons
-      await loadFromDB(user.id);
+      // await loadFromDB(user.id);
       handleLogPolygons();
     } catch (error) {
       console.error("Error updating field name:", error);
@@ -95,117 +102,36 @@ const Sidenav = ({
   const handleLogout = () => {
     window.location.href = "http://localhost:3000/api/logout";
   };
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
+
   return (
-    <div
-      style={{
-        width: "250px",
-        height: "100vh",
-        backgroundColor: "#f4f4f4",
-        padding: "10px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <div className="sidenav-container">
       {/* user info */}
-      <div
-        style={{
-          width: "100%",
-          backgroundColor: "#e0e0e0",
-          padding: "10px",
-          borderRadius: "5px",
-          textAlign: "center",
-        }}
-      >
+      <div className="user-info">
         {user.image && (
           <img
             src={user.image}
             alt={`${user.displayName}'s profile`}
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              marginBottom: "10px",
-            }}
+            className="user-image"
           />
         )}
-        <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-          {user.displayName}
-        </div>
-        {/* <div style={{ color: "#888" }}>ID: {user.id}</div> */}
-        <i
-          className="material-icons"
-          onClick={handleLogout}
-          style={{
-            fontSize: "24px",
-            cursor: "pointer",
-            color: "#f44336",
-          }}
-        >
+        <div className="user-name">{user.displayName}</div>
+        <i className="material-icons logout-icon" onClick={handleLogout}>
           logout
         </i>
       </div>
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
 
       {/* field */}
-      <div style={{ marginTop: "20px", width: "100%" }}>
+      <div className="field-container">
         {polygonInfo.map((field) => (
-          <div key={field.name} style={{ marginBottom: "10px" }}>
+          <div key={field.name} className="field-item">
             <div
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "15px", // Rounded edges
-                padding: "10px",
-                backgroundColor:
-                  selectedFieldIndex === field.index ? "#e0e0e0" : "#fff",
-                cursor: "pointer",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
-              }}
+              className={`field-item-content ${
+                selectedFieldIndex === field.index ? "selected" : ""
+              }`}
               onClick={() => onFieldClick(field.index)}
             >
               <div
-                style={{ cursor: "pointer", fontWeight: "bold" }}
+                className="field-name"
                 onClick={() =>
                   setExpandedField(
                     expandedField === field.name ? null : field.name
@@ -215,7 +141,7 @@ const Sidenav = ({
                 {expandedField === field.name ? "−" : "+"} {field.name}
               </div>
               {expandedField === field.name && (
-                <div style={{ marginTop: "10px" }}>
+                <div className="field-details">
                   {editFieldIndex ===
                   polygonInfo.findIndex((f) => f.name === field.name) ? (
                     <div>
@@ -223,18 +149,17 @@ const Sidenav = ({
                         type="text"
                         value={editFieldName}
                         onChange={(e) => setEditFieldName(e.target.value)}
-                        style={{ marginRight: "10px", padding: "5px" }}
+                        className="field-input"
                       />
                       <button
                         onClick={() => saveFieldName(field.name)}
-                        className="btn btn-primary btn-sm" // Smaller button
-                        style={{ marginRight: "5px" }}
+                        className="btn btn-primary btn-sm"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditFieldIndex(null)}
-                        className="btn btn-secondary btn-sm" // Smaller button
+                        className="btn btn-secondary btn-sm"
                       >
                         Cancel
                       </button>
@@ -243,14 +168,13 @@ const Sidenav = ({
                     <div>
                       <button
                         onClick={() => handleEditFieldName(field.name)}
-                        className="btn btn-warning btn-sm" // Smaller button
-                        style={{ marginRight: "10px" }}
+                        className="btn btn-warning btn-sm"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteField(field.name)}
-                        className="btn btn-danger btn-sm" // Smaller button
+                        className="btn btn-danger btn-sm"
                       >
                         Delete
                       </button>
@@ -262,25 +186,8 @@ const Sidenav = ({
           </div>
         ))}
       </div>
-
-      {/* buttons */}
-      {/* <button
-        onClick={handleLogPolygons}
-        className="btn btn-primary"
-        style={{ margin: "5px" }}
-      >
-        Load
-      </button> */}
-      {/* 
-      <button
-        onClick={handleLogout}
-        className="btn btn-danger"
-        style={{ margin: "5px" }}
-      >
-        Logout
-      </button> */}
     </div>
   );
 };
 
-export default Sidenav;
+export default SideNav;
