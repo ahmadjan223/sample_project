@@ -18,20 +18,12 @@ const SideNav
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
-    handleLogPolygons();
+    handlePolygons();
   }, [polygons]);
 
+  const handlePolygons = () => {
 
-  const logPolygons = () => {
-    return polygons.map((polygon, index) => ({
-      index: index,
-      name: polygon.name,
-    }));
-  };
-
-  const handleLogPolygons = () => {
-    const response = logPolygons();
-    const formattedPolygons = response.map((polygon, index) => ({
+    const formattedPolygons = polygons.map((polygon, index) => ({
       index: index,
       name: polygon.name || `Field ${index}`, // Use polygon.name if available
     }));
@@ -43,7 +35,7 @@ const SideNav
     setEditFieldIndex(polygonInfo.findIndex((field) => field.name === name));
 
     // await loadFromDB(user.id); // Ensure latest data is loaded
-    handleLogPolygons();
+    handlePolygons();
   };
 
   const handleDeleteField = async (name) => {
@@ -62,7 +54,7 @@ const SideNav
 
       // Wait for loadFromDB to finish before calling handleLogPolygons
       // await loadFromDB(user.id);
-      handleLogPolygons();
+      handlePolygons();
     } catch (error) {
       console.error("Error deleting field:", error);
     }
@@ -93,7 +85,7 @@ const SideNav
 
       // Wait for loadFromDB to finish before calling handleLogPolygons
       // await loadFromDB(user.id);
-      handleLogPolygons();
+      handlePolygons();
     } catch (error) {
       console.error("Error updating field name:", error);
     }
@@ -128,7 +120,7 @@ const SideNav
               className={`field-item-content ${
                 selectedFieldIndex === field.index ? "selected" : ""
               }`}
-              onClick={() => onFieldClick(field.index)}
+              onClick={() => onFieldClick(field.name,field.name)}
             >
               <div
                 className="field-name"
@@ -145,7 +137,7 @@ const SideNav
                   {editFieldIndex ===
                   polygonInfo.findIndex((f) => f.name === field.name) ? (
                     <div>
-                      <input
+                      {/* <input
                         type="text"
                         value={editFieldName}
                         onChange={(e) => setEditFieldName(e.target.value)}
@@ -162,7 +154,7 @@ const SideNav
                         className="btn btn-secondary btn-sm"
                       >
                         Cancel
-                      </button>
+                      </button> */}
                     </div>
                   ) : (
                     <div>

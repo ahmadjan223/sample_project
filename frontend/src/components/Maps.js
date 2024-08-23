@@ -6,7 +6,7 @@ import {
 } from "@react-google-maps/api";
 import { savePolygon, sendToDb, loadPolygon } from "./apiService";
 const libraries = ["places", "drawing"];
-const Maps = ({user, polygons}) => {
+const Maps = ({user, polygons,DataFetch}) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const defaultCenter = {
@@ -68,8 +68,10 @@ const Maps = ({user, polygons}) => {
       // ]);
 
       // Save to database
-      savePolygon(newPolygonPath, name, user.id); 
+      await savePolygon(newPolygonPath, name, user.id); 
       newPolygon.setMap(null);
+      // to trigger the data fetch
+      DataFetch();
     } else {
       alert("The name is already taken. Please choose a different name.");
       newPolygon.setMap(null);
@@ -92,7 +94,6 @@ const Maps = ({user, polygons}) => {
           center={defaultCenter}
           onLoad={(map) => {
             setMap(map);
-            console.log("i am getting load mutiple times");
           }}
           mapContainerStyle={containerStyle}
         >

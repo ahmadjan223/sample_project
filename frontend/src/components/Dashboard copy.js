@@ -5,11 +5,11 @@ import {
   Polygon,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import Sidenav from "./sidenav";
-import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
+// import Sidenav from "./sidenav";
 
 const libraries = ["places", "drawing"];
-const Dashboard = ({ user }) => {
+
+const DrawableMap = ({ user }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
@@ -100,6 +100,55 @@ const Dashboard = ({ user }) => {
     }
   };
 
+  const sendSinglePolygonToDb = async (coordinates, name, userId) => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/save-single-polygon",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            coordinates,
+            name,
+            userId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to save polygon:", errorData.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const sendToDb = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/fields", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ polygons }),
+      });
+
+      if (response.ok) {
+        console.log("Polygons saved successfully!");
+      } else {
+        console.error("Failed to save polygons");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const logPolygons = () => {
     return polygons.map((polygon, index) => ({
       index: index,
@@ -118,6 +167,30 @@ const Dashboard = ({ user }) => {
       logPolygons();
     }
   }, [polygons, map]);
+
+  const loadFromDB = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/load-polygons/${encodeURIComponent(userId)}`
+      );
+      if (response.ok) {
+        const result = await response.json();
+        const transformedPolygons = result.map((polygon) => ({
+          path: polygon.coordinates.map((coord) => ({
+            lat: coord.lat,
+            lng: coord.lng,
+          })),
+          name: polygon.name,
+        }));
+        setPolygons(transformedPolygons);
+        logPolygons();
+      } else {
+        console.error("Failed to load polygons");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const clearMap = () => {
     drawnPolygons.forEach((polygon) => polygon.setMap(null));
@@ -225,15 +298,6 @@ const Dashboard = ({ user }) => {
       console.error("Error:", error);
     }
   };
-  const loadFromDB = async (userId) => {
-    try {
-      const tPolygons = await loadPolygon(userId);
-      setPolygons(tPolygons);
-      logPolygons();
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return isLoaded ? (
     <div style={{ display: "flex" }}>
@@ -242,9 +306,7 @@ const Dashboard = ({ user }) => {
         user={user}
         logPolygons={logPolygons}
         resetDB={() => resetDB(user.id)}
-        sendToDb={() => {
-          sendToDb(polygons);
-        }}
+        sendToDb={sendToDb}
         loadFromDB={() => loadFromDB(user.id)}
         clearMap={clearMap}
         selectedFieldIndex={selectedFieldIndex}
@@ -256,7 +318,6 @@ const Dashboard = ({ user }) => {
           center={defaultCenter}
           onLoad={(map) => {
             setMap(map);
-            console.log("i am getting load mutiple times");
           }}
           mapContainerStyle={containerStyle}
         >
@@ -281,4 +342,4 @@ const Dashboard = ({ user }) => {
   ) : null;
 };
 
-export default Dashboard;
+export default DrawableMap;

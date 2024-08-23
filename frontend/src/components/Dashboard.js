@@ -18,7 +18,7 @@ const Dashboard = ({ user }) => {
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
 
   useEffect(() => {
-    DataFetch(user.id);
+    DataFetch();
   }, []);
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
@@ -26,11 +26,11 @@ const Dashboard = ({ user }) => {
     libraries,
   });
   //fetching polygons from db
-  const DataFetch = async (userId) => {
+  const DataFetch = async () => {
     try {
-      const response = await loadPolygon(userId);
+      const response = await loadPolygon(user.id);
       setPolygons(response);
-      console.log("polygon array of this user have arrived in Dashboard ");
+      console.log("data fetched from db");
     } catch (error) {
       console.log(error);
     }
@@ -43,7 +43,8 @@ const Dashboard = ({ user }) => {
     setFieldNames([]);
   };
 
-  const handleFieldClick = async (index) => {
+  const handleFieldClick = async (index,name) => {
+    console.log(name)
     if (selectedFieldIndex === index) {
       setSelectedFieldIndex(null);
       drawnPolygons.forEach((polygon, i) => {
@@ -159,7 +160,7 @@ const Dashboard = ({ user }) => {
       />
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         {isLoaded && (
-          <Maps user={user} polygons={polygons}></Maps>
+          <Maps user={user} polygons={polygons} DataFetch={DataFetch}></Maps>
         )}
       </div>
     </div>
