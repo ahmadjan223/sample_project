@@ -17,7 +17,7 @@ const Dashboard = ({ user }) => {
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
-  const [layerDisplay, setLayerDisplay] = useState(null);
+  const [layerDisplay, setLayerDisplay] = useState([]);
 
 
   useEffect(() => {
