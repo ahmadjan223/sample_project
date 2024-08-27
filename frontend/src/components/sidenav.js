@@ -94,6 +94,11 @@ const Sidenav = ({
   const handleLogout = () => {
     window.location.href = "http://localhost:3000/api/logout";
   };
+  const [userSelectedIndex, setUserSelectedIndex] = useState("");
+  const temp = async(index) => {
+    await setUserSelectedIndex(index);
+    // alert("User has selected index:" + userSelectedIndex);
+  };
   {
     /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
   }
@@ -201,7 +206,7 @@ const Sidenav = ({
                 cursor: "pointer",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
               }}
-              onClick={() => onFieldClick(field.index)}
+              onClick={() => temp(field.index)}
             >
               <div
                 style={{ cursor: "pointer", fontWeight: "bold" }}
@@ -240,6 +245,13 @@ const Sidenav = ({
                     </div>
                   ) : (
                     <div>
+                      <button
+                      onClick={() => onFieldClick(field.index)}
+                        className="btn btn-primary btn-sm"
+                        style={{ marginRight: "10px" }}
+                      >
+                        {selectedFieldIndex === userSelectedIndex ? "Hide NDVI":"Show NDVI"}
+                      </button>
                       <button
                         onClick={() => handleEditFieldName(field.name)}
                         className="btn btn-warning btn-sm" // Smaller button

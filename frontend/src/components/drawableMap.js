@@ -6,6 +6,7 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import Sidenav from "./sidenav";
+import Undernav from "./under_nav";
 
 const libraries = ["places", "drawing"];
 
@@ -198,85 +199,126 @@ const DrawableMap = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
+  const [imageOverlay, setImageOverlay] = useState(null);
 
   const handleFieldClick = async (index) => {
-    if (selectedFieldIndex === index) {
-      setSelectedFieldIndex(null);
-      drawnPolygons.forEach((polygon, i) => {
-        if (i === index) {
-          polygon.setMap(null);
-        }
-      });
+    const isSelected = selectedFieldIndex === index;
+    setSelectedFieldIndex(isSelected ? null : index);
+  
+    drawnPolygons.forEach((polygon, i) => {
+      polygon.setMap(i === index && !isSelected ? map : null);
+    });
+  
+    if (isSelected) {
+      clearImageOverlay();
     } else {
-      setSelectedFieldIndex(index);
-      drawnPolygons.forEach((polygon, i) => {
-        polygon.setMap(i === index ? map : null);
+      loadFieldImage(index);
+    }
+  };
+  
+  
+  const loadFieldImage = async (index) => {
+    const selectedPolygon = polygons[index];
+    const { path } = selectedPolygon;
+    const [lons, lats] = [path.map(c => c.lng), path.map(c => c.lat)];
+    const [minLon, maxLon] = [Math.min(...lons), Math.max(...lons)];
+    const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
+    
+    try {
+      const response = await fetch("http://localhost:3000/sentinel/getImageUrl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coordinates: path }),
       });
-
-      // Show an alert with the coordinates of the selected field
-      const selectedPolygon = polygons[index];
-      const coordinates = selectedPolygon.path
-        .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
-        .join(", ");
-
-      const lons = selectedPolygon.path.map((coord) => coord.lng);
-      const lats = selectedPolygon.path.map((coord) => coord.lat);
-      const minLon = Math.min(...lons);
-      const maxLon = Math.max(...lons);
-      const minLat = Math.min(...lats);
-      const maxLat = Math.max(...lats);
-      // alert(selectedPolygon)
-
-      // Send coordinates to backend to get image URL
-      try {
-        const response = await fetch(
-          "http://localhost:3000/sentinel/getImageUrl",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ coordinates: selectedPolygon.path }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          // Assuming `data.imageUrl` contains the image URL
-          // window.open(data.imageUrl, "_blank");
-          displayImageLayerOnMap(data.imageUrl, minLat, minLon, maxLat, maxLon);
-
-          // You can display the image URL as needed, e.g., set it in the state and display it in the UI.
-        } else {
-          alert(
-            `The field could be too small for sentinel!
-          Coordinates of ${selectedPolygon.name}: ${coordinates}`
-          );
-          console.error("Error in backend response");
-        }
-      } catch (error) {
-        console.error("Error fetching image URL:", error.message);
+  
+      if (response.ok) {
+        const { imageUrl } = await response.json();
+        updateImageOverlay(imageUrl, minLat, minLon, maxLat, maxLon);
+      } else {
+        showAlert(selectedPolygon.name, path);
       }
+    } catch (error) {
+      console.error("Error fetching image URL:", error.message);
+    }
+  };
+  
+  const showAlert = (name, path) => {
+    const coordinates = path
+      .map(coord => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
+      .join(", ");
+    alert(`The field could be too small for Sentinel! Coordinates of ${name}: ${coordinates}`);
+  };
+  const clearImageOverlay = () => {
+    if (imageOverlay) {
+      imageOverlay.setMap(null);
+      setImageOverlay(null);
     }
   };
 
-  const displayImageLayerOnMap = (imageUrl, minLat, minLon, maxLat, maxLon) => {
+  
+  const updateImageOverlay = (imageUrl, minLat, minLon, maxLat, maxLon) => {
     if (!map) {
       console.error("Map is not loaded yet.");
       return;
     }
-
+    
+    clearImageOverlay();
+  
     const bounds = new window.google.maps.LatLngBounds(
-      new window.google.maps.LatLng(minLat, minLon), // SW corner
-      new window.google.maps.LatLng(maxLat, maxLon) // NE corner
+      new window.google.maps.LatLng(minLat, minLon),
+      new window.google.maps.LatLng(maxLat, maxLon)
     );
-
-    const groundOverlay = new window.google.maps.GroundOverlay(
-      imageUrl,
-      bounds
-    );
-    groundOverlay.setMap(map);
+  
+    const overlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
+    overlay.setMap(map);
+    setImageOverlay(overlay);
+    map.addListener("mousemove", (event) => {
+      const { latLng } = event;
+      const { lat, lng } = latLng.toJSON();
+      getColorAtPoint(lat, lng, imageUrl, minLat, minLon, maxLat, maxLon);
+    });
   };
+  const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLon) => {
+    const image = new Image();
+    //downlaod the image on the frontend and then use that image to fix the cross origin issueue
+    
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      
+      const [width, height] = [image.width, image.height];
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(image, 0, 0, width, height);
+      
+      // Convert lat/lng to canvas coordinates
+      // This will depend on your coordinate system
+      const a = (lng - minLon) / (maxLon - minLon) * width;
+      const b = (lat - minLat) / (maxLat - minLat) * height;
+      const [x,y] = [a,b]
+  
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+      console.log(`Color at (${x}, ${y}): ${color}`);
+      
+      // Show color on UI
+      showColorAtCursor(color);
+    };
+  };
+
+  const showColorAtCursor = (color) => {
+    // Display the color value on the UI
+    // This could be a tooltip or any other UI element
+    const colorDisplayElement = document.getElementById("colorDisplay");
+    colorDisplayElement.style.backgroundColor = color;
+    colorDisplayElement.textContent = color;
+  };
+  
+  
+
+  
+
+
 
   const resetDB = async (userId) => {
     try {
@@ -312,34 +354,38 @@ const DrawableMap = ({ user }) => {
         selectedFieldIndex={selectedFieldIndex}
         onFieldClick={handleFieldClick}
       />
-      <div className="map-container" style={{ flex: 1, position: "relative" }}>
-        <GoogleMap
-          zoom={13}
-          center={defaultCenter}
-          onLoad={(map) => {
-            setMap(map);
-          }}
-          mapContainerStyle={containerStyle}
-        >
-          <DrawingManager
-            onLoad={(drawingManager) => {
-              setDrawingManager(drawingManager);
+      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+        <div className="map-container" style={{ height: "60vh", position: "relative" }}>
+          <GoogleMap
+            zoom={13}
+            center={defaultCenter}
+            onLoad={(map) => {
+              setMap(map);
             }}
-            onOverlayComplete={onOverlayComplete}
-            options={drawingManagerOptions}
-          />
-          {polygons.map((polygon, index) => (
-            <Polygon
-              key={index}
-              paths={polygon.path}
-              options={polygonOptions}
-              visible={selectedFieldIndex === index}
+            mapContainerStyle={containerStyle}
+          >
+            <DrawingManager
+              onLoad={(drawingManager) => {
+                setDrawingManager(drawingManager);
+              }}
+              onOverlayComplete={onOverlayComplete}
+              options={drawingManagerOptions}
             />
-          ))}
-        </GoogleMap>
+            {polygons.map((polygon, index) => (
+              <Polygon
+                key={index}
+                paths={polygon.path}
+                options={polygonOptions}
+                visible={selectedFieldIndex === index}
+              />
+            ))}
+          </GoogleMap>
+        </div>
+        {/* <Undernav /> */}
       </div>
     </div>
   ) : null;
+  
 };
 
 export default DrawableMap;
