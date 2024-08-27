@@ -13,10 +13,11 @@ const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
   const [map, setMap] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
-  const [polygons, setPolygons] = useState([]);
+  const [polygons, setPolygons] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
+  const [layerDisplay, setLayerDisplay] = useState(null);
 
 
   useEffect(() => {
@@ -25,9 +26,9 @@ const Dashboard = ({ user }) => {
   //for sentinel
   useEffect(() => {
     if(selectedFieldName){
-      
+      handleFieldClick(selectedFieldName)
+      console.log("selected field name", selectedFieldName);
     }
-    handleFieldClick(selectedFieldName)
   }, [selectedFieldName]);
   
   //loading maps first and libs for drawing.
@@ -54,8 +55,18 @@ const Dashboard = ({ user }) => {
   };
 
   const handleFieldClick = async (name) => {
-    
       const selectedPolygon = polygons.find((polygon) => polygon.name === name);
+      const coordinates = selectedPolygon.path
+      .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
+      .join(", ");
+
+    const lons = selectedPolygon.path.map((coord) => coord.lng);
+    const lats = selectedPolygon.path.map((coord) => coord.lat);
+    const minLon = Math.min(...lons);
+    const maxLon = Math.max(...lons);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    
       try {
         const response = await fetch(
           "http://localhost:3000/sentinel/getImageUrl",
@@ -70,7 +81,15 @@ const Dashboard = ({ user }) => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data.imageUrl);
+          const propsArray = [
+            data.imageUrl,
+            minLat,
+            minLon,
+            maxLat,
+            maxLon
+          ];
+          setLayerDisplay(propsArray);
+          console.log(layerDisplay)
         }
       } catch (error) {
         console.error("Error fetching image URL:", error.message);
@@ -131,8 +150,8 @@ const Dashboard = ({ user }) => {
         // onFieldClick={handleFieldClick}
       />
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
-        {isLoaded && (
-          <Maps user={user} polygons={polygons} DataFetch={DataFetch}></Maps>
+        {(isLoaded) &&  (
+          <Maps user={user} polygons={polygons} DataFetch={DataFetch} layerDisplay = {layerDisplay}></Maps>
         )}
       </div>
     </div>

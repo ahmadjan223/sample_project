@@ -25,7 +25,7 @@ const SideNav
   }, [polygons]);
 
   const handlePolygons = () => {
-
+    console.log("handle polygon is called in navbar once data is fetched");
     const formattedPolygons = polygons.map((polygon, index) => ({
       index: index,
       name: polygon.name || `Field ${index}`, // Use polygon.name if available

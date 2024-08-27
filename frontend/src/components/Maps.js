@@ -6,7 +6,7 @@ import {
 } from "@react-google-maps/api";
 import { savePolygon, sendToDb, loadPolygon } from "./apiService";
 const libraries = ["places", "drawing"];
-const Maps = ({user, polygons,DataFetch}) => {
+const Maps = ({user, polygons,DataFetch,layerDisplay }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const defaultCenter = {
@@ -35,6 +35,13 @@ const Maps = ({user, polygons,DataFetch}) => {
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   }
+  useEffect(() => {
+    console.log('use effect in maps is called',layerDisplay)
+    displayImageLayerOnMap();
+      // Cleanup function to clear the timeout if the component unmounts or propsArray changes
+  }, [layerDisplay]);
+  
+
   const onOverlayComplete = async (event) => {
     const newPolygon = event.overlay;
     //a minimal lat long map we be obtained
@@ -86,7 +93,26 @@ const Maps = ({user, polygons,DataFetch}) => {
       });
     }
   };
+  const displayImageLayerOnMap = () => {
+    console.log('i am getting triggered i am layer on map')
+    const [imageUrl, minLat, minLon, maxLat, maxLon] = layerDisplay;
+    console.log(imageUrl);
+    if (!map) {
+      console.error("Map is not loaded yet.");
+      return;
+    }
 
+    const bounds = new window.google.maps.LatLngBounds(
+      new window.google.maps.LatLng(minLat, minLon), // SW corner
+      new window.google.maps.LatLng(maxLat, maxLon) // NE corner
+    );
+
+    const groundOverlay = new window.google.maps.GroundOverlay(
+      imageUrl,
+      bounds
+    );
+    groundOverlay.setMap(map);
+  };
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
         <GoogleMap
