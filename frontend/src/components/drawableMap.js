@@ -201,7 +201,8 @@ const DrawableMap = ({ user }) => {
   };
   const [imageOverlay, setImageOverlay] = useState(null);
 
-  const handleFieldClick = async (index,layer) => {
+  const handleFieldClick = async (index,layer, timeRange) => {
+    // alert(timeRange);
     const isSelected = selectedFieldIndex === index;
     setSelectedFieldIndex(isSelected ? null : index);
   
@@ -212,12 +213,12 @@ const DrawableMap = ({ user }) => {
     if (isSelected) {
       clearImageOverlay();
     } else {
-      loadFieldImage(index, layer);
+      loadFieldImage(index, layer,timeRange);
     }
   };
   
   
-  const loadFieldImage = async (index,layer) => {
+  const loadFieldImage = async (index,layer,timeRange) => {
     const selectedPolygon = polygons[index];
     const { path } = selectedPolygon;
     const [lons, lats] = [path.map(c => c.lng), path.map(c => c.lat)];
@@ -225,10 +226,14 @@ const DrawableMap = ({ user }) => {
     const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
     
     try {
+      // alert(timeRange);
+      const requestBody = JSON.stringify({ coordinates: path, layer, time: timeRange });
+      console.log("Request Body:", requestBody); // Log the request body
+
       const response = await fetch("http://localhost:3000/sentinel/getImageUrl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ coordinates: path, layer:layer }),
+        body: requestBody,
       });
   
       if (response.ok) {

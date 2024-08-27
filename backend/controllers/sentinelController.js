@@ -29,12 +29,12 @@ const getAccessToken = async () => {
   }
 };
 // Function to construct the URL for WMS request
-const getWMSImageUrl = (accessToken, bbox, geometry,layer) => {
+const getWMSImageUrl = (accessToken, bbox, geometry,layer,time) => {
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instance_id}`;
   // const layer = "NDVI";
   const width = 512;
   const height = 512;
-  const time = "2024-01-01/2024-01-31";
+//  const time = "2024-01-01/2024-01-31";
   const format = "image/png";
 
   return (
@@ -51,7 +51,7 @@ const getWMSImageUrl = (accessToken, bbox, geometry,layer) => {
 exports.getImageUrl = async (req, res) => {
   try {
     console.log("\n");
-    const { coordinates,layer } = req.body;
+    const { coordinates,layer,time } = req.body;
 
     // Ensure coordinates is an array of objects with lng and lat properties
     if (!Array.isArray(coordinates) || coordinates.length === 0) {
@@ -81,10 +81,11 @@ exports.getImageUrl = async (req, res) => {
     }
 
     // Construct WMS URL with access token and BBOX
-    const wmsUrl = getWMSImageUrl(accessToken, box, geometry,layer);
+    const wmsUrl = getWMSImageUrl(accessToken, box, geometry,layer,time);
 
     // console.log("BBOX:", bbox); // Ensure bbox is defined or move inside getWMSImageUrl
     console.log("Image URL:", wmsUrl);
+    console.log("\n"+time);
 
     // Make a request to the WMS URL to fetch the image
     const response = await axios.get(wmsUrl, {
