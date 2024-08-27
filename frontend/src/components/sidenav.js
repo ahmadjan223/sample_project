@@ -13,6 +13,7 @@ const Sidenav = ({
   const [expandedField, setExpandedField] = useState(null);
   const [editFieldIndex, setEditFieldIndex] = useState(null);
   const [editFieldName, setEditFieldName] = useState("");
+  const [layer, setLayer] = useState("NDVI"); // Default value is 'NDVI'
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
@@ -20,6 +21,9 @@ const Sidenav = ({
       handleLogPolygons();
     }
   });
+  const handleLayerChange = (event) => {
+    setLayer(event.target.value);
+  };
 
   const handleLogPolygons = () => {
     const polygons = logPolygons();
@@ -95,7 +99,7 @@ const Sidenav = ({
     window.location.href = "http://localhost:3000/api/logout";
   };
   const [userSelectedIndex, setUserSelectedIndex] = useState("");
-  const temp = async(index) => {
+  const temp = async (index) => {
     await setUserSelectedIndex(index);
     // alert("User has selected index:" + userSelectedIndex);
   };
@@ -194,6 +198,8 @@ const Sidenav = ({
 
       {/* field */}
       <div style={{ marginTop: "20px", width: "100%" }}>
+      <h6 style={{  fontWeight: "bold", textAlign: "center" }}>User Bar</h6>
+
         {polygonInfo.map((field) => (
           <div key={field.name} style={{ marginBottom: "10px" }}>
             <div
@@ -246,11 +252,13 @@ const Sidenav = ({
                   ) : (
                     <div>
                       <button
-                      onClick={() => onFieldClick(field.index)}
+                        onClick={() => onFieldClick(field.index, layer)}
                         className="btn btn-primary btn-sm"
                         style={{ marginRight: "10px" }}
                       >
-                        {selectedFieldIndex === userSelectedIndex ? "Hide NDVI":"Show NDVI"}
+                        {selectedFieldIndex === userSelectedIndex
+                          ? `Hide ${layer}`
+                          : `Show ${layer}`}
                       </button>
                       <button
                         onClick={() => handleEditFieldName(field.name)}
@@ -273,7 +281,30 @@ const Sidenav = ({
           </div>
         ))}
       </div>
-
+      <div>
+        <h6
+          style={{ marginTop: "20px", fontWeight: "bold", textAlign: "center" }}
+        >
+          Control Bar
+        </h6>
+        <select
+          className="form-select"
+          style={{ marginTop: "10px" }}
+          value={layer}
+          onChange={handleLayerChange}
+        >
+          <option value="AGRICULTURE">Agriculture</option>
+          <option value="BATHYMETRIC">Bathymetric</option>
+          <option value="FALSE-COLOR-URBAN">False color (urban)</option>
+          <option value="FALSE-COLOR">False color (vegetation)</option>
+          <option value="GEOLOGY">Geology</option>
+          <option value="MOISTURE-INDEX">Moisture Index</option>
+          <option value="NATURAL-COLOR">Natural color (true color)</option>
+          <option value="NDVI">NDVI</option>
+          <option value="SWIR">SWIR</option>
+          <option value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</option>
+        </select>
+      </div>
       {/* buttons */}
       {/* <button
         onClick={handleLogPolygons}
