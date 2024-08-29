@@ -8,6 +8,7 @@ import {
 import SideNav from "./SideNav";
 import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
 import Maps from "./Maps";
+import BottomBar from "./bottomBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -149,10 +150,16 @@ const Dashboard = ({ user }) => {
         setSelectedFieldName={(name)=>{setSelectedFieldName(name);}}
         // onFieldClick={handleFieldClick}
       />
+      <div style={{flex:1, flexDirection:'row'}}>
+
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         {(isLoaded) &&  (
           <Maps user={user} polygons={polygons} DataFetch={DataFetch} layerDisplay = {layerDisplay}></Maps>
         )}
+      </div>
+      <div>
+        <BottomBar></BottomBar>
+      </div>
       </div>
     </div>
   );
