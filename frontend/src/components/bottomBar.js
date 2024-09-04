@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 
-const BottomBar = () => {
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedImageOption, setSelectedImageOption] = useState('');
+const BottomBar = ({
+  layer,
+  date,
+  setDate,
+  setLayer
+}) => {
 
   return (
     <div style={styles.bottomBar}>
       {/* Date Picker */}
       <input 
         type="date" 
-        value={selectedDate} 
-        onChange={(e) => setSelectedDate(e.target.value)} 
+        value={date} 
+        onChange={(e) => setDate(e.target.value)} 
         style={styles.datePicker}
       />
 
       {/* Dropdown Menu */}
       <select 
-        value={selectedImageOption} 
-        onChange={(e) => setSelectedImageOption(e.target.value)} 
+        value={layer} 
+        onChange={(e) => setLayer(e.target.value)} 
         style={styles.dropdownMenu}
       >
         <option value="">Select Image Option</option>

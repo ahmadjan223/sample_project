@@ -17,9 +17,9 @@ const Dashboard = ({ user }) => {
   const [polygons, setPolygons] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldName, setSelectedFieldName] = useState(null);
-  const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
   const [layerDisplay, setLayerDisplay] = useState([]);
-
+  const [date,setDate] = useState(new Date());
+  const [layer,setLayer] = useState("NDVI");
 
   useEffect(() => {
     DataFetch();
@@ -27,10 +27,11 @@ const Dashboard = ({ user }) => {
   //for sentinel
   useEffect(() => {
     if(selectedFieldName){
-      handleFieldClick(selectedFieldName)
+      console.log("selected layer", layer);
       console.log("selected field name", selectedFieldName);
+      handleFieldClick(selectedFieldName,layer,date);
     }
-  }, [selectedFieldName]);
+  }, [selectedFieldName,layer,date]);
   
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
@@ -55,7 +56,7 @@ const Dashboard = ({ user }) => {
     setFieldNames([]);
   };
 
-  const handleFieldClick = async (name) => {
+  const handleFieldClick = async (name,layer,date) => {
       const selectedPolygon = polygons.find((polygon) => polygon.name === name);
       const coordinates = selectedPolygon.path
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
@@ -76,7 +77,7 @@ const Dashboard = ({ user }) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ coordinates: selectedPolygon.path }),
+            body: JSON.stringify({ coordinates: selectedPolygon.path, layer:layer, date:date }),
           }
         );
 
@@ -97,23 +98,6 @@ const Dashboard = ({ user }) => {
       }
   };
 
-  // const displayImageLayerOnMap = (imageUrl, minLat, minLon, maxLat, maxLon) => {
-  //   if (!map) {
-  //     console.error("Map is not loaded yet.");
-  //     return;
-  //   }
-
-  //   const bounds = new window.google.maps.LatLngBounds(
-  //     new window.google.maps.LatLng(minLat, minLon), // SW corner
-  //     new window.google.maps.LatLng(maxLat, maxLon) // NE corner
-  //   );
-
-  //   const groundOverlay = new window.google.maps.GroundOverlay(
-  //     imageUrl,
-  //     bounds
-  //   );
-  //   groundOverlay.setMap(map);
-  // };
 
   const resetDB = async (userId) => {
     try {
@@ -158,7 +142,7 @@ const Dashboard = ({ user }) => {
         )}
       </div>
       <div>
-        <BottomBar></BottomBar>
+        <BottomBar date = {date} layer = {layer} setDate = {setDate} setLayer = {setLayer}></BottomBar>
       </div>
       </div>
     </div>

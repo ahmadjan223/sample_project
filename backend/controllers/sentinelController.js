@@ -29,19 +29,19 @@ const getAccessToken = async () => {
   }
 };
 // Function to construct the URL for WMS request
-const getWMSImageUrl = (accessToken, bbox, geometry) => {
+const getWMSImageUrl = (accessToken, bbox, geometry,layer,date) => {
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instance_id}`;
-  const layer = "NDVI";
+  // const layer = "NDVI";
   const width = 512;
   const height = 512;
-  const time = "2024-01-01/2024-01-31";
+  // const time = "2024-01-01/2024-01-31";
   const format = "image/png";
 
   return (
     `${baseUrl}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
     `&LAYERS=${layer}&BBOX=${bbox}&WIDTH=${width}` +
     `&HEIGHT=${height}&FORMAT=${format}` +
-    `&TIME=${time}&CRS=EPSG:4326` +
+    `&TIME=${date}&CRS=EPSG:4326` +
     `&GEOMETRY=${geometry}` + // Uncomment if needed
     `&MAXCC=20&TRANSPARENT=TRUE&SHOWLOGO=false`
   );
@@ -51,7 +51,8 @@ const getWMSImageUrl = (accessToken, bbox, geometry) => {
 exports.getImageUrl = async (req, res) => {
   try {
     console.log("\n");
-    const { coordinates } = req.body;
+    const { coordinates,date,layer } = req.body;
+    console.log(date,"\n")
 
     // Ensure coordinates is an array of objects with lng and lat properties
     if (!Array.isArray(coordinates) || coordinates.length === 0) {
@@ -81,7 +82,7 @@ exports.getImageUrl = async (req, res) => {
     }
 
     // Construct WMS URL with access token and BBOX
-    const wmsUrl = getWMSImageUrl(accessToken, box, geometry);
+    const wmsUrl = getWMSImageUrl(accessToken, box, geometry,layer,date);
 
     // console.log("BBOX:", bbox); // Ensure bbox is defined or move inside getWMSImageUrl
     console.log("Image URL:", wmsUrl);
@@ -97,7 +98,7 @@ exports.getImageUrl = async (req, res) => {
     // Respond with the WMS URL or the saved image path
     res.json({ imageUrl: wmsUrl });
   } catch (error) {
-    console.log("Coordinates at error:", coordinates);
+    // console.log("Coordinates at error:", coordinates);
     console.error("Error obtaining image URL:", error.message);
     res.status(500).json({ error: error.message });
   }
