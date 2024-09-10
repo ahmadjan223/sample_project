@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from "react";
+// SideNav.js
+import React, { useEffect } from "react";
+import { useAppState } from "./centralprops";
+import { useCentralProps } from './centralpropscontext';
+
 const Sidenav = ({
   user,
   logPolygons,
@@ -8,16 +12,36 @@ const Sidenav = ({
   selectedFieldIndex,
   onFieldClick,
   isLoaded,
+  highlightField,
 }) => {
-  const [selectedMonth, setSelectedMonth] = useState("Aug");
-
-  const [polygonInfo, setPolygonInfo] = useState([]);
-  const [expandedField, setExpandedField] = useState(null);
-  const [editFieldIndex, setEditFieldIndex] = useState(null);
-  const [editFieldName, setEditFieldName] = useState("");
-  const [layer, setLayer] = useState("NDVI"); // Default value is 'NDVI'
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const {
+    selectedMonth,
+    setSelectedMonth,
+    polygonInfo,
+    setPolygonInfo,
+    expandedField,
+    setExpandedField,
+    editFieldIndex,
+    setEditFieldIndex,
+    editFieldName,
+    setEditFieldName,
+    layer,
+    setLayer,
+    currentMonth,
+    setCurrentMonth,
+    currentYear,
+    setCurrentYear,
+    timeRange,
+    setTimeRange,
+    userSelectedIndex,
+    setUserSelectedIndex,
+    handleLayerChange,
+    handleMonthClick,
+    handleNextMonths,
+    handlePreviousMonths,
+    getMonthName,
+    temp,
+  } = useCentralProps();
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
@@ -25,58 +49,6 @@ const Sidenav = ({
       handleLogPolygons();
     }
   });
-  const handleLayerChange = (event) => {
-    setLayer(event.target.value);
-  };
-
-  const [timeRange, setTimeRange] = useState("");
-
-  const handleMonthClick = (month, year) => {
-    const formattedMonth = month.toString().padStart(2, "0");
-    setTimeRange(`${year}-${formattedMonth}-01/${year}-${formattedMonth}-26`);
-    setSelectedMonth(month);
-  };
-
-  const handleNextMonths = () => {
-    const nextMonth = currentMonth + 3;
-    const nextYear = currentYear;
-
-    if (nextMonth > 12) {
-      setCurrentMonth(nextMonth - 12);
-      setCurrentYear(nextYear + 1);
-    } else {
-      setCurrentMonth(nextMonth);
-    }
-
-    // Prevent displaying future months
-    const today = new Date();
-    if (
-      currentYear > today.getFullYear() ||
-      (currentYear === today.getFullYear() &&
-        currentMonth > today.getMonth() + 1)
-    ) {
-      setCurrentMonth(today.getMonth() + 1);
-      setCurrentYear(today.getFullYear());
-    }
-  };
-
-  const handlePreviousMonths = () => {
-    const prevMonth = currentMonth - 3;
-    const prevYear = currentYear;
-
-    if (prevMonth < 1) {
-      setCurrentMonth(12 + prevMonth);
-      setCurrentYear(prevYear - 1);
-    } else {
-      setCurrentMonth(prevMonth);
-    }
-  };
-
-  const getMonthName = (month, year) => {
-    const date = new Date(year, month - 1);
-
-    return `${date.toLocaleString("default", { month: "short" })} ${year}`;
-  };
 
   const handleLogPolygons = () => {
     const polygons = logPolygons();
@@ -151,35 +123,7 @@ const Sidenav = ({
   const handleLogout = () => {
     window.location.href = "http://localhost:3000/api/logout";
   };
-  const [userSelectedIndex, setUserSelectedIndex] = useState("");
-  const temp = async (index) => {
-    await setUserSelectedIndex(index);
-    // alert("User has selected index:" + userSelectedIndex);
-  };
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
-  {
-    /*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-  }
+
   return (
     <div
       style={{
@@ -250,7 +194,7 @@ const Sidenav = ({
       {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
 
       {/* field */}
-      <div
+      {/* <div
         style={{
           marginTop: "20px",
           width: "90%",
@@ -347,62 +291,7 @@ const Sidenav = ({
           </div>
         </div>
 
-        {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            margin: "20px 0",
-            width: "70%",
-            boxSizing: "border-box", // Ensure padding is included in the width
-            border: "1px solid black", // Corrected semicolon to a comma
-          }}
-        >
-          <div style={{ display: "flex", margin: "0 10px" }}>
-            <div
-              style={{
-                margin: "0 5px",
-                cursor: "pointer",
-                borderRadius: "10px", // Greyish highlight
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
-              }}
-              onClick={handlePreviousMonths}
-            >
-              {"<"}
-            </div>
-
-            {[currentMonth, currentMonth + 1, currentMonth + 2].map(
-              (month, idx) => (
-                <div
-                  key={month}
-                  style={{
-                    margin: "0 5px",
-                    cursor: "pointer",
-                    padding: "0px 3px",
-                    borderRadius: "10px", // Rounded corners
-                    backgroundColor:
-                      selectedMonth === month ? "#d3d3d3" : "transparent", // Greyish highlight
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
-                  }}
-                  onClick={() => handleMonthClick(month, currentYear)}
-                >
-                  {getMonthName(month, currentYear)}
-                </div>
-              )
-            )}
-          </div>
-          <div
-            style={{
-              cursor: "pointer",
-              borderRadius: "10px", // Greyish highlight
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
-            }}
-            onClick={handleNextMonths}
-          >
-            {">"}
-          </div>
-        </div> */}
-      </div>
+      </div> */}
 
       {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
       {/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/}
@@ -425,11 +314,14 @@ const Sidenav = ({
                 borderRadius: "15px", // Rounded edges
                 padding: "10px",
                 backgroundColor:
-                  selectedFieldIndex === field.index ? "#e0e0e0" : "#fff",
+                  userSelectedIndex == field.index ? "#e0e0e0" : "#fff",
                 cursor: "pointer",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
               }}
-              onClick={() => temp(field.index)}
+              onClick={() => {
+                temp(field.index);  // Call the first function
+                highlightField(field.index);  // Call the second function
+              }}
             >
               <div
                 style={{ cursor: "pointer", fontWeight: "bold" }}
@@ -468,9 +360,10 @@ const Sidenav = ({
                     </div>
                   ) : (
                     <div>
-                      <button
+
+                      {/* <button
                         onClick={() =>
-                          onFieldClick(field.index, layer, timeRange)
+                          onFieldClick(userSelectedIndex, layer, timeRange)
                         }
                         className="btn btn-primary btn-sm"
                         style={{ marginRight: "10px" }}
@@ -478,7 +371,8 @@ const Sidenav = ({
                         {selectedFieldIndex === userSelectedIndex
                           ? `Hide ${layer}`
                           : `Show ${layer}`}
-                      </button>
+                      </button> */}
+
                       <button
                         onClick={() => handleEditFieldName(field.name)}
                         className="btn btn-warning btn-sm" // Smaller button
@@ -486,6 +380,7 @@ const Sidenav = ({
                       >
                         Edit
                       </button>
+
                       <button
                         onClick={() => handleDeleteField(field.name)}
                         className="btn btn-danger btn-sm" // Smaller button

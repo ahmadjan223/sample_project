@@ -7,6 +7,7 @@ import {
 } from "@react-google-maps/api";
 import Sidenav from "./sidenav";
 import Undernav from "./under_nav";
+import Bottom from "./bottom.js";
 
 const libraries = ["places", "drawing"];
 
@@ -30,7 +31,7 @@ const DrawableMap = ({ user }) => {
 
   const containerStyle = {
     width: "100%",
-    height: "100vh",
+    height: "74.5vh",
   };
 
   const polygonOptions = {
@@ -201,44 +202,69 @@ const DrawableMap = ({ user }) => {
   };
   const [imageOverlay, setImageOverlay] = useState(null);
 
-  const handleFieldClick = async (index,layer, timeRange) => {
-    // alert(timeRange);
+  const highlightField = async (index) => {
     const isSelected = selectedFieldIndex === index;
     setSelectedFieldIndex(isSelected ? null : index);
-  
+
     drawnPolygons.forEach((polygon, i) => {
       polygon.setMap(i === index && !isSelected ? map : null);
     });
-  
+  };
+
+  const handleFieldClick = async (index, layer, timeRange) => {
+    if (index === "") {
+      alert("You have not selected any field from the sidebar.");
+      return;
+    }
+    // alert(timeRange);
+
+    const isSelected = selectedFieldIndex === index;
+    setSelectedFieldIndex(isSelected ? null : index);
+
+    drawnPolygons.forEach((polygon, i) => {
+      polygon.setMap(i === index && !isSelected ? map : null);
+    });
+
     if (isSelected) {
       clearImageOverlay();
     } else {
-      loadFieldImage(index, layer,timeRange);
+      loadFieldImage(index, layer, timeRange);
     }
   };
-  
-  
-  const loadFieldImage = async (index,layer,timeRange) => {
+
+  const loadFieldImage = async (index, layer, timeRange) => {
+    // alert(`index: ${index}`);
+
     const selectedPolygon = polygons[index];
     const { path } = selectedPolygon;
-    const [lons, lats] = [path.map(c => c.lng), path.map(c => c.lat)];
+    const [lons, lats] = [path.map((c) => c.lng), path.map((c) => c.lat)];
     const [minLon, maxLon] = [Math.min(...lons), Math.max(...lons)];
     const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
-    
+
     try {
       // alert(timeRange);
-      const requestBody = JSON.stringify({ coordinates: path, layer, time: timeRange });
+      const requestBody = JSON.stringify({
+        coordinates: path,
+        layer,
+        time: timeRange,
+      });
       console.log("Request Body:", requestBody); // Log the request body
 
-      const response = await fetch("http://localhost:3000/sentinel/getImageUrl", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: requestBody,
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/sentinel/getImageUrl",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+        }
+      );
+
       if (response.ok) {
         const { imageUrl } = await response.json();
         updateImageOverlay(imageUrl, minLat, minLon, maxLat, maxLon);
+        // window.open(imageUrl, '_blank');
+        // console.log(imageUrl)
+        // alert(imageUrl)
       } else {
         showAlert(selectedPolygon.name, path);
       }
@@ -246,12 +272,14 @@ const DrawableMap = ({ user }) => {
       console.error("Error fetching image URL:", error.message);
     }
   };
-  
+
   const showAlert = (name, path) => {
     const coordinates = path
-      .map(coord => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
+      .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
       .join(", ");
-    alert(`The field could be too small for Sentinel! Coordinates of ${name}: ${coordinates}`);
+    alert(
+      `The field could be too small for Sentinel! Coordinates of ${name}: ${coordinates}`
+    );
   };
   const clearImageOverlay = () => {
     if (imageOverlay) {
@@ -260,20 +288,19 @@ const DrawableMap = ({ user }) => {
     }
   };
 
-  
   const updateImageOverlay = (imageUrl, minLat, minLon, maxLat, maxLon) => {
     if (!map) {
       console.error("Map is not loaded yet.");
       return;
     }
-    
+
     clearImageOverlay();
-  
+
     const bounds = new window.google.maps.LatLngBounds(
       new window.google.maps.LatLng(minLat, minLon),
       new window.google.maps.LatLng(maxLat, maxLon)
     );
-  
+
     const overlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
     overlay.setMap(map);
     setImageOverlay(overlay);
@@ -283,29 +310,37 @@ const DrawableMap = ({ user }) => {
       getColorAtPoint(lat, lng, imageUrl, minLat, minLon, maxLat, maxLon);
     });
   };
-  const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLon) => {
+  const getColorAtPoint = async (
+    lat,
+    lng,
+    imageUrl,
+    minLat,
+    minLon,
+    maxLat,
+    maxLon
+  ) => {
     const image = new Image();
     //downlaod the image on the frontend and then use that image to fix the cross origin issueue
-    
+
     image.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      
+
       const [width, height] = [image.width, image.height];
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(image, 0, 0, width, height);
-      
+
       // Convert lat/lng to canvas coordinates
       // This will depend on your coordinate system
-      const a = (lng - minLon) / (maxLon - minLon) * width;
-      const b = (lat - minLat) / (maxLat - minLat) * height;
-      const [x,y] = [a,b]
-  
+      const a = ((lng - minLon) / (maxLon - minLon)) * width;
+      const b = ((lat - minLat) / (maxLat - minLat)) * height;
+      const [x, y] = [a, b];
+
       const pixel = ctx.getImageData(x, y, 1, 1).data;
       const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
       console.log(`Color at (${x}, ${y}): ${color}`);
-      
+
       // Show color on UI
       showColorAtCursor(color);
     };
@@ -318,12 +353,6 @@ const DrawableMap = ({ user }) => {
     colorDisplayElement.style.backgroundColor = color;
     colorDisplayElement.textContent = color;
   };
-  
-  
-
-  
-
-
 
   const resetDB = async (userId) => {
     try {
@@ -358,9 +387,13 @@ const DrawableMap = ({ user }) => {
         clearMap={clearMap}
         selectedFieldIndex={selectedFieldIndex}
         onFieldClick={handleFieldClick}
+        highlightField={highlightField}
       />
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <div className="map-container" style={{ height: "60vh", position: "relative" }}>
+        <div
+          className="map-container"
+          style={{ height: "74.75vh", position: "relative" }}
+        >
           <GoogleMap
             zoom={13}
             center={defaultCenter}
@@ -386,11 +419,13 @@ const DrawableMap = ({ user }) => {
             ))}
           </GoogleMap>
         </div>
-        {/* <Undernav /> */}
+        <Bottom
+          onFieldClick={handleFieldClick}
+          selectedFieldIndex={selectedFieldIndex}
+        />
       </div>
     </div>
   ) : null;
-  
 };
 
 export default DrawableMap;
