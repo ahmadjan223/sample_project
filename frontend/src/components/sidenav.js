@@ -334,7 +334,7 @@ const Sidenav = ({
                 {expandedField === field.name ? "−" : "+"} {field.name}
               </div>
               {expandedField === field.name && (
-                <div style={{ marginTop: "10px" }}>
+                <div style={{ marginTop: "10px " }}>
                   {editFieldIndex ===
                   polygonInfo.findIndex((f) => f.name === field.name) ? (
                     <div>
