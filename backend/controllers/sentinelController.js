@@ -103,3 +103,13 @@ exports.getImageUrl = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.getLayer = async (req, res) => {
+  try {
+    const { layer } = req.body;
+    console.log(layer);
+    res.json({ layer });
+  } catch (error) {
+    console.error("Error getting layer:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+}
