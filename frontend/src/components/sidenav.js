@@ -48,7 +48,15 @@ const Sidenav = ({
     if (isLoaded) {
       handleLogPolygons();
     }
-  });
+  },[user,
+    logPolygons,
+    resetDB,
+    loadFromDB,
+    clearMap,
+    selectedFieldIndex,
+    onFieldClick,
+    isLoaded,
+    highlightField]);
 
   const handleLogPolygons = () => {
     const polygons = logPolygons();

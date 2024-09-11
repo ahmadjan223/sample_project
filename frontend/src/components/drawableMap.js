@@ -304,56 +304,7 @@ const DrawableMap = ({ user }) => {
     const overlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
     overlay.setMap(map);
     setImageOverlay(overlay);
-    map.addListener("mousemove", (event) => {
-      const { latLng } = event;
-      const { lat, lng } = latLng.toJSON();
-      getColorAtPoint(lat, lng, imageUrl, minLat, minLon, maxLat, maxLon);
-    });
   };
-  const getColorAtPoint = async (
-    lat,
-    lng,
-    imageUrl,
-    minLat,
-    minLon,
-    maxLat,
-    maxLon
-  ) => {
-    const image = new Image();
-    //downlaod the image on the frontend and then use that image to fix the cross origin issueue
-
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      const [width, height] = [image.width, image.height];
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(image, 0, 0, width, height);
-
-      // Convert lat/lng to canvas coordinates
-      // This will depend on your coordinate system
-      const a = ((lng - minLon) / (maxLon - minLon)) * width;
-      const b = ((lat - minLat) / (maxLat - minLat)) * height;
-      const [x, y] = [a, b];
-
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
-      console.log(`Color at (${x}, ${y}): ${color}`);
-
-      // Show color on UI
-      showColorAtCursor(color);
-    };
-  };
-
-  const showColorAtCursor = (color) => {
-    // Display the color value on the UI
-    // This could be a tooltip or any other UI element
-    const colorDisplayElement = document.getElementById("colorDisplay");
-    colorDisplayElement.style.backgroundColor = color;
-    colorDisplayElement.textContent = color;
-  };
-
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
