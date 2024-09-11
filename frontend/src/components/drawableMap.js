@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import sampleImage from '../images/sample.png';
 import {
   DrawingManager,
   GoogleMap,
@@ -18,6 +19,7 @@ const DrawableMap = ({ user }) => {
   const [polygons, setPolygons] = useState([]);
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
+  const [imageUrl,setImageUrl] = useState("");
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
@@ -41,6 +43,7 @@ const DrawableMap = ({ user }) => {
     strokeWeight: 2,
     draggable: false,
     editable: true,
+    clickable: false, // Prevent polygons from interfering with the map clicks
   };
 
   const drawingManagerOptions = {
@@ -261,6 +264,7 @@ const DrawableMap = ({ user }) => {
 
       if (response.ok) {
         const { imageUrl } = await response.json();
+        setImageUrl(imageUrl);
         updateImageOverlay(imageUrl, minLat, minLon, maxLat, maxLon);
         // window.open(imageUrl, '_blank');
         // console.log(imageUrl)
@@ -325,6 +329,78 @@ const DrawableMap = ({ user }) => {
       console.error("Error:", error);
     }
   };
+  //mouse click ndvi value
+  // Function to handle click on the GroundOverlay
+const handleMapClick = async (event) => {
+  if (!imageOverlay) {
+    console.error("Image overlay is not loaded.");
+    return;
+  }
+
+  const latLng = event.latLng;
+  const { lat, lng } = latLng.toJSON();
+  console.log("Clicked at Lat:", lat, "Lng:", lng);
+
+  // Bounds of the overlay
+  const bounds = imageOverlay.getBounds();
+  const northEast = bounds.getNorthEast(); // maxLat, maxLon
+  const southWest = bounds.getSouthWest(); // minLat, minLon
+  const minLat = southWest.lat();
+  const minLon = southWest.lng();
+  const maxLat = northEast.lat();
+  const maxLon = northEast.lng();
+
+  // Download and process the image
+  await getColorAtPoint(lat, lng, imageUrl, minLat, minLon, maxLat, maxLon);
+};
+
+// Function to download image and get color at clicked point
+const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLon) => {
+  console.log("Getting color at point:", lat, lng, "for local image");
+
+  const image = new Image();
+  image.crossOrigin = "Anonymous"; 
+  // Assign the onload handler before setting the src to ensure it's loaded first
+  image.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const width = image.width;
+    const height = image.height;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(image, 0, 0, width, height);
+
+    // Convert lat/lng to canvas coordinates
+    let x = ((lng - minLon) / (maxLon - minLon)) * width;
+    let y = ((lat - maxLat) / (minLat - maxLat)) * height; // Adjusted to maintain proper scaling
+
+    // Round x and y to the nearest integers as getImageData expects integer values
+    x = Math.round(x);
+    y = Math.round(y);
+
+    console.log("Canvas Coordinates:", x, y);
+
+    // Ensure x and y are within the bounds of the image/canvas
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      // Get the pixel color at the computed coordinates
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+      console.log(`Color at (${x}, ${y}) [lat: ${lat}, lng: ${lng}] is: ${color}`);
+    } else {
+      console.error("Coordinates are out of bounds");
+    }
+  };
+
+  // Log if the image fails to load
+  image.onerror = () => {
+    console.error("Failed to load the image");
+  };
+
+  // Set the image source after setting the onload and onerror handlers
+  image.src = imageUrl;
+};
+
 
   return isLoaded ? (
     <div style={{ display: "flex" }}>
@@ -348,6 +424,7 @@ const DrawableMap = ({ user }) => {
           <GoogleMap
             zoom={13}
             center={defaultCenter}
+            onMouseOver={handleMapClick}
             onLoad={(map) => {
               setMap(map);
             }}
