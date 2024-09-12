@@ -400,6 +400,25 @@ const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLo
   // Set the image source after setting the onload and onerror handlers
   image.src = imageUrl;
 };
+// let timer;  
+// if(map){
+//   map.addListener('mousemove', (event) => {
+//     // Clear the timer if the mouse keeps moving
+//     clearTimeout(timer);
+  
+//     // Start a 0.3 second timer to check if the mouse stays
+//     timer = setTimeout(() => {
+//       handleMapClick(event);  // Trigger function after 0.3 seconds
+//     }, 1000);
+//   });
+
+// }
+// // Mouseout event to cancel the timer if the mouse leaves the GroundOverlay
+// if(map){
+//   map.addListener('mouseout', () => {
+//     clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
+//   });
+// }
 
 
   return isLoaded ? (
