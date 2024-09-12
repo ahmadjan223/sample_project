@@ -20,6 +20,7 @@ const DrawableMap = ({ user }) => {
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
   const [imageUrl,setImageUrl] = useState("");
+const [imageOverlay, setImageOverlay] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
@@ -54,7 +55,17 @@ const DrawableMap = ({ user }) => {
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   };
-
+  // Create a tooltip element
+const tooltip = document.createElement("div");
+tooltip.style.position = "absolute";
+tooltip.style.backgroundColor = "white";
+tooltip.style.border = "1px solid #ccc";
+tooltip.style.padding = "5px";
+tooltip.style.borderRadius = "4px";
+tooltip.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.2)";
+tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
+tooltip.style.display = "none"; // Initially hidden
+document.body.appendChild(tooltip);
   const onOverlayComplete = async (event) => {
     const newPolygon = event.overlay;
     const newPolygonPath = newPolygon
@@ -203,7 +214,6 @@ const DrawableMap = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
-  const [imageOverlay, setImageOverlay] = useState(null);
 
   const highlightField = async (index) => {
     const isSelected = selectedFieldIndex === index;
@@ -297,18 +307,46 @@ const DrawableMap = ({ user }) => {
       console.error("Map is not loaded yet.");
       return;
     }
-
-    clearImageOverlay();
-
+  
+    clearImageOverlay(); // Clear any previous overlay
+  
     const bounds = new window.google.maps.LatLngBounds(
       new window.google.maps.LatLng(minLat, minLon),
       new window.google.maps.LatLng(maxLat, maxLon)
     );
-
-    const overlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
-    overlay.setMap(map);
-    setImageOverlay(overlay);
+  
+    const overlay = new window.google.maps.GroundOverlay(imageUrl, bounds, {
+      clickable: true, // Ensure overlay captures events
+    });
+  
+    overlay.setMap(map); // Set the new overlay on the map
+    setImageOverlay(overlay); // Ensure the overlay is stored in state
+  
+    let timer; // Timer for delaying the tooltip display
+  
+    // Ensure event listeners are added after the overlay is set
+      // Add mousemove listener to the overlay
+      window.google.maps.event.addListener(overlay, 'mousemove', (event) => {
+        clearTimeout(timer); // Clear timer if mouse keeps moving
+        hideTooltip();       // Hide tooltip if mouse moves
+  
+        // Start 1-second timer to show tooltip if mouse stays still
+        timer = setTimeout(() => {
+          handleMapClick(event);
+          showTooltipWithDummyValue(event); // Show tooltip after 1 second
+        }, 300);
+      });
+  
+      // Add mouseout listener to cancel the timer if the mouse leaves the overlay
+      window.google.maps.event.addListener(overlay, 'mouseout', () => {
+        clearTimeout(timer); // Clear timer if mouse moves out
+        hideTooltip();       // Hide tooltip when mouse leaves the overlay
+      });
   };
+  
+  
+  
+  
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
@@ -341,21 +379,12 @@ const handleMapClick = async (event) => {
   const { lat, lng } = latLng.toJSON();
   console.log("Clicked at Lat:", lat, "Lng:", lng);
 
-  // Bounds of the overlay
-  const bounds = imageOverlay.getBounds();
-  const northEast = bounds.getNorthEast(); // maxLat, maxLon
-  const southWest = bounds.getSouthWest(); // minLat, minLon
-  const minLat = southWest.lat();
-  const minLon = southWest.lng();
-  const maxLat = northEast.lat();
-  const maxLon = northEast.lng();
-
-  // Download and process the image
-  await getColorAtPoint(lat, lng, imageUrl, minLat, minLon, maxLat, maxLon);
+  // Download and process the image without checking bounds
+  await getColorAtPoint(lat, lng, imageUrl);
 };
 
 // Function to download image and get color at clicked point
-const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLon) => {
+const getColorAtPoint = async (lat, lng, imageUrl) => {
   console.log("Getting color at point:", lat, lng, "for local image");
 
   const image = new Image();
@@ -371,7 +400,12 @@ const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLo
     canvas.height = height;
     ctx.drawImage(image, 0, 0, width, height);
 
-    // Convert lat/lng to canvas coordinates
+    // Convert lat/lng to canvas coordinates based on overlay boundaries
+    const minLat = imageOverlay.getBounds().getSouthWest().lat();
+    const minLon = imageOverlay.getBounds().getSouthWest().lng();
+    const maxLat = imageOverlay.getBounds().getNorthEast().lat();
+    const maxLon = imageOverlay.getBounds().getNorthEast().lng();
+
     let x = ((lng - minLon) / (maxLon - minLon)) * width;
     let y = ((lat - maxLat) / (minLat - maxLat)) * height; // Adjusted to maintain proper scaling
 
@@ -381,15 +415,10 @@ const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLo
 
     console.log("Canvas Coordinates:", x, y);
 
-    // Ensure x and y are within the bounds of the image/canvas
-    if (x >= 0 && x < width && y >= 0 && y < height) {
-      // Get the pixel color at the computed coordinates
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
-      console.log(`Color at (${x}, ${y}) [lat: ${lat}, lng: ${lng}] is: ${color}`);
-    } else {
-      console.error("Coordinates are out of bounds");
-    }
+    // Get the pixel color at the computed coordinates
+    const pixel = ctx.getImageData(x, y, 1, 1).data;
+    const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+    console.log(`Color at (${x}, ${y}) [lat: ${lat}, lng: ${lng}] is: ${color}`);
   };
 
   // Log if the image fails to load
@@ -400,26 +429,49 @@ const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLo
   // Set the image source after setting the onload and onerror handlers
   image.src = imageUrl;
 };
-// let timer;  
-// if(map){
-//   map.addListener('mousemove', (event) => {
-//     // Clear the timer if the mouse keeps moving
-//     clearTimeout(timer);
+
+let timer;  
+if (map) {
+  map.addListener('mousemove', (event) => {
+    // Clear the timer if the mouse keeps moving
+    clearTimeout(timer);
+    hideTooltip();
+    // Start a 1 second timer to check if the mouse stays
+    timer = setTimeout(() => {
+      handleMapClick(event);
+      showTooltipWithDummyValue(event);    // Trigger function after 1 second
+    }, 1000);
+  });
+
+  // Mouseout event to cancel the timer if the mouse leaves the map
+  map.addListener('mouseout', () => {
+    clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
+    hideTooltip();        // Hide tooltip when mouse leaves the map
+  });
+}
+
+const updateTooltip = (content, x, y) => {
+  tooltip.textContent = content;
+  tooltip.style.left = `${x}px`;
+  tooltip.style.top = `${y}px`;
+  tooltip.style.display = "block"; // Show tooltip
+};
+
+const hideTooltip = () => {
+  tooltip.style.display = "none"; // Hide tooltip
+};
+
+// Mousemove event to show tooltip with dummy value
+const showTooltipWithDummyValue = (event) => {
+  // Dummy values for demonstration
+  const dummyValue = "Dummy RGB Value: rgb(100, 150, 200)";
   
-//     // Start a 0.3 second timer to check if the mouse stays
-//     timer = setTimeout(() => {
-//       handleMapClick(event);  // Trigger function after 0.3 seconds
-//     }, 1000);
-//   });
+  // Get the mouse position from the event
+  const mouseX = event.domEvent.clientX;
+  const mouseY = event.domEvent.clientY;
 
-// }
-// // Mouseout event to cancel the timer if the mouse leaves the GroundOverlay
-// if(map){
-//   map.addListener('mouseout', () => {
-//     clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
-//   });
-// }
-
+  updateTooltip(dummyValue, mouseX, mouseY);
+};
 
   return isLoaded ? (
     <div style={{ display: "flex" }}>
@@ -443,7 +495,7 @@ const getColorAtPoint = async (lat, lng, imageUrl, minLat, minLon, maxLat, maxLo
           <GoogleMap
             zoom={13}
             center={defaultCenter}
-            onMouseOver={handleMapClick}
+            // onMouseOver={handleMapClick}
             onLoad={(map) => {
               setMap(map);
             }}
