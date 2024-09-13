@@ -489,7 +489,12 @@ if (map) {
 }
 
 const updateTooltip = (v1,v2,v3, x, y) => {
-  tooltip.textContent = `${v1} ${v2} ${v3}`;
+  const red = v1;
+  const green = v2;
+  const ndvi = (green - red) / (green + red);
+  const ndviValue = ndvi.toFixed(2);
+
+  tooltip.textContent = `${ndviValue}`;
   tooltip.style.left = `${x}px`;
   tooltip.style.top = `${y}px`;
   tooltip.style.display = "block"; // Show tooltip
