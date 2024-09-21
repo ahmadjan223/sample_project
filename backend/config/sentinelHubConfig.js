@@ -59,7 +59,7 @@ what's happening: */
     const wmsUrl = getWMSImageUrl(accessToken);
 
     // Log URL and make a request to test
-    console.log('Hardcoded:::', wmsUrl);
+    // console.log('Hardcoded:::', wmsUrl);
 
     // Optionally, you can make a request to the WMS URL to test if it's working
     const response = await axios.get(wmsUrl, {
@@ -79,4 +79,4 @@ what's happening: */
   }
 };
 
-getImageUrl();
+// getImageUrl();
