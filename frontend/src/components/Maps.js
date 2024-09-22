@@ -8,12 +8,15 @@ const Maps = ({
   DataFetch,
   polygonLayer,
   selectedFieldName,
+  date,
+  layer,
 }) => {
   console.log(selectedFieldName);
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const [imageData, setImageData] = useState(null); // State to store image data
   const [polygonBoundary, setPolygoneBoundary] = useState([]);
+  const [groundOverlay,setGroundOverlay] = useState(null);
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 33.639777,
     lng: 72.985718,
@@ -72,6 +75,12 @@ const Maps = ({
 
     return center;
   };
+  //for clearing map and drawing new polygons
+  useEffect(() => {
+    if(groundOverlay){
+      groundOverlay.setMap(null);
+    }
+  },[date,layer])
   useEffect(() => {
     console.log("use effect in maps is called", polygonLayer);
     displayImageLayerOnMap();
@@ -155,15 +164,15 @@ const Maps = ({
       };
     });
   };
-  let groundOverlay = null;
   const displayImageLayerOnMap = () => {
+    let groundOverlay = null;
     const [imageUrl, minLat, minLon, maxLat, maxLon] = polygonLayer;
-    if (!map) {
-      console.error("Map is not loaded yet.");
-      return;
-    }
+    // if (!map) {
+    //   console.error("Map is not loaded yet.");
+    //   return;
+    // }
     if (groundOverlay) {
-      groundOverlay.setMap(null); // Remove the existing overlay from the map
+      groundOverlay.setMap(null);
     }
 
     const bounds = new window.google.maps.LatLngBounds(
@@ -173,7 +182,7 @@ const Maps = ({
 
     groundOverlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
     groundOverlay.setMap(map);
-
+    setGroundOverlay(groundOverlay);
     // Fetch and store the image data
     fetchImageData(imageUrl)
       .then((data) => setImageData(data))

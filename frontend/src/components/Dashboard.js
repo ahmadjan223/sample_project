@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { ThreeCircles } from 'react-loader-spinner'
+
 import {
   DrawingManager,
   GoogleMap,
@@ -12,6 +14,7 @@ import BottomBar from "./bottomBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
+  const [isLoading,setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState(null);
@@ -55,7 +58,7 @@ const Dashboard = ({ user }) => {
     setFieldNames([]);
   };
   const updateImage = async (name,layer,date) => {
-    console.log("update image is called it will be updated very now")
+      setIsLoading(true);
       const selectedPolygon = polygons.find((polygon) => polygon.name === name);
       const coordinates = selectedPolygon.path
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
@@ -91,8 +94,10 @@ const Dashboard = ({ user }) => {
           ];
           setPolygonLayer(propsArray);
           console.log(polygonLayer)
+          setIsLoading(false);
         }
       } catch (error) {
+        setIsLoading(false);
         console.error("Error fetching image URL:", error.message);
       }
   };
@@ -132,11 +137,35 @@ const Dashboard = ({ user }) => {
         setSelectedFieldName={(name)=>{setSelectedFieldName(name);}}
         // onFieldClick={handleFieldClick}
       />
+        {isLoading && ( // Add a condition to show the loader
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
+            zIndex: 999, // Ensure it's above all other elements
+            display: "flex",
+            justifyContent: "center", // Center horizontally
+            alignItems: "center", // Center vertically
+          }}
+        >
+          <ThreeCircles
+            visible={true}
+            height="100"
+            width="100"
+            color="#4fa94d"
+            ariaLabel="three-circles-loading"
+          />
+        </div>
+      )}
       <div style={{flex:1, flexDirection:'row'}}>
 
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         {(isLoaded) &&  (
-          <Maps user={user} polygons={polygons} DataFetch={DataFetch} polygonLayer = {polygonLayer} selectedFieldName = {selectedFieldName}></Maps>
+          <Maps user={user} polygons={polygons} DataFetch={DataFetch} polygonLayer = {polygonLayer} selectedFieldName = {selectedFieldName} date={date} layer ={layer}></Maps>
         )}
       </div>
       <div>
