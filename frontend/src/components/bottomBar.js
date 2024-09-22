@@ -20,13 +20,21 @@ const BottomBar = ({
       {/* Dropdown Menu */}
       <select 
         value={layer} 
-        onChange={(e) => setLayer(e.target.value)} 
+        onChange={(e) => {setLayer(e.target.value)
+          console.log('ndvi value is changed')
+        }} 
         style={styles.dropdownMenu}
       >
-        <option value="">Select Image Option</option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
+       <option value="AGRICULTURE">Agriculture</option>
+            <option value="BATHYMETRIC">Bathymetric</option>
+            <option value="FALSE-COLOR-URBAN">False color (urban)</option>
+            <option value="FALSE-COLOR">False color (vegetation)</option>
+            <option value="GEOLOGY">Geology</option>
+            <option value="MOISTURE-INDEX">Moisture Index</option>
+            <option value="NATURAL-COLOR">Natural color (true color)</option>
+            <option value="NDVI">NDVI</option>
+            <option value="SWIR">SWIR</option>
+            <option value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</option>
       </select>
     </div>
   );

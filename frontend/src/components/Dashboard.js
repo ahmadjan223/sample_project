@@ -17,21 +17,20 @@ const Dashboard = ({ user }) => {
   const [polygons, setPolygons] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldName, setSelectedFieldName] = useState(null);
-  const [layerDisplay, setLayerDisplay] = useState([]);
+  const [polygonLayer, setPolygonLayer] = useState([]);
   const [date,setDate] = useState(new Date());
   const [layer,setLayer] = useState("NDVI");
+  const [polygoneBoundary,setPolygoneBoundary] = useState([]);  
 
   useEffect(() => {
     DataFetch();
   }, []);
-  //for sentinel
+  
   useEffect(() => {
     if(selectedFieldName){
-      console.log("selected layer", layer);
-      console.log("selected field name", selectedFieldName);
-      handleFieldClick(selectedFieldName,layer,date);
+      updateImage(selectedFieldName,layer,date);
     }
-  }, [selectedFieldName,layer,date]);
+  }, [layer,date]);
   
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
@@ -55,8 +54,8 @@ const Dashboard = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
-
-  const handleFieldClick = async (name,layer,date) => {
+  const updateImage = async (name,layer,date) => {
+    console.log("update image is called it will be updated very now")
       const selectedPolygon = polygons.find((polygon) => polygon.name === name);
       const coordinates = selectedPolygon.path
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
@@ -90,14 +89,13 @@ const Dashboard = ({ user }) => {
             maxLat,
             maxLon
           ];
-          setLayerDisplay(propsArray);
-          console.log(layerDisplay)
+          setPolygonLayer(propsArray);
+          console.log(polygonLayer)
         }
       } catch (error) {
         console.error("Error fetching image URL:", error.message);
       }
   };
-
 
   const resetDB = async (userId) => {
     try {
@@ -138,7 +136,7 @@ const Dashboard = ({ user }) => {
 
       <div className="map-container" style={{ flex: 1, position: "relative" }}>
         {(isLoaded) &&  (
-          <Maps user={user} polygons={polygons} DataFetch={DataFetch} layerDisplay = {layerDisplay}></Maps>
+          <Maps user={user} polygons={polygons} DataFetch={DataFetch} polygonLayer = {polygonLayer} selectedFieldName = {selectedFieldName}></Maps>
         )}
       </div>
       <div>
