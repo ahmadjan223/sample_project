@@ -13,11 +13,11 @@ const Maps = ({
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const [imageData, setImageData] = useState(null); // State to store image data
-  const [polygonBoundary,setPolygoneBoundary] = useState([]);
-  const defaultCenter = {
+  const [polygonBoundary, setPolygoneBoundary] = useState([]);
+  const [defaultCenter, setDefaultCenter] = useState({
     lat: 33.639777,
     lng: 72.985718,
-  };
+  });
 
   const containerStyle = {
     width: "100%",
@@ -31,7 +31,6 @@ const Maps = ({
     strokeWeight: 5,
     draggable: false,
     editable: false,
-    
   };
 
   const drawingManagerOptions = {
@@ -42,7 +41,37 @@ const Maps = ({
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   };
- 
+  //for changing the center
+  useEffect(() => {
+    if (selectedFieldName) {
+      const filter = polygons.find(
+        (polygon) => polygon.name === selectedFieldName
+      );
+      const centerPoint = calculateCenter(filter.path);
+      setDefaultCenter(centerPoint);
+    }
+  }, [selectedFieldName]);
+  const calculateCenter = (path) => {
+    const totalPoints = path.length;
+
+    // Sum all latitudes and longitudes
+    const { latSum, lngSum } = path.reduce(
+      (acc, point) => {
+        acc.latSum += point.lat;
+        acc.lngSum += point.lng;
+        return acc;
+      },
+      { latSum: 0, lngSum: 0 }
+    );
+
+    // Calculate average lat and lng
+    const center = {
+      lat: latSum / totalPoints,
+      lng: lngSum / totalPoints,
+    };
+
+    return center;
+  };
   useEffect(() => {
     console.log("use effect in maps is called", polygonLayer);
     displayImageLayerOnMap();
@@ -52,14 +81,13 @@ const Maps = ({
     return polygons.some((polygon) => polygon.name === name);
   };
   useEffect(() => {
-    if(selectedFieldName && polygons)
-      polygonCoordinates();
+    if (selectedFieldName && polygons) polygonCoordinates();
   }, [selectedFieldName]);
   const polygonCoordinates = () => {
     const filter = polygons.find(
       (polygon) => polygon.name === selectedFieldName
     );
-    setPolygoneBoundary(filter.path)
+    setPolygoneBoundary(filter.path);
   };
   const onOverlayComplete = async (event) => {
     const name = prompt("Enter a name for this field:");
@@ -73,7 +101,6 @@ const Maps = ({
       .getArray()
       .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
 
-   
     if (name !== null && name !== "") {
       await savePolygon(newPolygonPath, name, user.id);
       newPolygon.setMap(null);
@@ -144,10 +171,7 @@ const Maps = ({
       new window.google.maps.LatLng(maxLat, maxLon) // NE corner
     );
 
-    groundOverlay = new window.google.maps.GroundOverlay(
-      imageUrl,
-      bounds
-    );
+    groundOverlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
     groundOverlay.setMap(map);
 
     // Fetch and store the image data
@@ -155,7 +179,7 @@ const Maps = ({
       .then((data) => setImageData(data))
       .catch((error) => console.error("Error fetching image data:", error));
   };
- 
+
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
       <GoogleMap
@@ -171,10 +195,10 @@ const Maps = ({
           options={drawingManagerOptions}
         />
         <Polygon
-            paths={polygonBoundary}
-            options={polygonOptions}  
-            visible={true}
-          />
+          paths={polygonBoundary}
+          options={polygonOptions}
+          visible={true}
+        />
       </GoogleMap>
     </div>
   );
