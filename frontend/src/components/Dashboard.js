@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ThreeCircles } from 'react-loader-spinner'
+import { ThreeCircles } from "react-loader-spinner";
 
 import {
   DrawingManager,
@@ -14,27 +14,27 @@ import BottomBar from "./bottomBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
-  const [isLoading,setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [polygonLayer, setPolygonLayer] = useState([]);
-  const [date,setDate] = useState(new Date());
-  const [layer,setLayer] = useState("NDVI");
-  const [polygoneBoundary,setPolygoneBoundary] = useState([]);  
+  const [date, setDate] = useState(new Date());
+  const [layer, setLayer] = useState("NDVI");
+  const [polygoneBoundary, setPolygoneBoundary] = useState([]);
 
   useEffect(() => {
     DataFetch();
   }, []);
-  
+
   useEffect(() => {
-    if(selectedFieldName){
-      updateImage(selectedFieldName,layer,date);
+    if (selectedFieldName) {
+      updateImage(selectedFieldName, layer, date);
     }
-  }, [layer,date]);
-  
+  }, [layer, date]);
+
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
@@ -57,10 +57,10 @@ const Dashboard = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
-  const updateImage = async (name,layer,date) => {
-      setIsLoading(true);
-      const selectedPolygon = polygons.find((polygon) => polygon.name === name);
-      const coordinates = selectedPolygon.path
+  const updateImage = async (name, layer, date) => {
+    setIsLoading(true);
+    const selectedPolygon = polygons.find((polygon) => polygon.name === name);
+    const coordinates = selectedPolygon.path
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
       .join(", ");
 
@@ -70,36 +70,34 @@ const Dashboard = ({ user }) => {
     const maxLon = Math.max(...lons);
     const minLat = Math.min(...lats);
     const maxLat = Math.max(...lats);
-    
-      try {
-        const response = await fetch(
-          "http://localhost:3000/sentinel/getImageUrl",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ coordinates: selectedPolygon.path, layer:layer, date:date }),
-          }
-        );
 
-        if (response.ok) {
-          const data = await response.json();
-          const propsArray = [
-            data.imageUrl,
-            minLat,
-            minLon,
-            maxLat,
-            maxLon
-          ];
-          setPolygonLayer(propsArray);
-          console.log(polygonLayer)
-          setIsLoading(false);
+    try {
+      const response = await fetch(
+        "http://localhost:3000/sentinel/getImageUrl",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            coordinates: selectedPolygon.path,
+            layer: layer,
+            date: date,
+          }),
         }
-      } catch (error) {
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const propsArray = [data.imageUrl, minLat, minLon, maxLat, maxLon];
+        setPolygonLayer(propsArray);
+        console.log(polygonLayer);
         setIsLoading(false);
-        console.error("Error fetching image URL:", error.message);
       }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching image URL:", error.message);
+    }
   };
 
   const resetDB = async (userId) => {
@@ -134,10 +132,12 @@ const Dashboard = ({ user }) => {
           sendToDb(polygons);
         }}
         clearMap={clearMap}
-        setSelectedFieldName={(name)=>{setSelectedFieldName(name);}}
+        setSelectedFieldName={(name) => {
+          setSelectedFieldName(name);
+        }}
         // onFieldClick={handleFieldClick}
       />
-        {isLoading && ( // Add a condition to show the loader
+      {isLoading && ( // Add a condition to show the loader
         <div
           style={{
             position: "absolute",
@@ -161,16 +161,31 @@ const Dashboard = ({ user }) => {
           />
         </div>
       )}
-      <div style={{flex:1, flexDirection:'row'}}>
-
-      <div className="map-container" style={{ flex: 1, position: "relative" }}>
-        {(isLoaded) &&  (
-          <Maps user={user} polygons={polygons} DataFetch={DataFetch} polygonLayer = {polygonLayer} selectedFieldName = {selectedFieldName} date={date} layer ={layer}></Maps>
-        )}
-      </div>
-      <div>
-        <BottomBar date = {date} layer = {layer} setDate = {setDate} setLayer = {setLayer}></BottomBar>
-      </div>
+      <div style={{ flex: 1, flexDirection: "row" }}>
+        <div
+          className="map-container"
+          style={{ flex: 1, position: "relative" }}
+        >
+          {isLoaded && (
+            <Maps
+              user={user}
+              polygons={polygons}
+              DataFetch={DataFetch}
+              polygonLayer={polygonLayer}
+              selectedFieldName={selectedFieldName}
+              date={date}
+              layer={layer}
+            ></Maps>
+          )}
+        </div>
+        <div>
+          <BottomBar
+            date={date}
+            layer={layer}
+            setDate={setDate}
+            setLayer={setLayer}
+          ></BottomBar>
+        </div>
       </div>
     </div>
   );

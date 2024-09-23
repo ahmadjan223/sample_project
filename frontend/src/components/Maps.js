@@ -81,14 +81,13 @@ const Maps = ({
       groundOverlay.setMap(null);
     }
   },[date,layer])
+  // for displaying image layer on map
   useEffect(() => {
-    console.log("use effect in maps is called", polygonLayer);
-    displayImageLayerOnMap();
+    if(polygonLayer){
+      displayImageLayerOnMap();
+    }
   }, [polygonLayer]);
-  // to check if name already exists donot allow to save
-  const nameExists = (name) => {
-    return polygons.some((polygon) => polygon.name === name);
-  };
+  //for saving polygon coordinates in state
   useEffect(() => {
     if (selectedFieldName && polygons) polygonCoordinates();
   }, [selectedFieldName]);
@@ -97,6 +96,10 @@ const Maps = ({
       (polygon) => polygon.name === selectedFieldName
     );
     setPolygoneBoundary(filter.path);
+  };
+  // to check if name already exists donot allow to save
+  const nameExists = (name) => {
+    return polygons.some((polygon) => polygon.name === name);
   };
   const onOverlayComplete = async (event) => {
     const name = prompt("Enter a name for this field:");
@@ -127,68 +130,89 @@ const Maps = ({
       });
     }
   };
-  const fetchImageData = (imageUrl) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous"; // To handle CORS if needed
-      img.src = imageUrl;
 
-      img.onload = () => {
-        // Create a canvas with the same size as the image
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-
-        // Draw the image onto the canvas
-        ctx.drawImage(img, 0, 0);
-
-        // Extract pixel data from the canvas
-        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-        console.log("Image loaded successfully!");
-        console.log("Image Width:", img.width);
-        console.log("Image Height:", img.height);
-        console.log("Pixel Data:", imageData.data);
-
-        // Resolve with the image data and additional info (dimensions, etc.)
-        resolve({
-          data: imageData.data, // Pixel data
-          width: img.width,
-          height: img.height,
-          bounds: null, // You can assign the bounds later
-        });
-      };
-
-      img.onerror = (err) => {
-        reject(new Error("Failed to load image: " + err.message));
-      };
-    });
-  };
   const displayImageLayerOnMap = () => {
     let groundOverlay = null;
     const [imageUrl, minLat, minLon, maxLat, maxLon] = polygonLayer;
-    // if (!map) {
-    //   console.error("Map is not loaded yet.");
-    //   return;
-    // }
+    
+    if (!map) {
+      console.error("Map is not loaded yet.");
+      return;
+    }
+    
     if (groundOverlay) {
       groundOverlay.setMap(null);
     }
-
+  
     const bounds = new window.google.maps.LatLngBounds(
       new window.google.maps.LatLng(minLat, minLon), // SW corner
       new window.google.maps.LatLng(maxLat, maxLon) // NE corner
     );
-
-    groundOverlay = new window.google.maps.GroundOverlay(imageUrl, bounds);
+  
+    groundOverlay = new window.google.maps.GroundOverlay(imageUrl, bounds, {
+      clickable: true, // Set clickable to true to capture events
+    });
     groundOverlay.setMap(map);
     setGroundOverlay(groundOverlay);
-    // Fetch and store the image data
-    fetchImageData(imageUrl)
-      .then((data) => setImageData(data))
-      .catch((error) => console.error("Error fetching image data:", error));
+    // Add the mousemove listener to the GroundOverlay
+    groundOverlay.addListener('mousemove', (event) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        updateTooltip(event, 25); // Update the tooltip with dummy value
+      }, 10);
+    });
+  
+    // Add mouseout listener to hide the tooltip when the mouse leaves
+    groundOverlay.addListener('mouseout', () => {
+      clearTimeout(timer);
+      hideTooltip(); // Hide tooltip when mouse leaves the overlay
+    });
   };
+  
+  const updateTooltip = (event, indexValue) => {
+    const mouseX = event.domEvent.clientX;
+    const mouseY = event.domEvent.clientY;
+    tooltip.textContent = `${indexValue}`;
+    tooltip.style.left = `${mouseX}px`;
+    tooltip.style.top = `${mouseY}px`;
+    tooltip.style.display = "block"; // Show tooltip
+  };
+  
 
+  const hideTooltip = () => {
+    tooltip.style.display = "none"; // Hide tooltip
+  };
+  const tooltip = document.createElement("div");
+  tooltip.style.position = "absolute";
+  tooltip.style.backgroundColor = "white";
+  tooltip.style.border = "1px solid #ccc";
+  tooltip.style.padding = "5px";
+  tooltip.style.borderRadius = "4px";
+  tooltip.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.2)";
+  tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
+  tooltip.style.display = "none"; // Initially hidden
+  document.body.appendChild(tooltip);
+
+  let timer;  
+  //   if (map) {
+  //   console.log('map listener is about to get initialized')
+  //   map.addListener('mousemove', (event) => {
+  //     // Clear the timer if the mouse keeps moving
+  //     clearTimeout(timer);
+  //     // hideTooltip();
+  //     // Start a 1 second timer to check if the mouse stays
+  //     timer = setTimeout(() => {
+  //       updateTooltip(event, 25)
+  //       console.log('print mouse value')
+  //     }, 10);
+  //   });
+  
+  //   // Mouseout event to cancel the timer if the mouse leaves the map
+  //   map.addListener('mouseout', () => {
+  //     clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
+  //     hideTooltip();        // Hide tooltip when mouse leaves the map
+  //   });
+  // }
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
       <GoogleMap
