@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./SideNav.css";
 
-const SideNav
- = ({
+const SideNav = ({
   polygons,
   isLoaded,
   user,
   resetDB,
   clearMap,
+  selectedFieldName,
   setSelectedFieldName,
   onFieldClick,
 }) => {
+  const [hoveredFieldIndex, setHoveredFieldIndex] = useState(null);
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [expandedField, setExpandedField] = useState(null);
   const [editFieldIndex, setEditFieldIndex] = useState(null);
@@ -18,8 +19,7 @@ const SideNav
 
   // Load polygons and synchronize state on mount or when `isLoaded` changes
   useEffect(() => {
-    if(polygons){
-
+    if (polygons) {
       handlePolygons();
     }
   }, [polygons]);
@@ -117,16 +117,20 @@ const SideNav
 
       {/* field */}
       <div className="field-container">
-        {polygonInfo.map((field) => (
+        {polygonInfo.map((field, index) => (
           <div key={field.name} className="field-item">
-            <div
+            <button
               className={`field-item-content ${
-                true ? "selected" : ""
-              }`}
+                selectedFieldName === field.name ? "selected" : ""
+              } ${hoveredFieldIndex === index ? "hovered" : ""}`}
+              onMouseEnter={() => setHoveredFieldIndex(index)}
+              onMouseLeave={() => setHoveredFieldIndex(null)}
               onClick={() => setSelectedFieldName(field.name)}
             >
               <div
-                className="field-name"
+                className={`field-name ${
+                  selectedFieldName === field.name ? "selected" : ""
+                }`}
                 onClick={() =>
                   setExpandedField(
                     expandedField === field.name ? null : field.name
@@ -140,36 +144,21 @@ const SideNav
                   {editFieldIndex ===
                   polygonInfo.findIndex((f) => f.name === field.name) ? (
                     <div>
-                      {/* <input
-                        type="text"
-                        value={editFieldName}
-                        onChange={(e) => setEditFieldName(e.target.value)}
-                        className="field-input"
-                      />
-                      <button
-                        onClick={() => saveFieldName(field.name)}
-                        className="btn btn-primary btn-sm"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditFieldIndex(null)}
-                        className="btn btn-secondary btn-sm"
-                      >
-                        Cancel
-                      </button> */}
+                      {/* Input and Save/Cancel buttons can be implemented here */}
                     </div>
                   ) : (
                     <div>
                       <button
                         onClick={() => handleEditFieldName(field.name)}
-                        className="btn btn-warning btn-sm"
+                        className="btn btn-sm"
+                        style={{ backgroundColor: "#3592fd", color: "#fafafa" }}
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteField(field.name)}
-                        className="btn btn-danger btn-sm"
+                        className="btn btn-sm"
+                        style={{ backgroundColor: "#3592fd", color: "#fafafa" }}
                       >
                         Delete
                       </button>
@@ -177,7 +166,7 @@ const SideNav
                   )}
                 </div>
               )}
-            </div>
+            </button>
           </div>
         ))}
       </div>

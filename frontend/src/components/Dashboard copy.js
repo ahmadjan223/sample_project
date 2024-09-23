@@ -248,10 +248,6 @@ const DrawableMap = ({ user }) => {
 
           // You can display the image URL as needed, e.g., set it in the state and display it in the UI.
         } else {
-          alert(
-            `The field could be too small for sentinel!
-          Coordinates of ${selectedPolygon.name}: ${coordinates}`
-          );
           console.error("Error in backend response");
         }
       } catch (error) {

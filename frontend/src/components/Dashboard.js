@@ -7,7 +7,7 @@ import {
   Polygon,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import SideNav from "./SideNav";
+import SideNav from "./sidenav";
 import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
 import Maps from "./Maps";
 import BottomBar from "./bottomBar";
@@ -82,7 +82,7 @@ const Dashboard = ({ user }) => {
           body: JSON.stringify({
             coordinates: selectedPolygon.path,
             layer: layer,
-            date: date,
+            time: date,
           }),
         }
       );
@@ -132,6 +132,7 @@ const Dashboard = ({ user }) => {
           sendToDb(polygons);
         }}
         clearMap={clearMap}
+        selectedFieldName={selectedFieldName}
         setSelectedFieldName={(name) => {
           setSelectedFieldName(name);
         }}
@@ -172,6 +173,7 @@ const Dashboard = ({ user }) => {
               polygons={polygons}
               DataFetch={DataFetch}
               polygonLayer={polygonLayer}
+        
               selectedFieldName={selectedFieldName}
               date={date}
               layer={layer}
@@ -184,6 +186,7 @@ const Dashboard = ({ user }) => {
             layer={layer}
             setDate={setDate}
             setLayer={setLayer}
+            selectedFieldName={selectedFieldName}
           ></BottomBar>
         </div>
       </div>

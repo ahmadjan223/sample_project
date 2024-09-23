@@ -23,7 +23,9 @@ const Maps = ({
   //saving image on canvas ofr mouse hover
   let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
   let [cachedCanvas,setCachedCanvas] = useState(null);
-
+//map ki height waghera yahan maps se change hogi
+//lekin agar wo scroll bar aana shuru ho jaye 
+//right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
   const containerStyle = {
     width: "100%",
     height: "100vh",

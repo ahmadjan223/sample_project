@@ -1,19 +1,18 @@
 // centralProps.js
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const formatDate = (date) => {
-  const options = { day: '2-digit', month: 'short' };
-  return new Intl.DateTimeFormat('en-GB', options).format(date);
+  const options = { day: "2-digit", month: "short" };
+  return new Intl.DateTimeFormat("en-GB", options).format(date);
 };
 
 export const useAppState = () => {
+  const dateCount = 15;
 
-const dateCount =15;
+  const increment = 28;
+  const [incrementValue, setIncrementValue] = useState(increment);
 
-const increment = 28;
-const [incrementValue, setIncrementValue] = useState(increment);
-
-const initDays = 45;
+  const initDays = 45;
 
   const [selectedMonth, setSelectedMonth] = useState("Aug");
   const [polygonInfo, setPolygonInfo] = useState([]);
@@ -34,113 +33,12 @@ const initDays = 45;
   const temp = async (index) => {
     if (userSelectedIndex === index) {
       await setUserSelectedIndex("-1");
-    }
-    else{
+    } else {
       await setUserSelectedIndex(index);
     }
-    
   };
 
-
-  const formatDate = (date) => {
-  const options = { day: '2-digit', month: 'short' };
-  return new Intl.DateTimeFormat('en-GB', options).format(date);
-};
-
-  const [selectedDate, setSelectedDate] = useState(null);
   const [dates, setDates] = useState([]);
-
-  const format = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const setDate = (date) => {
-    setSelectedDate(date);
-    const inputDate = new Date(date);
-    const fiveDaysBefore = new Date(inputDate);
-    fiveDaysBefore.setDate(inputDate.getDate() - incrementValue);
-    // alert("Date: "+ format(inputDate) + "\nNext Date: "+ format(fiveDaysBefore));
-    setTimeRange(`${format(fiveDaysBefore)}/${format(inputDate)}`);
-
-  }
-
-  useEffect(() => {
-    // Initialize the dates array with increments of 5 days
-    const generateDates = () => {
-      const today = new Date();
-      let currentDate = new Date(today);
-      currentDate.setDate(today.getDate() - initDays);
-
-
-      const dateArray = [];
-      for (let i = 0; i < dateCount; i++) {
-        dateArray.push(new Date(currentDate));
-        currentDate.setDate(currentDate.getDate() - incrementValue);
-      }
-      dateArray.reverse();
-      setDates(dateArray);
-      // setSelectedDate(dateArray[0]); // Set the default selected date
-    };
-
-    generateDates();
-
-  }, [incrementValue]);
-
-  const getDateLabel = (date) => {
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'short' });
-    // Add a line break using a span with display block
-    return (
-      <>
-        {day}
-        <br />
-        {month}
-      </>
-    );
-  };
-  
-
-  const handleNextDates = () => {
-    setDates((prevDates) => {
-      const benchmarkDate = new Date();
-      benchmarkDate.setDate(benchmarkDate.getDate() - initDays);
-
-      const newDates = [...prevDates];
-      const lastDate = new Date(newDates[newDates.length - 1]);
-      const newDate = new Date(lastDate);
-      newDate.setDate(lastDate.getDate() + incrementValue);
-  
-      // Check if the new date exceeds the benchmark date
-      if (newDate > benchmarkDate) {
-        alert("Can't go beyond the benchmark date.");
-        return prevDates; // Return the previous state to prevent modification
-      }
-  
-      // Add the new date to the end and remove the oldest date
-      newDates.push(newDate);
-      newDates.shift();
-  
-      return newDates;
-    });
-  };
-  
-
-  const handlePreviousDates = () => {
-    setDates((prevDates) => {
-      const newDates = [...prevDates];
-      const firstDate = new Date(newDates[0]);
-      firstDate.setDate(firstDate.getDate() - incrementValue);
-
-      // Add a new date to the beginning and remove the newest date
-      newDates.unshift(firstDate);
-      newDates.pop();
-
-      return newDates;
-    });
-  };
 
   return {
     selectedMonth,
@@ -178,7 +76,7 @@ const initDays = 45;
     handlePreviousDates,
     incrementValue,
     setIncrementValue,
-    setDates
+    setDates,
   };
 };
 

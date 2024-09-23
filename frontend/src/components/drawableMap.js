@@ -5,7 +5,7 @@ import {
   Polygon,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import Sidenav from "./SideNav";
+import Sidenav from "./sidenav";
 import Undernav from "./under_nav";
 
 const libraries = ["places", "drawing"];

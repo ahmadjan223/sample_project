@@ -84,8 +84,8 @@ exports.getImageUrl = async (req, res) => {
     // Construct WMS URL with access token and BBOX
     const wmsUrl = getWMSImageUrl(accessToken, box, geometry, layer, time);
 
-    // console.log("Image URL:", wmsUrl);
-    // console.log("\n" + time);p
+    console.log("Image URL:", wmsUrl);
+    console.log("\n" + time);
 
     // Make a request to the WMS URL to fetch the image
     const response = await axios.get(wmsUrl, {
