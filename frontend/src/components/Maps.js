@@ -16,7 +16,7 @@ const Maps = ({
   const [drawingManager, setDrawingManager] = useState(null);
   const [imageData, setImageData] = useState(null); // State to store image data
   const [polygonBoundary, setPolygoneBoundary] = useState([]);
-  const [groundOverlay,setGroundOverlay] = useState(null);
+  const [groundOverlay, setGroundOverlay] = useState(null);
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 33.639777,
     lng: 72.985718,
@@ -34,6 +34,7 @@ const Maps = ({
     strokeWeight: 5,
     draggable: false,
     editable: false,
+    clickable: true,
   };
 
   const drawingManagerOptions = {
@@ -77,13 +78,13 @@ const Maps = ({
   };
   //for clearing map and drawing new polygons
   useEffect(() => {
-    if(groundOverlay){
+    if (groundOverlay) {
       groundOverlay.setMap(null);
     }
-  },[date,layer])
+  }, [date, layer]);
   // for displaying image layer on map
   useEffect(() => {
-    if(polygonLayer){
+    if (polygonLayer) {
       displayImageLayerOnMap();
     }
   }, [polygonLayer]);
@@ -130,45 +131,40 @@ const Maps = ({
       });
     }
   };
+  // let timer;
 
   const displayImageLayerOnMap = () => {
-    let groundOverlay = null;
-    const [imageUrl, minLat, minLon, maxLat, maxLon] = polygonLayer;
-    
     if (!map) {
       console.error("Map is not loaded yet.");
       return;
     }
-    
+
+    // Clear the existing overlay if it exists
     if (groundOverlay) {
       groundOverlay.setMap(null);
     }
-  
+
+    const [imageUrl, minLat, minLon, maxLat, maxLon] = polygonLayer;
     const bounds = new window.google.maps.LatLngBounds(
       new window.google.maps.LatLng(minLat, minLon), // SW corner
       new window.google.maps.LatLng(maxLat, maxLon) // NE corner
     );
-  
-    groundOverlay = new window.google.maps.GroundOverlay(imageUrl, bounds, {
-      clickable: true, // Set clickable to true to capture events
-    });
-    groundOverlay.setMap(map);
-    setGroundOverlay(groundOverlay);
-    // Add the mousemove listener to the GroundOverlay
-    groundOverlay.addListener('mousemove', (event) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        updateTooltip(event, 25); // Update the tooltip with dummy value
-      }, 10);
-    });
-  
-    // Add mouseout listener to hide the tooltip when the mouse leaves
-    groundOverlay.addListener('mouseout', () => {
-      clearTimeout(timer);
-      hideTooltip(); // Hide tooltip when mouse leaves the overlay
-    });
+
+    // Create a new GroundOverlay
+    const newGroundOverlay = new window.google.maps.GroundOverlay(
+      imageUrl,
+      bounds,
+      {
+        clickable: false, // Ensure overlay captures events
+      }
+    );
+
+    newGroundOverlay.setMap(map);
+    setGroundOverlay(newGroundOverlay); // Save the overlay in state
+
   };
-  
+
+  // Add the mousemove listener to the GroundOverlay
   const updateTooltip = (event, indexValue) => {
     const mouseX = event.domEvent.clientX;
     const mouseY = event.domEvent.clientY;
@@ -177,7 +173,6 @@ const Maps = ({
     tooltip.style.top = `${mouseY}px`;
     tooltip.style.display = "block"; // Show tooltip
   };
-  
 
   const hideTooltip = () => {
     tooltip.style.display = "none"; // Hide tooltip
@@ -192,27 +187,16 @@ const Maps = ({
   tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
   tooltip.style.display = "none"; // Initially hidden
   document.body.appendChild(tooltip);
+  const handlePolygonLoad = (polygon) => {
+    // Add mousemove listener to the polygon
+    polygon.addListener("mousemove", (event) => {
+      updateTooltip(event, 25); // Display index value
+    });
 
-  let timer;  
-  //   if (map) {
-  //   console.log('map listener is about to get initialized')
-  //   map.addListener('mousemove', (event) => {
-  //     // Clear the timer if the mouse keeps moving
-  //     clearTimeout(timer);
-  //     // hideTooltip();
-  //     // Start a 1 second timer to check if the mouse stays
-  //     timer = setTimeout(() => {
-  //       updateTooltip(event, 25)
-  //       console.log('print mouse value')
-  //     }, 10);
-  //   });
-  
-  //   // Mouseout event to cancel the timer if the mouse leaves the map
-  //   map.addListener('mouseout', () => {
-  //     clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
-  //     hideTooltip();        // Hide tooltip when mouse leaves the map
-  //   });
-  // }
+    // Add mouseout listener to hide the tooltip
+    polygon.addListener("mouseout", hideTooltip);
+  };
+
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
       <GoogleMap
@@ -228,9 +212,11 @@ const Maps = ({
           options={drawingManagerOptions}
         />
         <Polygon
+          
           paths={polygonBoundary}
           options={polygonOptions}
           visible={true}
+          onLoad={handlePolygonLoad}
         />
       </GoogleMap>
     </div>
