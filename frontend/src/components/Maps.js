@@ -14,13 +14,15 @@ const Maps = ({
   console.log(selectedFieldName);
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
-  const [imageData, setImageData] = useState(null); // State to store image data
   const [polygonBoundary, setPolygoneBoundary] = useState([]);
   const [groundOverlay, setGroundOverlay] = useState(null);
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 33.639777,
     lng: 72.985718,
   });
+  //saving image on canvas ofr mouse hover
+  let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
+  let [cachedCanvas,setCachedCanvas] = useState(null);
 
   const containerStyle = {
     width: "100%",
@@ -88,7 +90,7 @@ const Maps = ({
       displayImageLayerOnMap();
     }
   }, [polygonLayer]);
-  //for saving polygon coordinates in state
+  //for saving polygon coordinates in state for displaying polygon
   useEffect(() => {
     if (selectedFieldName && polygons) polygonCoordinates();
   }, [selectedFieldName]);
@@ -161,7 +163,39 @@ const Maps = ({
 
     newGroundOverlay.setMap(map);
     setGroundOverlay(newGroundOverlay); // Save the overlay in state
+    processLayerForPopUp(imageUrl);
 
+  };
+  
+  const processLayerForPopUp = async (imageUrl) => {
+    console.log("Preprocessing layer...");
+  
+    const image = new Image();
+    image.crossOrigin = "Anonymous"; 
+  
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+  
+      const width = image.width;
+      const height = image.height;
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(image, 0, 0, width, height);
+  
+      // Cache the image and canvas for later use
+      
+      setCachedImage(image);
+      setCachedCanvas(canvas);
+      console.log("Image preprocessing completed.");
+    };
+  
+    image.onerror = (error) => {
+      console.error("Failed to load the image during preprocessing", error);
+      console.error("Image URL:", imageUrl);
+    };
+    // Load the image (only done once)
+    image.src = imageUrl;
   };
 
   // Add the mousemove listener to the GroundOverlay
@@ -212,7 +246,6 @@ const Maps = ({
           options={drawingManagerOptions}
         />
         <Polygon
-          
           paths={polygonBoundary}
           options={polygonOptions}
           visible={true}

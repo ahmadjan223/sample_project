@@ -402,7 +402,7 @@ document.body.appendChild(tooltip);
     setImageOverlay(overlay); // Ensure the overlay is stored in state
 
     processLayerForPopUp(imageUrl);
-  
+
     // let timer; // Timer for delaying the tooltip display
   
     // Ensure event listeners are added after the overlay is set
@@ -538,7 +538,6 @@ const processLayerForPopUp = async (imageUrl) => {
     
     setCachedImage(image);
     setCachedCanvas(canvas);
-
     console.log("Image preprocessing completed.");
   };
 
