@@ -1,7 +1,7 @@
 import { useState } from "react";
 
  
- const SideBarTiles = ({ field, selectedFieldName, setSelectedFieldName, clearMap }) => {
+ const SideBarTiles = ({ field, selectedFieldName, setSelectedFieldName, clearMap,handleShowFullPage }) => {
     const [hovered, setHovered] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [editFieldIndex, setEditFieldIndex] = useState(null);
@@ -40,7 +40,8 @@ import { useState } from "react";
             className={`field-name ${
               selectedFieldName === field.name ? "selected" : ""
             }`}
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => {
+                setExpanded(!expanded)}}
           >
             {expanded ? "−" : "+"} {field.name}
           </div>
