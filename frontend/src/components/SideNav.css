@@ -52,7 +52,7 @@
   padding: 10px;
   cursor: pointer;
   background-color: #323d49;
-  transition: background-color 0.3s; /* Smooth transition for background color */
+  /* transition: background-color 0.3s; */
 }
 
 .field-item-content.selected {

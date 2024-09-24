@@ -97,6 +97,11 @@ const SideNav = ({
   const handleLogout = () => {
     window.location.href = "http://localhost:3000/api/logout";
   };
+  useEffect(() => {
+    if (selectedFieldName===null && expandedField!==null){
+      setExpandedField(null);
+    }
+   }, [selectedFieldName]);
 
   return (
     <div className="sidenav-container">
@@ -125,12 +130,19 @@ const SideNav = ({
               } ${hoveredFieldIndex === index ? "hovered" : ""}`}
               onMouseEnter={() => setHoveredFieldIndex(index)}
               onMouseLeave={() => setHoveredFieldIndex(null)}
-              onClick={() => setSelectedFieldName(field.name)}
+              onClick={() => {
+                if (selectedFieldName === field.name) {
+                  setSelectedFieldName(null);
+                } else {
+                  setSelectedFieldName(field.name);
+                }
+              }}
             >
               <div
                 className={`field-name ${
                   selectedFieldName === field.name ? "selected" : ""
                 }`}
+                
                 onClick={() =>
                   setExpandedField(
                     expandedField === field.name ? null : field.name
