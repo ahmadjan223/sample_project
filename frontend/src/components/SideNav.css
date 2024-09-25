@@ -58,9 +58,6 @@
 .field-item-content.selected {
   background-color: #4b5966;
 }
-.field-item-content.hovered {
-  background-color: #4b5966;
-}
 
 .field-name {
   cursor: pointer;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./SideNav.css";
 import SideBarTiles from "./sideBarTile";
+import FieldDetails from "./FieldDetails"; // Import the new component
 
 // SideNav component
 const SideNav = ({
@@ -11,6 +12,7 @@ const SideNav = ({
   setSelectedFieldName,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
+  const [showDetailsPage, setShowDetailsPage] = useState(false); // New state to manage page
 
   // Load polygons and update state when polygons change
   useEffect(() => {
@@ -33,39 +35,61 @@ const SideNav = ({
     window.location.href = "http://localhost:3000/api/logout";
   };
 
-  return (
-    <div className="sidenav-container">
-      {/* User Info */}
-      <div className="user-info">
-        {user.image && (
-          <img
-            src={user.image}
-            alt={`${user.displayName}'s profile`}
-            className="user-image"
-          />
-        )}
-        <div className="user-name">{user.displayName}</div>
-        <i className="material-icons logout-icon" onClick={handleLogout}>
-          logout
-        </i>
-      </div>
+  // Function to open the FieldDetails page
+  const openDetailsPage = (fieldName) => {
+    setSelectedFieldName(fieldName);
+    setShowDetailsPage(true); // Switch to the details page
+  };
 
-      {/* Field List */}
-      <div className="field-container">
-        {polygonInfo.map((field, index) => (
-          <SideBarTiles
-            key={field.name}
-            field={field}
-            selectedFieldName={selectedFieldName}
-            setSelectedFieldName={setSelectedFieldName}
-            clearMap={clearMap}
-          />
-        ))}
-      </div>
-    </div>
+  // Function to go back to the SideNav
+  const goBackToSidebar = () => {
+    setShowDetailsPage(false); // Go back to sidebar
+    //to set selectedFielsName to null
+    setSelectedFieldName(null);
+  };
+
+  return (
+    <>
+      {showDetailsPage ? (
+        
+
+        <FieldDetails
+        fieldName={selectedFieldName}
+        polygonInfo={polygonInfo}
+        goBackToSidebar={goBackToSidebar} // Pass the back function to FieldDetails
+        />
+      ) : ( 
+        <div className="sidenav-container">
+          {/* User Info */}
+          <div className="user-info">
+            {user.image && (
+              <img
+                src={user.image}
+                alt={`${user.displayName}'s profile`}
+                className="user-image"
+              />
+            )}
+            <div className="user-name">{user.displayName}</div>
+            <i className="material-icons logout-icon" onClick={handleLogout}>
+              logout
+            </i>
+          </div>
+
+          {/* Field List */}
+          <div className="field-container">
+            {polygonInfo.map((field) => (
+              <SideBarTiles
+                key={field.name}
+                field={field}
+                selectedFieldName={selectedFieldName}
+                openDetailsPage={openDetailsPage} // Pass the function to open details
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
-
-
 
 export default SideNav;
