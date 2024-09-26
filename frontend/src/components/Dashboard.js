@@ -71,7 +71,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/sentinel/getImageUrl",
+        "https://densefusion-3n1o.vercel.app/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -101,7 +101,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.BACKEND}/api/reset/${encodeURIComponent(userId)}`,
+        `https://densefusion-3n1o.vercel.app/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
