@@ -31,6 +31,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 // MongoDB connection
 connectDB();
+
+app.get('/',(req,res)=>{res.send("QWERTYUIOP{")})
+
 //sentinel acess token
 app.get('/test-token', async (req, res) => {
   try {
