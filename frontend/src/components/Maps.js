@@ -10,8 +10,8 @@ const Maps = ({
   selectedFieldName,
   date,
   layer,
+  setIsLoading,
 }) => {
-  console.log(selectedFieldName);
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
   const [polygonBoundary, setPolygoneBoundary] = useState([]);
@@ -49,6 +49,13 @@ const Maps = ({
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   };
+  //for clearing map
+  useEffect(() => {
+    if (!selectedFieldName && groundOverlay) {
+      setPolygoneBoundary([]); 
+      groundOverlay.setMap(null);
+    }
+  },[selectedFieldName])
   //for changing the center
   useEffect(() => {
     if (selectedFieldName) {
@@ -80,7 +87,7 @@ const Maps = ({
 
     return center;
   };
-  //for clearing map and drawing new polygons
+  //for removing prev image layer and drawing new image layer
   useEffect(() => {
     if (groundOverlay) {
       groundOverlay.setMap(null);
@@ -190,6 +197,7 @@ const Maps = ({
       setCachedImage(image);
       setCachedCanvas(canvas);
       console.log("Image preprocessing completed.");
+      setIsLoading(false);
     };
   
     image.onerror = (error) => {

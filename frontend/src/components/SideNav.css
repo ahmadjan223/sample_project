@@ -64,7 +64,7 @@
 
 .field-name {
   cursor: pointer;
-  font-weight: bold;
+  /* font-weight: bold; */
   color: #fafafa;
 }
 .field-name.selected {

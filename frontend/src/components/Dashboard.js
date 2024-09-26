@@ -15,7 +15,6 @@ import BottomBar from "./bottomBar";
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [map, setMap] = useState(null);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
@@ -23,7 +22,6 @@ const Dashboard = ({ user }) => {
   const [polygonLayer, setPolygonLayer] = useState([]);
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
-  const [polygoneBoundary, setPolygoneBoundary] = useState([]);
 
   useEffect(() => {
     DataFetch();
@@ -92,7 +90,7 @@ const Dashboard = ({ user }) => {
         const propsArray = [data.imageUrl, minLat, minLon, maxLat, maxLon];
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     } catch (error) {
       setIsLoading(false);
@@ -177,6 +175,7 @@ const Dashboard = ({ user }) => {
               selectedFieldName={selectedFieldName}
               date={date}
               layer={layer}
+              setIsLoading={setIsLoading}
             ></Maps>
           )}
         </div>

@@ -1,0 +1,22 @@
+.fullpage-container {
+    position: absolute; /* Positioned relative to the sidebar */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width of the sidebar */
+    height: 100%; /* Full height of the sidebar */
+    background-color: #ffffff; /* Background color */
+    z-index: 10; /* Ensures it overlays the sidebar content */
+    padding: 20px;
+    overflow-y: auto; /* If content is long, make it scrollable */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional shadow for effect */
+  }
+  
+  .back-button {
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  
+  .fullpage-content {
+    /* Add more styling if necessary */
+  }
+  
