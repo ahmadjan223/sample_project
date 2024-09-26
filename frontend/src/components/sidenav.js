@@ -52,7 +52,6 @@ const SideNav = ({
     <>
       {showDetailsPage ? (
         
-
         <FieldDetails
         fieldName={selectedFieldName}
         polygonInfo={polygonInfo}

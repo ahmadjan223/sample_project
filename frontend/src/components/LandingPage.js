@@ -123,9 +123,11 @@ const LandingPage = () => {
                       flexGrow: 0,
                       flexShrink: 0,
                       fontSize: 32,
+                    
                       fontWeight: 700,
-                      textAlign: "left",
+                      textAlign: "center", // Changed to "center"
                       color: "#000",
+                      paddingTop:10,
                     }}
                   >
                     Crop Monitoring
@@ -265,6 +267,7 @@ const LandingPage = () => {
                     textAlign: "left",
                     color: "#0f172a",
                     fontFamily: "Segoe UI",
+                    paddingTop:5,
                   }}
                 >
                   Continue with Google

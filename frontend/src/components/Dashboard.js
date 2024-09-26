@@ -22,6 +22,7 @@ const Dashboard = ({ user }) => {
   const [polygonLayer, setPolygonLayer] = useState([]);
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
+  const [indexValues,setIndexValues] = useState({});
 
   useEffect(() => {
     DataFetch();
@@ -91,12 +92,45 @@ const Dashboard = ({ user }) => {
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
         // setIsLoading(false);
+        //fetching index values
+        getIndexValues(selectedPolygon.path, layer, date);
       }
     } catch (error) {
       setIsLoading(false);
       console.error("Error fetching image URL:", error.message);
     }
   };
+  const getIndexValues = async (path,layer,timeRange) => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/sentinel/getIndexValues",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            coordinates: path,
+            layer,
+            time: timeRange,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+
+        // Extract the indexvalue and convert it into an array
+        const IndexArray = Object.values(result.indexValues);
+        
+        // Pass the array to indexvalue
+        setIndexValues(IndexArray);
+        console.log(result);
+      } else {
+        console.error("Failed to get index values");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   const resetDB = async (userId) => {
     try {
@@ -176,6 +210,7 @@ const Dashboard = ({ user }) => {
               date={date}
               layer={layer}
               setIsLoading={setIsLoading}
+              indexValues = {indexValues}
             ></Maps>
           )}
         </div>

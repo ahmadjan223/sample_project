@@ -11,6 +11,7 @@ const Maps = ({
   date,
   layer,
   setIsLoading,
+  indexValues
 }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
@@ -20,9 +21,11 @@ const Maps = ({
     lat: 33.639777,
     lng: 72.985718,
   });
+  const [event, setEvent] = useState(null); //for mouse hover
   //saving image on canvas ofr mouse hover
   let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
   let [cachedCanvas,setCachedCanvas] = useState(null);
+
 //map ki height waghera yahan maps se change hogi
 //lekin agar wo scroll bar aana shuru ho jaye 
 //right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
@@ -30,7 +33,16 @@ const Maps = ({
     width: "100%",
     height: "100vh",
   };
-
+  const tooltip = document.createElement("div");
+  tooltip.style.position = "absolute";
+  tooltip.style.backgroundColor = "white";
+  tooltip.style.border = "1px solid #ccc";
+  tooltip.style.padding = "5px";
+  tooltip.style.borderRadius = "4px";
+  tooltip.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.2)";
+  tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
+  tooltip.style.display = "none"; // Initially hidden
+  document.body.appendChild(tooltip);
   const polygonOptions = {
     fillOpacity: 0,
     fillColor: "#ff0000",
@@ -49,10 +61,23 @@ const Maps = ({
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
     },
   };
+
+  //for mousehover
+  useEffect(() => {
+    if (event) {
+      handleMouseHover(event);
+    }
+    if(!event){
+      hideTooltip();
+    }
+  }, [event])
+  
   //for clearing map
   useEffect(() => {
-    if (!selectedFieldName && groundOverlay) {
+    if (!selectedFieldName ) {
       setPolygoneBoundary([]); 
+    }
+    if(groundOverlay){
       groundOverlay.setMap(null);
     }
   },[selectedFieldName])
@@ -207,7 +232,103 @@ const Maps = ({
     // Load the image (only done once)
     image.src = imageUrl;
   };
+  //getting index values for mouse hover
 
+  //mouseHover on image layer
+  const handleMouseHover =  async (event) => {
+    if (!groundOverlay) {
+      console.error("groundOverlay is is not loaded.");
+      return;
+    }
+  
+    // Check if cachedImage and cachedCanvas are initialized
+    if (!cachedCanvas || !indexValues) {
+      console.error("Cached canvas or NDVI values are not available.");
+      return;
+    }
+  
+    const latLng = event.latLng;
+    const { lat, lng } = latLng.toJSON();
+    console.log("Hovered at Lat:", lat, "Lng:", lng);
+  
+    // Bounds of the overlay
+    const bounds = groundOverlay.getBounds();
+    const northEast = bounds.getNorthEast(); // maxLat, maxLon
+    const southWest = bounds.getSouthWest(); // minLat, minLon
+    const minLat = southWest.lat();
+    const minLon = southWest.lng();
+    const maxLat = northEast.lat();
+    const maxLon = northEast.lng();
+  
+    // Get canvas dimensions
+    const width = cachedCanvas.width;
+    const height = cachedCanvas.height;
+  
+    // Process the click
+    console.log('sent for calculating')
+    calculateIndexValue(lat, lng, minLat, minLon, maxLat, maxLon, width, height, event);
+  };
+  //code for calculating the index value on mouse hover
+
+
+  const calculateIndexValue = (lat, lng, minLat, minLon, maxLat, maxLon, width, height, event) => {
+  
+    console.log("IndexValue:", indexValues,lat,lng,minLat,minLon,maxLat,maxLon,width,height);
+    // Validate input values
+  
+    // Check if the ranges are valid
+    const lonRange = maxLon - minLon;
+    const latRange = maxLat - minLat;
+  
+    if (lonRange <= 0 || latRange <= 0) {
+      console.error("Invalid latitude or longitude range.");
+      return;
+    }
+    
+    // Convert lat/lng to pixel coordinates
+    const x = ((lng - minLon) / lonRange) * width;
+    const y = ((lat - maxLat) / -latRange) * height; // Invert latRange to correctly scale the Y axis
+  
+    // Check if the conversion resulted in valid numbers
+    if (isNaN(x) || isNaN(y)) {
+      console.error("Conversion to pixel coordinates resulted in NaN values.");
+      console.error(`lng: ${lng}, minLon: ${minLon}, maxLon: ${maxLon}, width: ${width}`);
+      console.error(`lat: ${lat}, minLat: ${minLat}, maxLat: ${maxLat}, height: ${height}`);
+      return;
+    }
+  
+    // Round x and y to the nearest integers
+    const pixelX = Math.round(x);
+    const pixelY = Math.round(y);
+  
+    console.log("NDVI Array Length:", indexValues.length);
+  console.log("Canvas Width:", width, "Canvas Height:", height);
+  console.log("Index Calculation: ", pixelY * width + pixelX);
+  
+    // Ensure x and y are within the bounds of the image dimensions
+    if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height) {
+      // Calculate the index in the NDVI values array
+      const index = pixelY * width + pixelX;
+  
+      // Ensure the index is within bounds
+      if (index >= 0 && index < indexValues.length) {
+        const ndviValue = indexValues[index];
+        
+        // NDVI values are typically in the range [-1, 1], adjust if necessary
+        console.log(`NDVI Value at (${pixelX}, ${pixelY}) [lat: ${lat}, lng: ${lng}] is: ${ndviValue}`);
+  
+        // Trigger function after 1 second (assuming you want to use ndviValue in the tooltip)
+        updateTooltip(event, ndviValue);
+  
+      } else {
+        console.error("Index is out of bounds in the NDVI values array. Length: ", indexValues.length, " Index: ", index);
+      }
+    } else {
+      console.error("Coordinates are out of bounds");
+    }
+  };
+  
+  
   // Add the mousemove listener to the GroundOverlay
   const updateTooltip = (event, indexValue) => {
     const mouseX = event.domEvent.clientX;
@@ -219,27 +340,31 @@ const Maps = ({
   };
 
   const hideTooltip = () => {
-    tooltip.style.display = "none"; // Hide tooltip
+    tooltip.style.display = "none"; 
+    tooltip.textContent = ""; 
+    // Hide tooltip
   };
-  const tooltip = document.createElement("div");
-  tooltip.style.position = "absolute";
-  tooltip.style.backgroundColor = "white";
-  tooltip.style.border = "1px solid #ccc";
-  tooltip.style.padding = "5px";
-  tooltip.style.borderRadius = "4px";
-  tooltip.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.2)";
-  tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
-  tooltip.style.display = "none"; // Initially hidden
-  document.body.appendChild(tooltip);
+ 
   const handlePolygonLoad = (polygon) => {
     // Add mousemove listener to the polygon
-    polygon.addListener("mousemove", (event) => {
-      updateTooltip(event, 25); // Display index value
+    let timer;  
+    polygon.addListener('mousemove', (event) => {
+      // Clear the timer if the mouse keeps moving
+      clearTimeout(timer);
+      // hideTooltip();
+      // Start a 1 second timer to check if the mouse stays
+      timer = setTimeout(() => {
+        setEvent(event);
+      }, 100);
     });
-
-    // Add mouseout listener to hide the tooltip
-    polygon.addListener("mouseout", hideTooltip);
-  };
+  
+    // Mouseout event to cancel the timer if the mouse leaves the map
+    polygon.addListener('mouseout', () => {
+      clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
+      console.log("hide tooltip");
+      setEvent(null);        // Hide tooltip when mouse leaves the map
+    });
+  }
 
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
@@ -256,6 +381,8 @@ const Maps = ({
           options={drawingManagerOptions}
         />
         <Polygon
+          handleMouseHover={(event) => handleMouseHover(event)}
+          // onClick={(event) => handleMouseHover(event)}
           paths={polygonBoundary}
           options={polygonOptions}
           visible={true}
