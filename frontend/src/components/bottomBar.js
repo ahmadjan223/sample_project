@@ -1,81 +1,9 @@
 import React, { useState, useEffect } from "react";
+import styles from "./BottomBarStyle"; // Adjust the path as needed
 
 const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   const [hoveredDateIndex, setHoveredDateIndex] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
-
-  const styles = {
-    bottomBar: {
-      position: "absolute",
-      bottom: 0,
-      width: "83.7%",
-      padding: "20px",
-      // backgroundColor: "transparent",
-      backgroundColor: "#212930",
-      // boxShadow: "0 -2px 5px rgba(0,0,0,0.1)",
-      // borderTop: "5px solid #00000",
-      display: "flex",
-      flexDirection: "column", // Stack elements vertically
-      alignItems: "center", // Center align the items
-    },
-
-    selectorsContainer: {
-      display: "flex",
-      // justifyContent: "", // Space the selectors
-      width: "50%", // Ensure it takes full width
-      marginBottom: "10px", // Space between selectors and date navigator
-      gap: "10px", // Add space between selectors
-      // backgroundColor: "red",
-      // color: "yellow",
-    },
-
-    dropdownMenu: {
-      padding: "8px",
-      fontSize: 
-      "16px",
-      backgroundColor: "#111418",
-      color: "#fafafa",
-    },
-    
-    dateContainer: {
-      width: "80%",
-      // border: "2px solid black",
-      borderRadius: "0px",
-      display: "flex",
-      alignItems: "center",
-      padding: "0px",
-      boxSizing: "border-box",
-      gap: "0px",
-      marginTop: "10px", // Add space above the date navigator
-    },
-
-    dateNav: {
-      cursor: "pointer",
-      borderRadius: "0px",
-      padding: "5px 4px",
-      border: "1px solid black", // Add border to make it look like a button
-
-      backgroundColor: "#111418",
-      color: "#fafafa",
-    },
-
-    dateTile: (isSelected, isHovered) => ({
-      cursor: "pointer",
-      borderRadius: "0px",
-      padding: "5px 4px",
-      backgroundColor: isSelected
-        ? "#192c45"
-        : isHovered
-        ? "#323d48"
-        : "#111418",
-      // // backgroundColor: isHovered ? "#323d48":"#111418",
-      // backgroundColor: selectedDate === date ? "#192c45" : "#111418",
-      color: isSelected ? "#338cf3" : "#fafafa",
-      textAlign: "center",
-      border: "1px solid black", // Add border to make it look like a button
-      outline: "none", // Remove the default outline on focus
-    }),
-  };
 
   const [incrementValue, setIncrementValue] = useState(30);
   const initDays = 30;
@@ -117,7 +45,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
     const years = date.getFullYear();
-    let year = years
+    let year = years;
     if (year > 2000) {
       year = year - 2000;
     } else {
@@ -179,11 +107,41 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
 
     generateDates();
   }, [incrementValue]);
+  const handleIntervalChange = async (event) => {
+    const value = event.target.value;
+    let increment;
+  
+    // Set increment based on the selected interval
+    if (value === "Weekly") {
+      increment = 7;
+    } else if (value === "Fortnightly") {
+      increment = 14;
+    } else if (value === "Monthly") {
+      increment = 28;
+    }
+
+    // Update the increment value state
+    await setIncrementValue(increment); // This will trigger the useEffect above
+  };
 
   return (
     <div style={styles.bottomBar}>
       {/* Selectors Container */}
       <div style={styles.selectorsContainer}>
+
+
+        <select
+          className="form-select"
+          style={styles.dropdownMenu}
+          onChange={handleIntervalChange}
+          defaultValue="Monthly" // Set default value here
+
+        >
+          <option value="Monthly">Monthly</option>
+          <option value="Fortnightly">Fortnightly</option>
+          <option value="Weekly">Weekly</option>
+        </select>
+
 
         <select
           value={layer}
@@ -192,7 +150,6 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
             console.log("Layer value is changed");
           }}
           className="form-select"
-
           style={styles.dropdownMenu}
         >
           <option value="AGRICULTURE">Agriculture</option>
@@ -208,33 +165,15 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
         </select>
 
         {/* Additional Selector */}
-        <select
-            className="form-select"
-            style={styles.dropdownMenu
-            //   {
-            //   width: "50%", // Set the width to 50%
-            //   borderRadius: "15px",
-            //   border: "1px solid black",
-
-            //   padding: "5px",
-            //   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            // }
-          }
-            // Add your handler for this select
-            // onChange={handleIntervalChange}
-          >
-            <option value="Monthly">Monthly</option>
-            <option value="Fortnightly">Fortnightly</option>
-            <option value="Weekly">Weekly</option>
-          </select>
       </div>
-
       {/* Date Navigator */}
-      <div className = "d-flex" style={styles.dateContainer} >
-        <button style={styles.dateNav} onClick={handlePreviousDates}>
+      <div className="d-flex" style={styles.dateContainer}>
+        <button
+          style={{ ...styles.dateNav, ...styles.dateNavLeft }}
+          onClick={handlePreviousDates}
+        >
           {"<"}
         </button>
-
         <div style={{ display: "flex", gap: "0px" }}>
           {dates.map((date, index) => (
             <button
@@ -258,7 +197,10 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
           ))}
         </div>
 
-        <button style={styles.dateNav} onClick={handleNextDates}>
+        <button
+          style={{ ...styles.dateNav, ...styles.dateNavRight }}
+          onClick={handleNextDates}
+        >
           {">"}
         </button>
       </div>

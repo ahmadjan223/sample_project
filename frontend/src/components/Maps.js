@@ -34,8 +34,8 @@ const Maps = ({
   const polygonOptions = {
     fillOpacity: 0,
     fillColor: "#ff0000",
-    strokeColor: "black",
-    strokeWeight: 5,
+    strokeColor: "white",
+    strokeWeight: 3,
     draggable: false,
     editable: false,
     clickable: true,
