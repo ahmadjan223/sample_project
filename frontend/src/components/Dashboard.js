@@ -180,13 +180,13 @@ const Dashboard = ({ user }) => {
           )}
         </div>
         <div>
-          <BottomBar
+          {selectedFieldName && (<BottomBar
             date={date}
             layer={layer}
             setDate={setDate}
             setLayer={setLayer}
             selectedFieldName={selectedFieldName}
-          ></BottomBar>
+          ></BottomBar>)}
         </div>
       </div>
     </div>

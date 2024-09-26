@@ -75,16 +75,58 @@ const SideNav = ({
             </i>
           </div>
 
-          {/* Field List */}
-          <div className="field-container">
-            {polygonInfo.map((field) => (
-              <SideBarTiles
-                key={field.name}
-                field={field}
-                selectedFieldName={selectedFieldName}
-                openDetailsPage={openDetailsPage} // Pass the function to open details
-              />
-            ))}
+      {/* field */}
+      <div className="field-container">
+        {polygonInfo.map((field, index) => (
+          <div key={field.name} className="field-item">
+            <button
+              className={`field-item-content ${
+                selectedFieldName === field.name ? "selected" : ""
+              } ${hoveredFieldIndex === index ? "hovered" : ""}`}
+              onMouseEnter={() => setHoveredFieldIndex(index)}
+              onMouseLeave={() => setHoveredFieldIndex(null)}
+              onClick={() => setSelectedFieldName(field.name)}
+            >
+              <div
+                className={`field-name ${
+                  selectedFieldName === field.name ? "selected" : ""
+                }`}
+                onClick={() =>
+                  setExpandedField(
+                    expandedField === field.name ? null : field.name
+                  )
+                }
+              >
+                {expandedField === field.name ? "−" : "+"} {field.name}
+              </div>
+              {expandedField === field.name && (
+                <div className="field-details">
+                  {editFieldIndex ===
+                  polygonInfo.findIndex((f) => f.name === field.name) ? (
+                    <div>
+                      {/* Input and Save/Cancel buttons can be implemented here */}
+                    </div>
+                  ) : (
+                    <div>
+                      <button
+                        onClick={() => handleEditFieldName(field.name)}
+                        className="btn btn-sm"
+                        style={{ backgroundColor: "#3592fd", color: "#fafafa" }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteField(field.name)}
+                        className="btn btn-sm"
+                        style={{ backgroundColor: "#3592fd", color: "#fafafa" }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </button>
           </div>
         </div>
       )}
