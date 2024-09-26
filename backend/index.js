@@ -32,7 +32,10 @@ app.use(passport.session());
 // MongoDB connection
 connectDB();
 
-app.get('/',(req,res)=>{res.send("QWERTYUIOP{")})
+// Example route
+app.get('/', (req, res) => {
+  res.send('Welcome to the API!');
+});
 
 //sentinel acess token
 app.get('/test-token', async (req, res) => {
@@ -55,4 +58,5 @@ app.use(userRoutes);
 app.use(sentinelRoutes);
 // Start the server
 const port = process.env.PORT || 3000;
+
 app.listen(port, () => console.log(`Server running on port ${port}`));
