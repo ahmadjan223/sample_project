@@ -131,7 +131,7 @@ const DrawableMap = ({ user }) => {
 
   const sendToDb = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/fields", {
+      const response = await fetch(`${process.env.BACKEND}/api/fields`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,7 +171,7 @@ const DrawableMap = ({ user }) => {
   const loadFromDB = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/load-polygons/${encodeURIComponent(userId)}`
+        `${process.env.BACKEND}/api/load-polygons/${encodeURIComponent(userId)}`
       );
       if (response.ok) {
         const result = await response.json();
@@ -230,7 +230,7 @@ const DrawableMap = ({ user }) => {
       // Send coordinates to backend to get image URL
       try {
         const response = await fetch(
-          "http://localhost:3000/sentinel/getImageUrl",
+          `${process.env.BACKEND}/sentinel/getImageUrl`,
           {
             method: "POST",
             headers: {
@@ -277,7 +277,7 @@ const DrawableMap = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/reset/${encodeURIComponent(userId)}`,
+        `${process.env.BACKEND}/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }

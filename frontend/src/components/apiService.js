@@ -1,7 +1,7 @@
 export const savePolygon = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/save-single-polygon",
+        `${process.env.BACKEND}/api/save-single-polygon`,
         {
           method: "POST",
           headers: {
@@ -30,7 +30,7 @@ export const savePolygon = async (coordinates, name, userId) => {
 
   export const sendToDb = async (polygons) => {
     try {
-      const response = await fetch("http://localhost:3000/api/fields", {
+      const response = await fetch(`${process.env.BACKEND}/api/fields`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export const savePolygon = async (coordinates, name, userId) => {
 export const loadPolygon = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/load-polygons/${encodeURIComponent(userId)}`
+        `${process.env.BACKEND}/api/load-polygons/${encodeURIComponent(userId)}`
       );
       if (response.ok) {
         const result = await response.json();

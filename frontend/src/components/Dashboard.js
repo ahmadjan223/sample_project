@@ -101,7 +101,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/reset/${encodeURIComponent(userId)}`,
+        `${process.env.BACKEND}/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
