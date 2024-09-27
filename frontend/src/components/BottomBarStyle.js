@@ -12,15 +12,21 @@ const styles = {
   },
 
   selectorsContainer: {
-    display: "flex",
-
-    justifyContent: "space-between", // Change to space-between
+    display: "block", // Use block display
     width: "80%", // Ensure it takes full width
     marginTop: "10px", // Space between selectors and date navigator
-    
-    gap: "700px", // Add space between selectors
-  },
-  
+    marginLeft: "0", // Align to the left
+    // gap: "20px"
+},
+
+
+selectorItem: {
+  width: "300px", // Set a fixed width for the selectors
+
+  display: "inline-block", // Use inline-block for individual items
+  // marginRight: "0px", // Set the desired gap between selectors
+  verticalAlign: "top", // Align items to the top if needed
+},
 
   dropdownMenu: {
     padding: "8px",

@@ -31,7 +31,7 @@ const SideBarTiles = ({
           paddingTop: 8,
           paddingBottom: 8,
           borderRadius: 8,
-          border: "1px solid white",
+          // border: "1px solid white",
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

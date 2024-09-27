@@ -7,7 +7,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
 
   const [incrementValue, setIncrementValue] = useState(30);
   const initDays = 30;
-  const dateCount = 12;
+  const dateCount = 11;
   const [dates, setDates] = useState([]);
   const [userSelectedIndex, setUserSelectedIndex] = useState("-1");
   const [timeRange, setTimeRange] = useState("");
@@ -130,18 +130,19 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
       <div style={styles.selectorsContainer}>
 
 
+      <div style={styles.selectorItem}>
         <select
-          className="form-select"
-          style={styles.dropdownMenu}
-          onChange={handleIntervalChange}
-          defaultValue="Monthly" // Set default value here
-
+            className="form-select"
+            style={styles.dropdownMenu}
+            onChange={handleIntervalChange}
+            defaultValue="Monthly"
         >
-          <option value="Monthly">Monthly</option>
-          <option value="Fortnightly">Fortnightly</option>
-          <option value="Weekly">Weekly</option>
+            <option value="Monthly">Monthly</option>
+            <option value="Fortnightly">Fortnightly</option>
+            <option value="Weekly">Weekly</option>
         </select>
-
+    </div>
+    <div style={styles.selectorItem}>
 
         <select
           value={layer}
@@ -163,6 +164,8 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
           <option value="SWIR">SWIR</option>
           <option value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</option>
         </select>
+
+          </div>
 
         {/* Additional Selector */}
       </div>

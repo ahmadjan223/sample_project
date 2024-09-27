@@ -123,6 +123,7 @@ const Dashboard = ({ user }) => {
 
   return (
     <div style={{ display: "flex" }}>
+      
       <SideNav
         polygons={polygons}
         isLoaded={isLoaded}
