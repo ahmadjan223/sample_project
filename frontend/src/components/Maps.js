@@ -21,7 +21,6 @@ const Maps = ({
     lat: 33.639777,
     lng: 72.985718,
   });
-  const [event, setEvent] = useState(null); //for mouse hover
   //saving image on canvas ofr mouse hover
   let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
   let [cachedCanvas,setCachedCanvas] = useState(null);
@@ -50,7 +49,7 @@ const Maps = ({
     strokeWeight: 3,
     draggable: false,
     editable: false,
-    clickable: true,
+    clickable: false,
   };
 
   const drawingManagerOptions = {
@@ -62,16 +61,6 @@ const Maps = ({
     },
   };
 
-  //for mousehover
-  useEffect(() => {
-    if (event) {
-      handleMouseHover(event);
-    }
-    if(!event){
-      hideTooltip();
-    }
-  }, [event])
-  
   //for clearing map
   useEffect(() => {
     if (!selectedFieldName ) {
@@ -198,7 +187,6 @@ const Maps = ({
     newGroundOverlay.setMap(map);
     setGroundOverlay(newGroundOverlay); // Save the overlay in state
     processLayerForPopUp(imageUrl);
-
   };
   
   const processLayerForPopUp = async (imageUrl) => {
@@ -235,7 +223,8 @@ const Maps = ({
   //getting index values for mouse hover
 
   //mouseHover on image layer
-  const handleMouseHover =  async (event) => {
+  const handleMouseHover =   (event) => {
+    hideTooltip();
     if (!groundOverlay) {
       console.error("groundOverlay is is not loaded.");
       return;
@@ -344,28 +333,28 @@ const Maps = ({
     tooltip.textContent = ""; 
     // Hide tooltip
   };
- 
-  const handlePolygonLoad = (polygon) => {
-    // Add mousemove listener to the polygon
+  if(map){
     let timer;  
-    polygon.addListener('mousemove', (event) => {
+    map.addListener('mousemove', (event) => {
+      hideTooltip();
       // Clear the timer if the mouse keeps moving
       clearTimeout(timer);
       // hideTooltip();
       // Start a 1 second timer to check if the mouse stays
       timer = setTimeout(() => {
-        setEvent(event);
+        // setEvent(event);
+        handleMouseHover(event);
       }, 100);
     });
   
     // Mouseout event to cancel the timer if the mouse leaves the map
-    polygon.addListener('mouseout', () => {
+    map.addListener('mouseout', () => {
       clearTimeout(timer);  // Clear the timer if the mouse moves out too soon
-      console.log("hide tooltip");
-      setEvent(null);        // Hide tooltip when mouse leaves the map
+      // console.log("hide tooltip");
+      // setEvent(null); 
+      hideTooltip();       // Hide tooltip when mouse leaves the map
     });
   }
-
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
       <GoogleMap
@@ -386,7 +375,6 @@ const Maps = ({
           paths={polygonBoundary}
           options={polygonOptions}
           visible={true}
-          onLoad={handlePolygonLoad}
         />
       </GoogleMap>
     </div>
