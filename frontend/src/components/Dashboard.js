@@ -14,6 +14,8 @@ import BottomBar from "./bottomBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
+  const [isDrawing, setIsDrawing] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState(null);
@@ -134,7 +136,9 @@ const Dashboard = ({ user }) => {
         setSelectedFieldName={(name) => {
           setSelectedFieldName(name);
         }}
-        // onFieldClick={handleFieldClick}
+        isDrawing={isDrawing}
+        setIsDrawing={setIsDrawing}
+        DataFetch={DataFetch}
       />
       {isLoading && ( // Add a condition to show the loader
         <div
@@ -171,22 +175,25 @@ const Dashboard = ({ user }) => {
               polygons={polygons}
               DataFetch={DataFetch}
               polygonLayer={polygonLayer}
-        
               selectedFieldName={selectedFieldName}
               date={date}
               layer={layer}
               setIsLoading={setIsLoading}
+              isDrawing={isDrawing}
+              setIsDrawing={setIsDrawing}
             ></Maps>
           )}
         </div>
         <div>
-          <BottomBar
-            date={date}
-            layer={layer}
-            setDate={setDate}
-            setLayer={setLayer}
-            selectedFieldName={selectedFieldName}
-          ></BottomBar>
+          {selectedFieldName && (
+            <BottomBar
+              date={date}
+              layer={layer}
+              setDate={setDate}
+              setLayer={setLayer}
+              selectedFieldName={selectedFieldName}
+            ></BottomBar>
+          )}
         </div>
       </div>
     </div>

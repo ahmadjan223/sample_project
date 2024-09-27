@@ -11,6 +11,8 @@ const Maps = ({
   date,
   layer,
   setIsLoading,
+  isDrawing,
+  setIsDrawing,
 }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
@@ -21,11 +23,12 @@ const Maps = ({
     lng: 72.985718,
   });
   //saving image on canvas ofr mouse hover
-  let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
-  let [cachedCanvas,setCachedCanvas] = useState(null);
-//map ki height waghera yahan maps se change hogi
-//lekin agar wo scroll bar aana shuru ho jaye 
-//right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
+  let [cachedImage, setCachedImage] = useState(null); // Store the loaded image globally
+  let [cachedCanvas, setCachedCanvas] = useState(null);
+
+  //map ki height waghera yahan maps se change hogi
+  //lekin agar wo scroll bar aana shuru ho jaye
+  //right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
   const containerStyle = {
     width: "100%",
     height: "100vh",
@@ -44,18 +47,37 @@ const Maps = ({
   const drawingManagerOptions = {
     polygonOptions: polygonOptions,
     drawingControl: true,
-    drawingControlOptions: {
-      position: window.google?.maps?.ControlPosition?.TOP_CENTER,
+    position: window.google?.maps?.ControlPosition?.TOP_CENTER,
       drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
-    },
+
   };
+  
+  useEffect(() => {
+    if (map && drawingManager) {
+      if (drawingManager) {
+        drawingManager.setMap(map); // Show the drawing manager
+        drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.POLYGON); // Activate polygon drawing
+      } else {
+        drawingManager.setMap(null); 
+        // deactivate polygon drawing drawing
+        // Hide the drawing manager when not in drawing mode
+
+      }
+    }
+  }, [isDrawing, map, drawingManager]);
+  
+
   //for clearing map
   useEffect(() => {
-    if (!selectedFieldName && groundOverlay) {
-      setPolygoneBoundary([]); 
+    if (!selectedFieldName) {
+      setPolygoneBoundary([]);
+    }
+    if(groundOverlay){  
       groundOverlay.setMap(null);
     }
-  },[selectedFieldName])
+
+  }, [selectedFieldName]);
+
   //for changing the center
   useEffect(() => {
     if (selectedFieldName) {
@@ -66,6 +88,7 @@ const Maps = ({
       setDefaultCenter(centerPoint);
     }
   }, [selectedFieldName]);
+
   const calculateCenter = (path) => {
     const totalPoints = path.length;
 
@@ -114,6 +137,7 @@ const Maps = ({
     return polygons.some((polygon) => polygon.name === name);
   };
   const onOverlayComplete = async (event) => {
+    setIsDrawing(false);
     const name = prompt("Enter a name for this field:");
     if (nameExists(name)) {
       alert("name already exists");
@@ -129,6 +153,7 @@ const Maps = ({
       await savePolygon(newPolygonPath, name, user.id);
       newPolygon.setMap(null);
       DataFetch();
+
     } else {
       alert("The name is already taken. Please choose a different name.");
       newPolygon.setMap(null);
@@ -141,6 +166,8 @@ const Maps = ({
         },
       });
     }
+    setIsDrawing(false); // Exit drawing mode after saving
+
   };
   // let timer;
 
@@ -173,33 +200,32 @@ const Maps = ({
     newGroundOverlay.setMap(map);
     setGroundOverlay(newGroundOverlay); // Save the overlay in state
     processLayerForPopUp(imageUrl);
-
   };
-  
+
   const processLayerForPopUp = async (imageUrl) => {
     console.log("Preprocessing layer...");
-  
+
     const image = new Image();
-    image.crossOrigin = "Anonymous"; 
-  
+    image.crossOrigin = "Anonymous";
+
     image.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-  
+
       const width = image.width;
       const height = image.height;
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(image, 0, 0, width, height);
-  
+
       // Cache the image and canvas for later use
-      
+
       setCachedImage(image);
       setCachedCanvas(canvas);
       console.log("Image preprocessing completed.");
       setIsLoading(false);
     };
-  
+
     image.onerror = (error) => {
       console.error("Failed to load the image during preprocessing", error);
       console.error("Image URL:", imageUrl);
@@ -253,7 +279,7 @@ const Maps = ({
         <DrawingManager
           onLoad={(drawingManager) => setDrawingManager(drawingManager)}
           onOverlayComplete={onOverlayComplete}
-          options={drawingManagerOptions}
+          options={isDrawing?drawingManagerOptions:{}}
         />
         <Polygon
           paths={polygonBoundary}
