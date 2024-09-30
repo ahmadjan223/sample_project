@@ -1,7 +1,7 @@
 export const savePolygon = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
-        "https://densefusion-3n1o.vercel.app/api/save-single-polygon",
+        "https://densefusion-3n10.vercel.app/api/save-single-polygon",
         {
           method: "POST",
           headers: {
