@@ -4,7 +4,7 @@ exports.googleAuth = passport.authenticate('google', { scope: ['profile', 'email
 
 exports.googleAuthCallback = (req, res) => {
   const user = req.user;
-  const redirectUrl = `https://densefusion.vercel.app/dashboard?name=${encodeURIComponent(user.displayName)}&id=${encodeURIComponent(user.id)}&image=${encodeURIComponent(user.image)}`;
+  const redirectUrl = `https://densefusion-3n1o.vercel.app/dashboard?name=${encodeURIComponent(user.displayName)}&id=${encodeURIComponent(user.id)}&image=${encodeURIComponent(user.image)}`;
   res.redirect(redirectUrl);
 };
 
