@@ -4,7 +4,7 @@ exports.googleAuth = passport.authenticate('google', { scope: ['profile', 'email
 
 exports.googleAuthCallback = (req, res) => {
   const user = req.user;
-  const redirectUrl = `https://densefusion-3n1o.vercel.app/dashboard?name=${encodeURIComponent(user.displayName)}&id=${encodeURIComponent(user.id)}&image=${encodeURIComponent(user.image)}`;
+  const redirectUrl = `http://densefusion.vercel.app/dashboard?name=${encodeURIComponent(user.displayName)}&id=${encodeURIComponent(user.id)}&image=${encodeURIComponent(user.image)}`;
   res.redirect(redirectUrl);
 };
 
@@ -14,6 +14,6 @@ exports.logout = (req, res) => {
       console.error('Logout error:', err);
       return res.status(500).json({ message: 'Logout failed' });
     }
-    res.redirect('https://densefusion.vercel.app/'); // Adjust the redirect path as needed
+    res.redirect('http://densefusion.vercel.app/'); // Adjust the redirect path as needed
   });
 };
