@@ -111,7 +111,7 @@ const SideNav = ({
           <div
             style={{
               width: 300,
-              height: 933,
+              height: "142%",
               position: "absolute",
               left: 0,
               top: 0,
