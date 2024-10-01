@@ -42,10 +42,10 @@ app.use(passport.session());
 // MongoDB connection
 connectDB();
 
-// Example route
 app.get('/', (req, res) => {
-  res.send('Welcome to the API!');
+  res.send('Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://densefusion-3001.vercel.app for the website. \n\nThanks!');
 });
+
 
 //sentinel acess token
 app.get('/test-token', async (req, res) => {
