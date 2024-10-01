@@ -32,7 +32,7 @@ const SideNav = ({
 
   // Handle logout
   const handleLogout = () => {
-    window.location.href = "https://cropmonb.vercel.app/api/logout";
+    window.location.href = "https://densefusion.vercel.app/api/logout";
   };
 
   // Function to open the FieldDetails page

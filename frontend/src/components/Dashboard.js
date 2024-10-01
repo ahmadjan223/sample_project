@@ -71,7 +71,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "https://cropmonb.vercel.app/sentinel/getImageUrl",
+        "https://densefusion.vercel.app/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -101,7 +101,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `https://cropmonb.vercel.app/api/reset/${encodeURIComponent(userId)}`,
+        `https://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
