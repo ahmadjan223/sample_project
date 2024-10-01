@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://densefusion-3n1o.vercel.app/api/items';
+const API_URL = 'https://cropmonb.vercel.app/api/items';
 
 export const fetchItems = async () => {
   try {

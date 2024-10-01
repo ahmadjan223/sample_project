@@ -1,7 +1,7 @@
 export const savePolygon = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
-        "https://densefusion-3n1o.vercel.app/api/save-single-polygon",
+        "https://cropmonb.vercel.app/api/save-single-polygon",
         {
           method: "POST",
           headers: {
@@ -30,7 +30,7 @@ export const savePolygon = async (coordinates, name, userId) => {
 
   export const sendToDb = async (polygons) => {
     try {
-      const response = await fetch("https://densefusion-3n1o.vercel.app/api/fields", {
+      const response = await fetch("https://cropmonb.vercel.app/api/fields", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export const savePolygon = async (coordinates, name, userId) => {
 export const loadPolygon = async (userId) => {
     try {
       const response = await fetch(
-        `https://densefusion-3n1o.vercel.app/api/load-polygons/${encodeURIComponent(userId)}`
+        `https://cropmonb.vercel.app/api/load-polygons/${encodeURIComponent(userId)}`
       );
       if (response.ok) {
         const result = await response.json();
