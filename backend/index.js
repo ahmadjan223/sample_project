@@ -23,7 +23,17 @@ const { getAccessToken, downloadImagery } = require('./config/sentinelHubConfig'
 const app = express();
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: 'https://densefusion-3001.vercel.app', // Replace with your client's origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true, // Allow credentials (if needed)
+};
+
+app.use(cors(corsOptions));
+
 app.use(
   session({ secret: "your_secret_key", resave: false, saveUninitialized: true })
 );
