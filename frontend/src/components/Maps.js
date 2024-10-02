@@ -1,269 +1,376 @@
-import React, { useState, useEffect } from "react";
-import { DrawingManager, GoogleMap, Polygon } from "@react-google-maps/api";
-import { savePolygon, sendToDb, loadPolygon } from "./apiService";
-const libraries = ["places", "drawing"];
-const Maps = ({
-  user,
-  polygons,
-  DataFetch,
-  polygonLayer,
-  selectedFieldName,
-  date,
-  layer,
-  setIsLoading,
-}) => {
-  const [map, setMap] = useState(null);
-  const [drawingManager, setDrawingManager] = useState(null);
-  const [polygonBoundary, setPolygoneBoundary] = useState([]);
-  const [groundOverlay, setGroundOverlay] = useState(null);
-  const [defaultCenter, setDefaultCenter] = useState({
-    lat: 33.639777,
-    lng: 72.985718,
-  });
-  //saving image on canvas ofr mouse hover
-  let [cachedImage,setCachedImage] = useState(null); // Store the loaded image globally
-  let [cachedCanvas,setCachedCanvas] = useState(null);
-//map ki height waghera yahan maps se change hogi
-//lekin agar wo scroll bar aana shuru ho jaye 
-//right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
-  const containerStyle = {
-    width: "100%",
-    height: "100vh",
-  };
+// src/components/LandingPage.js
+import React from "react";
+import logo from "../images/logo.jpg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons"; // Correct import for the Google icon
 
-  const polygonOptions = {
-    fillOpacity: 0,
-    fillColor: "#ff0000",
-    strokeColor: "#fafafa",
-    strokeWeight: 3,
-    draggable: false,
-    editable: false,
-    clickable: true,
-  };
-
-  const drawingManagerOptions = {
-    polygonOptions: polygonOptions,
-    drawingControl: true,
-    drawingControlOptions: {
-      position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-      drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
-    },
-  };
-  //for clearing map
-  useEffect(() => {
-    if (!selectedFieldName && groundOverlay) {
-      setPolygoneBoundary([]); 
-      groundOverlay.setMap(null);
-    }
-  },[selectedFieldName])
-  //for changing the center
-  useEffect(() => {
-    if (selectedFieldName) {
-      const filter = polygons.find(
-        (polygon) => polygon.name === selectedFieldName
-      );
-      const centerPoint = calculateCenter(filter.path);
-      setDefaultCenter(centerPoint);
-    }
-  }, [selectedFieldName]);
-  const calculateCenter = (path) => {
-    const totalPoints = path.length;
-
-    // Sum all latitudes and longitudes
-    const { latSum, lngSum } = path.reduce(
-      (acc, point) => {
-        acc.latSum += point.lat;
-        acc.lngSum += point.lng;
-        return acc;
-      },
-      { latSum: 0, lngSum: 0 }
-    );
-
-    // Calculate average lat and lng
-    const center = {
-      lat: latSum / totalPoints,
-      lng: lngSum / totalPoints,
-    };
-
-    return center;
-  };
-  //for removing prev image layer and drawing new image layer
-  useEffect(() => {
-    if (groundOverlay) {
-      groundOverlay.setMap(null);
-    }
-  }, [date, layer]);
-  // for displaying image layer on map
-  useEffect(() => {
-    if (polygonLayer) {
-      displayImageLayerOnMap();
-    }
-  }, [polygonLayer]);
-  //for saving polygon coordinates in state for displaying polygon
-  useEffect(() => {
-    if (selectedFieldName && polygons) polygonCoordinates();
-  }, [selectedFieldName]);
-  const polygonCoordinates = () => {
-    const filter = polygons.find(
-      (polygon) => polygon.name === selectedFieldName
-    );
-    setPolygoneBoundary(filter.path);
-  };
-  // to check if name already exists donot allow to save
-  const nameExists = (name) => {
-    return polygons.some((polygon) => polygon.name === name);
-  };
-  const onOverlayComplete = async (event) => {
-    const name = prompt("Enter a name for this field:");
-    if (nameExists(name)) {
-      alert("name already exists");
-      return;
-    }
-    const newPolygon = event.overlay;
-    const newPolygonPath = newPolygon
-      .getPath()
-      .getArray()
-      .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
-
-    if (name !== null && name !== "") {
-      await savePolygon(newPolygonPath, name, user.id);
-      newPolygon.setMap(null);
-      DataFetch();
-    } else {
-      alert("The name is already taken. Please choose a different name.");
-      newPolygon.setMap(null);
-    }
-    if (drawingManager) {
-      drawingManager.setOptions({
-        drawingControl: false,
-        drawingControlOptions: {
-          drawingModes: [],
-        },
-      });
-    }
-  };
-  // let timer;
-
-  const displayImageLayerOnMap = () => {
-    if (!map) {
-      console.error("Map is not loaded yet.");
-      return;
-    }
-
-    // Clear the existing overlay if it exists
-    if (groundOverlay) {
-      groundOverlay.setMap(null);
-    }
-
-    const [imageUrl, minLat, minLon, maxLat, maxLon] = polygonLayer;
-    const bounds = new window.google.maps.LatLngBounds(
-      new window.google.maps.LatLng(minLat, minLon), // SW corner
-      new window.google.maps.LatLng(maxLat, maxLon) // NE corner
-    );
-
-    // Create a new GroundOverlay
-    const newGroundOverlay = new window.google.maps.GroundOverlay(
-      imageUrl,
-      bounds,
-      {
-        clickable: false, // Ensure overlay captures events
-      }
-    );
-
-    newGroundOverlay.setMap(map);
-    setGroundOverlay(newGroundOverlay); // Save the overlay in state
-    processLayerForPopUp(imageUrl);
-
-  };
-  
-  const processLayerForPopUp = async (imageUrl) => {
-    console.log("Preprocessing layer...");
-  
-    const image = new Image();
-    image.crossOrigin = "Anonymous"; 
-  
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-  
-      const width = image.width;
-      const height = image.height;
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(image, 0, 0, width, height);
-  
-      // Cache the image and canvas for later use
-      
-      setCachedImage(image);
-      setCachedCanvas(canvas);
-      console.log("Image preprocessing completed.");
-      setIsLoading(false);
-    };
-  
-    image.onerror = (error) => {
-      console.error("Failed to load the image during preprocessing", error);
-      console.error("Image URL:", imageUrl);
-    };
-    // Load the image (only done once)
-    image.src = imageUrl;
-  };
-
-  // Add the mousemove listener to the GroundOverlay
-  const updateTooltip = (event, indexValue) => {
-    const mouseX = event.domEvent.clientX;
-    const mouseY = event.domEvent.clientY;
-    tooltip.textContent = `${indexValue}`;
-    tooltip.style.left = `${mouseX}px`;
-    tooltip.style.top = `${mouseY}px`;
-    tooltip.style.display = "block"; // Show tooltip
-  };
-
-  const hideTooltip = () => {
-    tooltip.style.display = "none"; // Hide tooltip
-  };
-  const tooltip = document.createElement("div");
-  tooltip.style.position = "absolute";
-  tooltip.style.backgroundColor = "white";
-  tooltip.style.border = "1px solid #ccc";
-  tooltip.style.padding = "5px";
-  tooltip.style.borderRadius = "4px";
-  tooltip.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.2)";
-  tooltip.style.pointerEvents = "none"; // Prevent tooltip from blocking mouse events
-  tooltip.style.display = "none"; // Initially hidden
-  document.body.appendChild(tooltip);
-  const handlePolygonLoad = (polygon) => {
-    // Add mousemove listener to the polygon
-    polygon.addListener("mousemove", (event) => {
-      updateTooltip(event, 25); // Display index value
-    });
-
-    // Add mouseout listener to hide the tooltip
-    polygon.addListener("mouseout", hideTooltip);
+const LandingPage = () => {
+  const handleGoogleSignIn = () => {
+    window.location.href = "http://densefusion.vercel.app/auth/google"; // Replace with your backend URL if it's different
   };
 
   return (
-    <div className="map-container" style={{ flex: 1, position: "relative" }}>
-      <GoogleMap
-        zoom={13}
-        center={defaultCenter}
-        onLoad={(map) => setMap(map)}
-        // onClick={handleClick} // Changed to handle clicks
-        mapContainerStyle={containerStyle}
+    //     <div style={styles.container}>
+    // //left dide ki photo
+    //       <div style={styles.imgContainer}>
+    //         <img src={landingPageImage} alt="Landing Page" style={styles.image} />
+    //       </div>
+
+    //       <div style={styles.textbox}>
+    //         <div style={styles.makeCenter}>
+    //           <h1 style={styles.text}>Dense Fusion</h1>
+
+    //           <a>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quasi a praesentium quibusdam blanditiis harum suscipit minima voluptate dolorum quo totam.</a>
+
+    //           <button onClick={handleGoogleSignIn} style={styles.button}>
+
+    //             <FontAwesomeIcon icon={faGoogle} style={styles.icon} /> Sign in with
+    //             Google
+    //           </button>
+    //         </div>
+    //       </div>
+    //     </div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center", // Center horizontally
+        alignItems: "center", // Center vertically
+        height: "100vh", // Full height of the viewport
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 678,
+          height: "100vh", // Full height of the viewport
+
+          gap: 32,
+        }}
       >
-        <DrawingManager
-          onLoad={(drawingManager) => setDrawingManager(drawingManager)}
-          onOverlayComplete={onOverlayComplete}
-          options={drawingManagerOptions}
-        />
-        <Polygon
-          paths={polygonBoundary}
-          options={polygonOptions}
-          visible={true}
-          onLoad={handlePolygonLoad}
-        />
-      </GoogleMap>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flexGrow: 0,
+            flexShrink: 0,
+            width: 557,
+            position: "relative",
+            gap: 48,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              alignSelf: "stretch",
+              flexGrow: 0,
+              flexShrink: 0,
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                flexGrow: 0,
+                flexShrink: 0,
+                width: 521,
+                gap: 64,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  flexGrow: 0,
+                  flexShrink: 0,
+                  position: "relative",
+                  gap: 16,
+                }}
+              >
+                <img
+                  src={logo}
+                  style={{
+                    flexGrow: 0,
+                    flexShrink: 0,
+                    width: 48,
+                    height: 48,
+                    objectFit: "cover",
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexGrow: 0,
+                    flexShrink: 0,
+                    position: "relative",
+                  }}
+                >
+                  <p
+                    style={{
+                      flexGrow: 0,
+                      flexShrink: 0,
+                      fontSize: 32,
+                    
+                      fontWeight: 700,
+                      textAlign: "center", // Changed to "center"
+                      color: "#000",
+                      paddingTop:10,
+                    }}
+                  >
+                    Crop Monitoring
+                  </p>
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  alignSelf: "stretch",
+                  flexGrow: 0,
+                  flexShrink: 0,
+                  position: "relative",
+                }}
+              >
+                <p
+                  style={{
+                    flexGrow: 0,
+                    flexShrink: 0,
+                    fontSize: 40,
+                    fontWeight: 700,
+                    textAlign: "left",
+                    color: "#000",
+                  }}
+                >
+                  Welcome to Crop Monitoring
+                </p>
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                alignSelf: "stretch",
+                flexGrow: 0,
+                flexShrink: 0,
+                position: "relative",
+              }}
+            >
+              <p
+                style={{
+                  flexGrow: 0,
+                  flexShrink: 0,
+                  fontSize: 20,
+                  textAlign: "left",
+                  color: "#708090",
+                }}
+              >
+                Please continue with your google account to login to crop
+                control.
+              </p>
+            </div>
+          </div>
+          <div
+            style={{
+              alignSelf: "stretch",
+              flexGrow: 0,
+              flexShrink: 0,
+              height: 52,
+              position: "relative",
+            }}
+          >
+            <button
+              style={{
+                width: 557,
+                height: 52,
+                position: "absolute",
+                left: 0,
+                top: 1,
+                borderRadius: 6,
+                background: "#fff",
+                borderWidth: 0.5,
+                // borderColor: "#cbd5e1",
+              }}
+              onClick={handleGoogleSignIn}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  position: "absolute",
+                  left: 169,
+                  top: 4,
+                  gap: 8,
+                }}
+              >
+                <svg
+                  width={45}
+                  height={44}
+                  viewBox="0 0 45 44"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{
+                    flexGrow: 0,
+                    flexShrink: 0,
+                    width: 44,
+                    height: 44,
+                    position: "relative",
+                  }}
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <rect x="0.5" width={44} height={44} rx={1} fill="white" />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M32.004 22.225C32.004 21.523 31.941 20.848 31.824 20.2H22.5V24.0295H27.828C27.5985 25.267 26.901 26.3155 25.8525 27.0175V29.5015H29.052C30.924 27.778 32.004 25.24 32.004 22.225Z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M22.5 31.9C25.173 31.9 27.414 31.0135 29.052 29.5015L25.8525 27.0175C24.966 27.6115 23.832 27.9625 22.5 27.9625C19.9215 27.9625 17.739 26.221 16.9605 23.881H13.653V26.446C15.282 29.6815 18.63 31.9 22.5 31.9Z"
+                    fill="#34A853"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M16.9605 23.881C16.7625 23.287 16.65 22.6525 16.65 22C16.65 21.3475 16.7625 20.713 16.9605 20.119V17.554H13.653C12.9825 18.8905 12.6 20.4025 12.6 22C12.6 23.5975 12.9825 25.1095 13.653 26.446L16.9605 23.881Z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M22.5 16.0375C23.9535 16.0375 25.2585 16.537 26.2845 17.518L29.124 14.6785C27.4095 13.081 25.1685 12.1 22.5 12.1C18.63 12.1 15.282 14.3185 13.653 17.554L16.9605 20.119C17.739 17.779 19.9215 16.0375 22.5 16.0375Z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                <p
+                  style={{
+                    flexGrow: 0,
+                    flexShrink: 0,
+                    fontSize: 18,
+                    textAlign: "left",
+                    color: "#0f172a",
+                    fontFamily: "Segoe UI",
+                    paddingTop:5,
+                  }}
+                >
+                  Continue with Google
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            alignSelf: "stretch",
+            flexGrow: 0,
+            flexShrink: 0,
+            position: "relative",
+          }}
+        >
+          <p
+            style={{
+              flexGrow: 0,
+              flexShrink: 0,
+              fontSize: 20,
+              textAlign: "left",
+              color: "#708090",
+            }}
+          >
+            By continuing you agree to Crop Control’s terms &amp; conditions and
+            Privacy Policy.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Maps;
+const styles = {
+  container: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "#f0f0f0",
+  },
+  makeCenter: {
+    justifyContent: "left",
+    // backgroundColor:'green'
+    width: "50%",
+  },
+  imgContainer: {
+    flex: 1,
+    backgroundColor: "green",
+    width: "100%",
+    height: "100%",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  },
+  image: {
+    flex: 1,
+    width: "100%",
+    height: "100vh", // Ensure it covers the full height of the viewport
+    objectFit: "cover", // Ensures the image covers the container without stretching
+    marginBottom: "20px",
+  },
+  textbox: {
+    flex: 1,
+    display: "flex", // Enable Flexbox
+    justifyContent: "center", // Center horizontally
+    alignItems: "center",
+    backgroundColor: "white",
+    width: "100%",
+    height: "100%",
+  },
+  text: {
+    color: "#333", // Dark grey text color
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Adds shadow to the text
+    fontFamily: "'Arial', sans-serif", // Change font family
+    fontSize: "36px", // Change font size
+    fontWeight: "bold", // Make the text bold
+  },
+  button: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "10px 20px",
+    fontSize: "16px",
+    fontWeight: "bold", // Corrected spelling
+    cursor: "pointer",
+    backgroundColor: "transparent", // Transparent background
+    color: "grey", // Dark grey text color
+    border: "2px solid #00BFFF", // Blue border
+    borderRadius: "50px", // Fully rounded corners
+    marginTop: "20px",
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", // Add shadow to the button
+  },
+  icon: {
+    marginRight: "10px",
+    color: "00BFFF", // Space between icon and text
+  },
+};
+
+export default LandingPage;
