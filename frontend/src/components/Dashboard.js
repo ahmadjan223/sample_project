@@ -14,6 +14,8 @@ import BottomBar from "./bottomBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
+  const [isDrawing, setIsDrawing] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [drawnPolygons, setDrawnPolygons] = useState([]);
   const [polygons, setPolygons] = useState(null);
@@ -22,6 +24,7 @@ const Dashboard = ({ user }) => {
   const [polygonLayer, setPolygonLayer] = useState([]);
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
+  const [indexValues,setIndexValues] = useState({});
 
   useEffect(() => {
     DataFetch();
@@ -71,7 +74,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "https://densefusion.vercel.app/sentinel/getImageUrl",
+        "http://densefusion.vercel.app/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -91,17 +94,50 @@ const Dashboard = ({ user }) => {
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
         // setIsLoading(false);
+        //fetching index values
+        getIndexValues(selectedPolygon.path, layer, date);
       }
     } catch (error) {
       setIsLoading(false);
       console.error("Error fetching image URL:", error.message);
     }
   };
+  const getIndexValues = async (path,layer,timeRange) => {
+    try {
+      const response = await fetch(
+        "http://densefusion.vercel.app/sentinel/getIndexValues",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            coordinates: path,
+            layer,
+            time: timeRange,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+
+        // Extract the indexvalue and convert it into an array
+        const IndexArray = Object.values(result.indexValues);
+        
+        // Pass the array to indexvalue
+        setIndexValues(IndexArray);
+        console.log(result);
+      } else {
+        console.error("Failed to get index values");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `https://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
+        `http://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
@@ -134,7 +170,9 @@ const Dashboard = ({ user }) => {
         setSelectedFieldName={(name) => {
           setSelectedFieldName(name);
         }}
-        // onFieldClick={handleFieldClick}
+        isDrawing={isDrawing}
+        setIsDrawing={setIsDrawing}
+        DataFetch={DataFetch}
       />
       {isLoading && ( // Add a condition to show the loader
         <div
@@ -176,6 +214,9 @@ const Dashboard = ({ user }) => {
               date={date}
               layer={layer}
               setIsLoading={setIsLoading}
+              indexValues = {indexValues}
+              isDrawing={isDrawing}
+              setIsDrawing={setIsDrawing}
             ></Maps>
           )}
         </div>
