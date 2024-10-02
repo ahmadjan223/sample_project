@@ -7,7 +7,7 @@ const App = () => {
     const [user, setUser] = useState({
         displayName: "Ahmad Jan",
         id: "66afae5f5f3f07e8eb7826f6",
-        image: "https://lh3.googleusercontent.com/a/ACg8ocIKoE8kx__kPERJcJ14hL3QhCMe2Vy1v0OKyortYvVwzJFe0eiN=s96-c",
+        image: "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg",
       });
     // useEffect(() => {
     //     const query = new URLSearchParams(window.location.search);
