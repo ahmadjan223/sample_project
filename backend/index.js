@@ -43,7 +43,7 @@ app.use(passport.session());
 connectDB();
 
 app.get('/', (req, res) => {
-  res.send('Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://densefusion-3001.vercel.app for the website. \n\nThanks!');
+  res.send('TEST Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://densefusion-3001.vercel.app for the website. \n\nThanks!');
 });
 
 
