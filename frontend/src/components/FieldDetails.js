@@ -21,7 +21,7 @@ const FieldDetails = ({
     try {
       // Call the delete endpoint with the field name
       await fetch(
-        `http://densefusion.vercel.app/api/delete-field/${encodeURIComponent(name)}`,
+        `https://densefusion.vercel.app/api/delete-field/${encodeURIComponent(name)}`,
         {
           method: "DELETE",
         }
