@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import BasicButtons from './components/Mui';
 
 const App = () => {
     const [user, setUser] = useState({
@@ -23,7 +24,8 @@ const App = () => {
     //     }
     // },[user])
     if (user) {
-        return <Dashboard user={user} />;
+        // return <Dashboard user={user} />;
+        return <BasicButtons></BasicButtons>;
     }
 
     return <LandingPage></LandingPage>;
