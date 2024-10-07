@@ -11,6 +11,9 @@ import SideNav from "./sidenav";
 import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
 import Maps from "./Maps";
 import BottomBar from "./bottomBar";
+import TopBar from "./TopBar";
+import { Drawer, Stack } from "@mui/material";
+import PermanentDrawer from "./PermanentDrawer";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -156,8 +159,13 @@ const Dashboard = ({ user }) => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
+    <Stack>
+
+      <TopBar></TopBar>
+      <PermanentDrawer></PermanentDrawer>
+    {/* <div style={{ display: "flex" }}>
       <div>
+        
       </div>
       <SideNav
         polygons={polygons}
@@ -232,7 +240,8 @@ const Dashboard = ({ user }) => {
           ></BottomBar>)}
         </div>
       </div>
-    </div>
+    </div> */}
+    </Stack>
   );
 };
 
