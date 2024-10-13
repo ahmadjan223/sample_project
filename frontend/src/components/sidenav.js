@@ -46,7 +46,7 @@ const SideNav = ({
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
       index,
-      name: polygon.name || `Field ${index}`, // Use polygon name if available
+      name: polygon.name || `Field ${index}`, 
     }));
     setPolygonInfo(formattedPolygons);
   };
