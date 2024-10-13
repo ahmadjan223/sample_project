@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
+import DashboardLayout from './components/DashboardLayout';
 import LandingPage from './components/LandingPage';
+import DashboardLayoutBasic from './components/DashboardLayout';
 const App = () => {
     const [user, setUser] = useState({
         displayName: "Ahmad Jan",
@@ -23,6 +25,7 @@ const App = () => {
     },[user])
     if (user) {
         return <Dashboard user={user} />;
+        // return <DashboardLayout></DashboardLayout>
         // return <BasicButtons></BasicButtons>;
     }
 

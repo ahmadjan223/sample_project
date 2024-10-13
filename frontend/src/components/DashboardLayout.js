@@ -1,71 +1,22 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import List from '@mui/material/List'; // Import List
-import ListItem from '@mui/material/ListItem'; // Import ListItem
-import ListItemText from '@mui/material/ListItemText'; // Import ListItemText
-import { createTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import * as React from "react";
+import PropTypes from "prop-types";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import List from "@mui/material/List"; // Import List
+import ListItem from "@mui/material/ListItem"; // Import ListItem
+import ListItemText from "@mui/material/ListItemText"; // Import ListItemText
+import { createTheme } from "@mui/material/styles";
+import LayersIcon from "@mui/icons-material/Layers";
 
-const NAVIGATION = [
-  {
-    kind: 'header',
-    title: 'Main items',
-  },
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Analytics',
-  },
-  {
-    segment: 'reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: 'sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: 'traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    segment: 'integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
-  },
-];
+import { AppProvider } from "@toolpad/core/AppProvider";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 
 const demoTheme = createTheme({
   cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+    colorSchemeSelector: "data-toolpad-color-scheme",
   },
   colorSchemes: { light: true, dark: true },
   breakpoints: {
@@ -84,13 +35,17 @@ function DemoPageContent({ pathname }) {
     <Box
       sx={{
         py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        border: "5px solid pink",
+        height: "100%",
+        width: "100%", // Set height to fill available space
+        flexGrow: 1, // Grow to take remaining space in the layout
       }}
     >
-      <Typography>Dashboard content for {pathname}</Typography>
+      <Typography>Map content for {pathname}</Typography>
     </Box>
   );
 }
@@ -100,23 +55,47 @@ DemoPageContent.propTypes = {
 };
 
 function DashboardLayoutBasic(props) {
+  const polygons = [
+    { name: "Field 1", coordinates: { x: 10, y: 20 } },
+    { name: "Field 2", coordinates: { x: 30, y: 40 } },
+    { name: "Field 3", coordinates: { x: 50, y: 60 } },
+    { name: "Field 4", coordinates: { x: 70, y: 80 } },
+    { name: "Field 5", coordinates: { x: 90, y: 100 } },
+  ];
+  const handleFieldClick = (fieldName) => {
+    alert(`You clicked on ${fieldName}`);
+  };
+  const NAVIGATION = [
+    {
+      kind: "header",
+      title: "Fields",
+      sx: { userSelect: "none", cursor: "pointer" }, // Corrected cursor property
+    },
+    ...polygons.map((polygon) => ({
+      segment: polygon.name.toLowerCase().replace(/\s+/g, "-"), // URL-friendly segment
+      title: polygon.name,
+      icon: <LayersIcon />,
+      onClick: handleFieldClick,
+    })),
+  ];
+
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-  const [isSecondarySidebarOpen, setIsSecondarySidebarOpen] = React.useState(false);
-  const [currentSegment, setCurrentSegment] = React.useState('');
+  const [pathname, setPathname] = React.useState("/dashboard");
+  const [Sidebar, setSidebar] = React.useState(false);
+  const [currentSegment, setCurrentSegment] = React.useState("");
 
   const handleTileClick = (segment) => {
-    if (segment === 'orders') {
-      setIsSecondarySidebarOpen(true);
-      setCurrentSegment('Orders');
-    } else {
-      setPathname(`/${segment}`);
-    }
+
+      setSidebar(true);
+      setCurrentSegment("Field 1");
+
+      setPathname(`/${segment} asdfghjkl`);
+
   };
 
   const handleBackClick = () => {
-    setIsSecondarySidebarOpen(false); // Go back to main sidebar
+    setSidebar(false); // Go back to main sidebar
   };
 
   const router = React.useMemo(() => {
@@ -130,50 +109,58 @@ function DashboardLayoutBasic(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex", border: "5px solid blue" }}>
       <AppProvider
-        navigation={NAVIGATION}
+        // navigation={null}
         router={router}
         theme={demoTheme}
         window={demoWindow}
       >
-        <DashboardLayout disableCollapsibleSidebar
-        >
-          {/* Main Sidebar */}
-          {/* <Drawer variant="permanent" open>
-            <List>
-              {NAVIGATION.map((item) => (
-                item.segment && (
-                  <ListItem button key={item.segment} onClick={() => handleTileClick(item.segment)}>
-                    {item.icon}
-                    <ListItemText primary={item.title} />
-                  </ListItem>
-                )
-              ))}
-            </List>
-          </Drawer> */}
+        {!Sidebar && (
+          <Drawer variant="permanent" open>
+          <List>
+            {NAVIGATION.map((item) => (
+              item.segment && (
+                <ListItem button key={item.segment} onClick={() => handleTileClick(item.segment)}>
+                  {item.icon}
+                  <ListItemText primary={item.title} />
+                </ListItem>
+              )
+            ))}
+          </List>
+        </Drawer>
 
-          {/* Dashboard content */}
-          {/* <DemoPageContent pathname={pathname} /> */}
+        )}
+        <DashboardLayout sx={{ border: "5px solid yellow" }}>
 
-          {/* Secondary Sidebar for "Orders" */}
-          {/* {isSecondarySidebarOpen && (
+          <DemoPageContent pathname={pathname} />
+
+          {Sidebar && (
             <Drawer
               variant="temporary"
               anchor="left"
-              open={isSecondarySidebarOpen}
+              open={Sidebar}
               onClose={handleBackClick}
+              sx={{ border: "5px solid yellow" }}
             >
-              <Box sx={{ width: 250, p: 2 }}>
+              <Box sx={{ width: 320, p: 10, border: "5px solid red" }}>
                 <IconButton onClick={handleBackClick}>
                   <ArrowBackIcon />
                 </IconButton>
+
                 <Typography variant="h6" sx={{ mt: 2 }}>
-                  {currentSegment}
+                  You are in
+                  {currentSegment ? currentSegment : " Modal Details Page"}
+                </Typography>
+                <Typography variant="body1">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.
                 </Typography>
               </Box>
             </Drawer>
-          )} */}
+          )}
         </DashboardLayout>
       </AppProvider>
     </Box>

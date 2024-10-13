@@ -2,7 +2,19 @@ import React, { useState, useEffect } from "react";
 import "./SideNav.css";
 import SideBarTiles from "./sideBarTile";
 import FieldDetails from "./FieldDetails"; // Import the new component
-
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+import Toolbar from "@mui/material/Toolbar";
+import LayersIcon from "@mui/icons-material/Layers";
+const drawerWidth = 340;
+const topBarHeight = 64;
 // SideNav component
 const SideNav = ({
   polygons,
@@ -14,7 +26,7 @@ const SideNav = ({
 
   isDrawing,
   setIsDrawing,
-  DataFetch
+  DataFetch,
 }) => {
   const [hovered, setHovered] = useState(false);
   const handleAddField = () => {
@@ -58,45 +70,8 @@ const SideNav = ({
   };
 
   return (
-    // <>
-    //   {showDetailsPage ? (
 
-    //     <FieldDetails
-    //     fieldName={selectedFieldName}
-    //     polygonInfo={polygonInfo}
-    //     goBackToSidebar={goBackToSidebar} // Pass the back function to FieldDetails
-    //     />
-    //   ) : (
-    //     <div className="sidenav-container">
-    //       {/* User Info */}
-    //       <div className="user-info">
-    //         {user.image && (
-    //           <img
-    //             src={user.image}
-    //             alt={`${user.displayName}'s profile`}
-    //             className="user-image"
-    //           />
-    //         )}
-    //         <div className="user-name">{user.displayName}</div>
-    //         <i className="material-icons logout-icon" onClick={handleLogout}>
-    //           logout
-    //         </i>
-    //       </div>
 
-    //       {/* Field List */}
-    //       <div className="field-container">
-    //         {polygonInfo.map((field) => (
-    //           <SideBarTiles
-    //             key={field.name}
-    //             field={field}
-    //             selectedFieldName={selectedFieldName}
-    //             openDetailsPage={openDetailsPage} // Pass the function to open details
-    //           />
-    //         ))}
-    //       </div>
-    //     </div>
-    //   )}
-    // </>
     <>
       {showDetailsPage ? (
         <FieldDetails
@@ -271,6 +246,8 @@ const SideNav = ({
                 cursor: "pointer",
               }}
               onClick={handleAddField}
+              // onClick={handleLogout}
+
             >
               <p
                 style={{
@@ -342,6 +319,7 @@ const SideNav = ({
         </div>
       )}
     </>
+
   );
 };
 

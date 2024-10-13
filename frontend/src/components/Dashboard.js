@@ -27,7 +27,7 @@ const Dashboard = ({ user }) => {
   const [polygonLayer, setPolygonLayer] = useState([]);
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
-  const [indexValues,setIndexValues] = useState({});
+  const [indexValues, setIndexValues] = useState({});
 
   useEffect(() => {
     DataFetch();
@@ -105,7 +105,7 @@ const Dashboard = ({ user }) => {
       console.error("Error fetching image URL:", error.message);
     }
   };
-  const getIndexValues = async (path,layer,timeRange) => {
+  const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
         "http://localhost:3000/sentinel/getIndexValues",
@@ -125,7 +125,7 @@ const Dashboard = ({ user }) => {
 
         // Extract the indexvalue and convert it into an array
         const IndexArray = Object.values(result.indexValues);
-        
+
         // Pass the array to indexvalue
         setIndexValues(IndexArray);
         console.log(result);
@@ -135,7 +135,7 @@ const Dashboard = ({ user }) => {
     } catch (error) {
       console.error("Error:", error);
     }
-  }
+  };
 
   const resetDB = async (userId) => {
     try {
@@ -160,10 +160,10 @@ const Dashboard = ({ user }) => {
 
   return (
     <Stack>
-
       <TopBar></TopBar>
-      <PermanentDrawer></PermanentDrawer>
-    {/* <div style={{ display: "flex" }}>
+      <PermanentDrawer polygons={polygons} user={user}></PermanentDrawer>
+
+      {/* <div style={{ display: "flex" }}>
       <div>
         
       </div>
