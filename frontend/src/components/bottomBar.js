@@ -7,7 +7,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
 
   const [incrementValue, setIncrementValue] = useState(30);
   const initDays = 30;
-  const dateCount = 11;
+  const dateCount = 10;
   const [dates, setDates] = useState([]);
   const [userSelectedIndex, setUserSelectedIndex] = useState("-1");
   const [timeRange, setTimeRange] = useState("");

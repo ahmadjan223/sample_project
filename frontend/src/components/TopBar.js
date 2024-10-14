@@ -12,7 +12,7 @@ function appBarLabel(label) {
   return (
     <Toolbar>
       <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-        <MenuIcon />
+        {/* <MenuIcon /> */}
       </IconButton>
       <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
         {label}

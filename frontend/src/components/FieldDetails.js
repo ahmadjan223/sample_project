@@ -10,6 +10,7 @@ const FieldDetails = ({
 }) => {
   // You can find the field data from polygonInfo if needed
   const fieldDetails = polygonInfo.find((field) => field.name === fieldName);
+  
   const selectedPolygon = polygons.find(
     (polygon) => polygon.name === fieldName
   );

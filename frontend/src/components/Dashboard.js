@@ -105,6 +105,7 @@ const Dashboard = ({ user }) => {
       console.error("Error fetching image URL:", error.message);
     }
   };
+
   const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
@@ -157,90 +158,84 @@ const Dashboard = ({ user }) => {
       console.error("Error:", error);
     }
   };
+  useEffect(() => {
+    if (selectedFieldName) {
+      alert(`Selected Field Name: ${selectedFieldName}`);
+    }
+  }, [selectedFieldName]);
 
   return (
     <Stack>
-      <TopBar></TopBar>
-      <PermanentDrawer polygons={polygons} user={user}></PermanentDrawer>
+      {/* TopBar */}
+      <TopBar />
 
-      {/* <div style={{ display: "flex" }}>
-      <div>
-        
-      </div>
-      <SideNav
-        polygons={polygons}
-        isLoaded={isLoaded}
-        user={user}
-        resetDB={() => resetDB(user.id)}
-        sendToDb={() => {
-          sendToDb(polygons);
+      <div
+        style={{
+          display: "flex",
+          // border: "1px solid white",
+          // padding: "1px",
         }}
-        clearMap={clearMap}
-        selectedFieldName={selectedFieldName}
-        setSelectedFieldName={(name) => {
-          setSelectedFieldName(name);
-        }}
-        isDrawing={isDrawing}
-        setIsDrawing={setIsDrawing}
-        DataFetch={DataFetch}
-      />
-      {isLoading && ( // Add a condition to show the loader
+      >
         <div
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
-            zIndex: 999, // Ensure it's above all other elements
-            display: "flex",
-            justifyContent: "center", // Center horizontally
-            alignItems: "center", // Center vertically
+            flex: "0 0 21.5%",
+            // border: "1px solid white",
+            // padding: "1px", // Solid black border for the left div
           }}
         >
-          <ThreeCircles
-            visible={true}
-            height="100"
-            width="100"
-            color="#4fa94d"
-            ariaLabel="three-circles-loading"
+          <PermanentDrawer
+            polygons={polygons}
+            user={user}
+            selectedFieldName={selectedFieldName}
+            setSelectedFieldName={setSelectedFieldName}
           />
         </div>
-      )}
-      <div style={{ flex: 1, flexDirection: "row" }}>
+
         <div
-          className="map-container"
-          style={{ flex: 1, position: "relative" }}
+          style={{
+            flex: "1 0 77%", // 70% width for the right div
+            display: "flex", // Flex to handle layout inside (map and bottom bar)
+            flexDirection: "column",
+            // border: "1px solid white", // Solid black border for the right div
+            padding: "10px", // Stack the map and BottomBar vertically
+          }}
         >
-          {isLoaded && (
-            <Maps
-              user={user}
-              polygons={polygons}
-              DataFetch={DataFetch}
-              polygonLayer={polygonLayer}
-        
-              selectedFieldName={selectedFieldName}
+ <div
+  style={{
+    flex: 1,
+    position: 'relative',
+    borderRadius: '20px', // Set the desired border radius here
+    overflow: 'hidden', // Ensure the content respects the border radius
+  }}
+>
+  {isLoaded && (
+    <Maps
+      user={user}
+      polygons={polygons}
+      DataFetch={DataFetch}
+      polygonLayer={polygonLayer}
+      selectedFieldName={selectedFieldName}
+      date={date}
+      layer={layer}
+      setIsLoading={setIsLoading}
+      indexValues={indexValues}
+      isDrawing={isDrawing}
+      setIsDrawing={setIsDrawing}
+    />
+  )}
+</div>
+
+          {selectedFieldName && (
+            <BottomBar
               date={date}
               layer={layer}
-              setIsLoading={setIsLoading}
-              indexValues = {indexValues}
-              isDrawing={isDrawing}
-              setIsDrawing={setIsDrawing}
-            ></Maps>
+              setDate={setDate}
+              setLayer={setLayer}
+              selectedFieldName={selectedFieldName}
+            />
           )}
         </div>
-        <div>
-          {selectedFieldName && (<BottomBar
-            date={date}
-            layer={layer}
-            setDate={setDate}
-            setLayer={setLayer}
-            selectedFieldName={selectedFieldName}
-          ></BottomBar>)}
-        </div>
       </div>
-    </div> */}
     </Stack>
   );
 };

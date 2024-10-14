@@ -1,8 +1,9 @@
 const styles = {
   bottomBar: {
     position: "absolute",
-    bottom: 0,
-    width: "80%",
+    bottom: 25,
+    
+    width: "77%",
     padding: "20px",
     backgroundColor: "transparent",
     // backgroundColor: "#212930",

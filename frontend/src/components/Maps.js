@@ -32,7 +32,7 @@ const Maps = ({
   //right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
   const containerStyle = {
     width: "100%",
-    height: "100vh",
+    height: "87.9vh",
   };
   const tooltip = document.createElement("div");
   tooltip.style.position = "absolute";
