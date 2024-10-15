@@ -207,7 +207,7 @@ const Dashboard = ({ user }) => {
   style={{
     flex: 1,
     position: 'relative',
-    borderRadius: '20px', // Set the desired border radius here
+    borderRadius: '32px', // Set the desired border radius here
     overflow: 'hidden', // Ensure the content respects the border radius
   }}
 >
