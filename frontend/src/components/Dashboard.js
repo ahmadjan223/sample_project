@@ -94,7 +94,7 @@ const Dashboard = ({ user }) => {
 
       if (response.ok) {
         const data = await response.json();
-        window.open(data.imageUrl, "_blank");
+        // window.open(data.imageUrl, "_blank");
         const propsArray = [data.imageUrl, minLat, minLon, maxLat, maxLon];
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
@@ -212,30 +212,31 @@ const Dashboard = ({ user }) => {
               overflow: "hidden", // Ensure the content respects the border radius
             }}
           >
-            {isLoading && ( // Add a condition to show the loader
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
-                  zIndex: 999, // Ensure it's above all other elements
-                  display: "flex",
-                  justifyContent: "center", // Center horizontally
-                  alignItems: "center", // Center vertically
-                }}
-              >
-                <ThreeCircles
-                  visible={true}
-                  height="100"
-                  width="100"
-                  color="#4fa94d"
-                  ariaLabel="three-circles-loading"
-                />
-              </div>
-            )}
+            {isLoading && (
+  <div
+    style={{
+      position: "fixed", // Ensure the overlay covers the whole screen, even when scrolling
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
+      zIndex: 1300, // Ensure it's above all other elements, including Drawer
+      display: "flex",
+      justifyContent: "center", // Center horizontally
+      alignItems: "center", // Center vertically
+    }}
+  >
+    <ThreeCircles
+      visible={true}
+      height="100"
+      width="100"
+      color="#4fa94d"
+      ariaLabel="three-circles-loading"
+    />
+  </div>
+)}
+
             {isLoaded && (
               <Maps
                 user={user}
