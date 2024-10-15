@@ -15,6 +15,9 @@ import Typography from "@mui/material/Typography";
 import FieldDetails from "./FieldDetails"; // Import your FieldDetails component
 import { ThemeProvider, Toolbar } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 
 const drawerWidth = 340;
 const topBarHeight = 64;
@@ -25,6 +28,7 @@ const PermanentDrawer = ({
   selectedFieldName,
   setSelectedFieldName,
   DataFetch,
+  setIsDrawing,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
@@ -40,8 +44,9 @@ const PermanentDrawer = ({
   };
 
   useEffect(() => {
-    if (polygons){
-    handlePolygons();}
+    if (polygons) {
+      handlePolygons();
+    }
     console.log(polygons);
   }, [polygons]);
 
@@ -70,7 +75,7 @@ const PermanentDrawer = ({
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
       .join(", ");
     // alert(coordinates);
-    setSelectedFieldCoords(coordinates)
+    setSelectedFieldCoords(coordinates);
   };
 
   const openDetailsPage = (field) => {
@@ -101,7 +106,18 @@ const PermanentDrawer = ({
         main: "#2D333A",
       },
     },
+
+    typography: {
+      allVariants: {
+        fontFamily: 'serif',
+      },
+    },
+
   });
+
+  const handleAddField = () => {
+    setIsDrawing(true);
+  };
 
   return (
     <>
@@ -135,43 +151,101 @@ const PermanentDrawer = ({
             variant="permanent"
             anchor="left"
           >
-            <div style={{ padding: "16px" }}>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <Avatar src="avatar.png" />
-                <div>
-                  <Typography variant="h6" color="white">
-                    {user.displayName}
-                  </Typography>
-                  <Typography variant="body2" color="gray">
-                    {user.id}
-                  </Typography>
-                </div>
-                <Button onClick={handleLogout} color="inherit">
-                  Logout
-                </Button>
-              </div>
-            </div>
-            <Divider />
-            <List>
-              {polygonInfo.map((field) => (
-                <ListItem key={field.name} disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      // setSelectedFieldName(field.name);
-                      openDetailsPage(field.name);
+            {/* top div */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "90%", // Ensures the container takes the full height of the sidebar
+              }}
+            >
+              {/* div 1 for fields info */}
+              <div>
+                {/* this div is for add button */}
+                <div
+                  style={{
+                    border: "10px solid transparent",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div style={{ border: "5px solid transparent", textAlign:"center", width:"60%"}}>
+                    <Typography variant="h6" component="div" >
+                      User Fields
+                    </Typography>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      marginRight: "20px",
+                      border: "0px solid transparent",
                     }}
                   >
-                    <ListItemIcon>
-                      <LayersIcon />
-                    </ListItemIcon>
+                    <Box sx={{ "& > :not(style)": { m: 0 } }}>
+                      <Fab
+                        size="small"
+                        color="default"
+                        aria-label="add"
+                        onClick={handleAddField}
+                      >
+                        <AddIcon />
+                      </Fab>
+                    </Box>
+                  </div>
+                </div>
 
-                    <ListItemText primary={field.name} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
+                <Divider />
+
+                <List>
+                  {polygonInfo.map((field) => (
+                    <ListItem key={field.name} disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          // setSelectedFieldName(field.name);
+                          openDetailsPage(field.name);
+                        }}
+                      >
+                        <ListItemIcon>
+                          <LayersIcon />
+                        </ListItemIcon>
+
+                        <ListItemText primary={field.name} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </div>
+
+              {/* div 2 for user info */}
+              <div>
+                {/* This div is for user info */}
+                <div style={{ padding: "16px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <Avatar src="avatar.png" />
+                    <div>
+                      <Typography variant="h6" color="white">
+                        {user.displayName}
+                      </Typography>
+                      <Typography variant="body2" color="gray">
+                        {user.id}
+                      </Typography>
+                    </div>
+                    <Button onClick={handleLogout} color="inherit">
+                      Logout
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </Drawer>
       </ThemeProvider>
     </>
