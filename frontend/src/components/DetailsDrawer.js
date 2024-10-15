@@ -16,6 +16,10 @@ const DetailsDrawer = ({
   polygons,
   PolygonInfo,
 }) => {
+    const handleEdit  = (name)=>{
+        setSelectedFieldName("Field 2")
+
+    };
   const handleDelete = async (name) => {
     try {
       // Call the delete endpoint with the field name
@@ -161,7 +165,7 @@ const DetailsDrawer = ({
         >
           {/* Add margin to create space above the bottom */}
           <Button
-            onClick={handleEditField}
+            onClick={() => handleEdit(selectedFieldName)} // Correct usage
             variant="outlined"
             color="inherit"
             style={{ marginTop: "16px" }}
