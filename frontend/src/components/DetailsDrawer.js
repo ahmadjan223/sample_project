@@ -3,6 +3,10 @@ import { Drawer, Button, Typography, Divider } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 const DetailsDrawer = ({
   drawerWidth,
@@ -14,12 +18,11 @@ const DetailsDrawer = ({
   handleEditField,
   DataFetch,
   polygons,
-  PolygonInfo,
+  polygonInfo,
 }) => {
-    const handleEdit  = (name)=>{
-        setSelectedFieldName("Field 2")
-
-    };
+  const handleEdit = (name) => {
+    setSelectedFieldName("Field 2");
+  };
   const handleDelete = async (name) => {
     try {
       // Call the delete endpoint with the field name
@@ -35,6 +38,11 @@ const DetailsDrawer = ({
       console.error("Error deleting field:", error);
     }
   };
+
+  const [age, setAge] = React.useState("");
+
+  const handleChange = (fieldName) => {
+setSelectedFieldName(fieldName)  };
 
   return (
     <Drawer
@@ -64,14 +72,52 @@ const DetailsDrawer = ({
         }}
       >
         <div>
-          <Button
-            onClick={goBackToSidebar}
-            variant="outlined"
-            color="inherit"
-            style={{ marginBottom: "32px" }}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
           >
-            Back
-          </Button>
+            <Button
+              onClick={goBackToSidebar}
+              variant="outlined"
+              color="inherit"
+              style={{ marginBottom: "32px" }}
+            >
+              Back
+            </Button>
+
+            <FormControl
+              variant="standard"
+              sx={{ minWidth: 120, marginBottom: "16px" }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                All Fields
+              </InputLabel>
+
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedFieldName}  // Use selectedFieldName as the value for the select
+                onChange={(event) => handleChange(event.target.value)} 
+                label="Field"
+              >
+                <MenuItem value={selectedFieldName}>
+                  <em>Current Field</em>
+                </MenuItem>
+                {polygonInfo.map(
+                  (field) =>
+                    field.name !== selectedFieldName && (
+                      <MenuItem value={field.name} key={field.name}>
+                        {field.name}
+                      </MenuItem>
+                    )
+                )}
+              </Select>
+            </FormControl>
+          </div>
+
           <Divider />
 
           <Typography
@@ -81,7 +127,7 @@ const DetailsDrawer = ({
           >
             {selectedFieldName}
           </Typography>
-          
+
           {/* <Divider /> */}
 
           {/* <Typography
@@ -91,35 +137,33 @@ const DetailsDrawer = ({
           >
             Coordinates: {selectedFieldCoords}
           </Typography> */}
-                  <div>
-          <Card sx={{ minWidth: 275 }}>
-            <CardContent>
-              {/* <Typography
+          <div>
+            <Card sx={{ minWidth: 275 }}>
+              <CardContent>
+                {/* <Typography
                 gutterBottom
                 sx={{ color: "text.secondary", fontSize: 16 }}
               >
                 {selectedFieldName} Notes
               </Typography> */}
 
-              <Typography variant="h6" component="div">
-                Coordinates{" "}
-              </Typography>
+                <Typography variant="h6" component="div">
+                  Coordinates{" "}
+                </Typography>
 
-              <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
-                {selectedFieldCoords}
-              </Typography>
+                <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
+                  {selectedFieldCoords}
+                </Typography>
 
-              {/* <Typography variant="body2">
+                {/* <Typography variant="body2">
                 Sed do eiusmod tempor incididunt ut labore et dolore magna
                 aliqua.{" "}
               </Typography> */}
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
           <Divider />
         </div>
-
-
 
         {/*  Field Note*/}
         <div>
