@@ -15,6 +15,8 @@ const DetailsDrawer = ({
   DataFetch,
   polygons,
   PolygonInfo,
+  open,
+  setOpen,
 }) => {
     const handleEdit  = (name)=>{
         setSelectedFieldName("Field 2")
@@ -49,8 +51,10 @@ const DetailsDrawer = ({
           marginTop: `${topBarHeight}px`, // Apply margin to drawer paper
         },
       }}
-      variant="permanent"
+      variant="temporary"
       anchor="left"
+      open={open}
+      ModalProps={{hideBackdrop: true}}
     >
       <div
         style={{

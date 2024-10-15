@@ -27,7 +27,7 @@ const PermanentDrawer = ({
   DataFetch,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
-  const [showDetailsPage, setShowDetailsPage] = useState(false);
+  const [open, setOpen] = useState(false);
   const [selectedFieldCoords, setSelectedFieldCoords] = useState();
 
   const handlePolygons = () => {
@@ -48,7 +48,7 @@ const PermanentDrawer = ({
   useEffect(() => {
     if (selectedFieldName) {
       getCoords(selectedFieldName);
-      setShowDetailsPage(true);
+      setOpen(true);
     }
   }, [selectedFieldName]);
 
@@ -80,7 +80,7 @@ const PermanentDrawer = ({
   const goBackToSidebar = () => {
     setSelectedFieldName(null);
     setSelectedFieldCoords(null);
-    setShowDetailsPage(false);
+    setOpen(false);
   };
 
   const handleDeleteField = () => {
@@ -106,8 +106,10 @@ const PermanentDrawer = ({
   return (
     <>
       <ThemeProvider theme={darkTheme}>
-        {showDetailsPage ? (
+
           <DetailsDrawer
+            open={open}
+            setOpen={setOpen}
             drawerWidth={drawerWidth}
             topBarHeight={topBarHeight}
             goBackToSidebar={goBackToSidebar}
@@ -119,7 +121,6 @@ const PermanentDrawer = ({
             polygons={polygons}
             polygonInfo={polygonInfo}
           />
-        ) : (
           <Drawer
             sx={{
               width: drawerWidth,
@@ -172,7 +173,6 @@ const PermanentDrawer = ({
               ))}
             </List>
           </Drawer>
-        )}
       </ThemeProvider>
     </>
   );
