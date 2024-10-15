@@ -4,8 +4,8 @@ const styles = {
     bottom: 25,
     
     width: "77%",
-    padding: "20px",
-    backgroundColor: "transparent",
+    // padding: "20px",
+    backgroundColor: "grey  ",
     // backgroundColor: "#212930",
     display: "flex",
     flexDirection: "column", // Stack elements vertically
