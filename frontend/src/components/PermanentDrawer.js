@@ -1,3 +1,5 @@
+import DetailsDrawer from "./DetailsDrawer"; // Adjust the path as necessary
+
 import React, { useState, useEffect } from "react";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -22,10 +24,11 @@ const PermanentDrawer = ({
   user,
   selectedFieldName,
   setSelectedFieldName,
+  DataFetch,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [showDetailsPage, setShowDetailsPage] = useState(false);
-  const [selectedFieldCoords, setSelectedFieldCoords] = useState({});
+  const [selectedFieldCoords, setSelectedFieldCoords] = useState();
 
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
@@ -37,38 +40,46 @@ const PermanentDrawer = ({
   };
 
   useEffect(() => {
-    if (polygons) {
-      handlePolygons();
-    }
+    if (polygons){
+    handlePolygons();}
     console.log(polygons);
   }, [polygons]);
+
+  useEffect(() => {
+    if (selectedFieldName) {
+      getCoords(selectedFieldName);
+      setShowDetailsPage(true);
+    }
+  }, [selectedFieldName]);
+
+  useEffect(() => {
+    if (selectedFieldCoords) {
+      // alert("COORDS ARE:: " + selectedFieldCoords)
+    }
+  }, [selectedFieldCoords]);
 
   const handleLogout = () => {
     window.location.href = "http://localhost:3000/api/logout"; // Adjust the logout URL as needed
   };
 
   const getCoords = (field) => {
-    const selectedPolygon = polygons.find((polygon) => polygon.name === field);
+    const selectedPolygon = polygons.find(
+      (polygon) => polygon.name == selectedFieldName
+    );
     const coordinates = selectedPolygon.path
       .map((coord) => `(${coord.lng.toFixed(1)}, ${coord.lat.toFixed(1)})`)
       .join(", ");
-
-    if (coordinates) {
-      alert(`Coordinates for ${field}: ${coordinates}`);
-    }
+    // alert(coordinates);
+    setSelectedFieldCoords(coordinates)
   };
 
   const openDetailsPage = (field) => {
     setSelectedFieldName(field);
-    console.log(selectedFieldName);
-    // getCoords(field.name);
-    setSelectedFieldCoords(field.coordinates);
-    setShowDetailsPage(true);
   };
 
   const goBackToSidebar = () => {
     setSelectedFieldName(null);
-    setSelectedFieldCoords({});
+    setSelectedFieldCoords(null);
     setShowDetailsPage(false);
   };
 
@@ -96,59 +107,18 @@ const PermanentDrawer = ({
     <>
       <ThemeProvider theme={darkTheme}>
         {showDetailsPage ? (
-          <Drawer
-            sx={{
-              width: drawerWidth,
-              flexShrink: 0,
-              marginTop: `${topBarHeight}px`, // Push drawer below TopBar
-              
-              "& .MuiDrawer-paper": {
-                width: drawerWidth,
-                boxSizing: "border-box",
-                marginTop: `${topBarHeight}px`, // Apply margin to drawer paper
-              },
-            }}
-            
-            variant="permanent"
-            anchor="left"
-          >
-            <div style={{ padding: "16px" }}>
-              <Button
-                onClick={goBackToSidebar}
-                variant="outlined"
-                color="inherit"
-                style={{ marginBottom: "16px" }}
-              >
-                Back
-              </Button>
-
-              <Typography variant="h6" color="white">
-                {selectedFieldName}
-              </Typography>
-
-              <Typography variant="body2" color="gray">
-                Coordinates: {selectedFieldCoords}
-              </Typography>
-
-              <Button
-                onClick={handleEditField}
-                variant="outlined"
-                color="inherit"
-                style={{ marginTop: "16px" }}
-              >
-                Edit Field Name
-              </Button>
-
-              <Button
-                onClick={handleDeleteField}
-                variant="outlined"
-                color="inherit"
-                style={{ marginTop: "16px" }}
-              >
-                Delete Field
-              </Button>
-            </div>
-          </Drawer>
+          <DetailsDrawer
+            drawerWidth={drawerWidth}
+            topBarHeight={topBarHeight}
+            goBackToSidebar={goBackToSidebar}
+            selectedFieldName={selectedFieldName}
+            setSelectedFieldName={setSelectedFieldName}
+            selectedFieldCoords={selectedFieldCoords}
+            handleEditField={handleEditField}
+            DataFetch={DataFetch}
+            polygons={polygons}
+            polygonInfo={polygonInfo}
+          />
         ) : (
           <Drawer
             sx={{
@@ -182,7 +152,7 @@ const PermanentDrawer = ({
                 </Button>
               </div>
             </div>
-              <Divider />
+            <Divider />
             <List>
               {polygonInfo.map((field) => (
                 <ListItem key={field.name} disablePadding>

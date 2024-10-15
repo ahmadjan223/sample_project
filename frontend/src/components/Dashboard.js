@@ -61,6 +61,7 @@ const Dashboard = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
+
   const updateImage = async (name, layer, date) => {
     setIsLoading(true);
     const selectedPolygon = polygons.find((polygon) => polygon.name === name);
@@ -93,6 +94,7 @@ const Dashboard = ({ user }) => {
 
       if (response.ok) {
         const data = await response.json();
+        window.open(data.imageUrl, '_blank');
         const propsArray = [data.imageUrl, minLat, minLon, maxLat, maxLon];
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
@@ -160,7 +162,7 @@ const Dashboard = ({ user }) => {
   };
   useEffect(() => {
     if (selectedFieldName) {
-      alert(`Selected Field Name: ${selectedFieldName}`);
+      // alert(`Selected Field Name: ${selectedFieldName}`);
     }
   }, [selectedFieldName]);
 
@@ -188,6 +190,7 @@ const Dashboard = ({ user }) => {
             user={user}
             selectedFieldName={selectedFieldName}
             setSelectedFieldName={setSelectedFieldName}
+            DataFetch={DataFetch}
           />
         </div>
 
