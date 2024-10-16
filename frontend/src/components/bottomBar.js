@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Select, MenuItem, Button } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 import styles from "./BottomBarStyle"; // Adjust the path as needed
 
 const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
@@ -107,9 +109,9 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   return (
     <Box sx={styles.bottomBar}>
       {/* Selectors Container */}
-      <Box sx={styles.selectorsContainer}>
-        {/* Interval Selector */}
-        <Box sx={styles.selectorItem}>
+      {/* <Box sx={styles.selectorsContainer}> */}
+      {/* Interval Selector */}
+      {/* <Box sx={styles.selectorItem}>
           <Select
             defaultValue="Monthly"
             onChange={handleIntervalChange}
@@ -119,10 +121,9 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
             <MenuItem value="Fortnightly">Fortnightly</MenuItem>
             <MenuItem value="Weekly">Weekly</MenuItem>
           </Select>
-        </Box>
-
-        {/* Layer Selector */}
-        <Box sx={styles.selectorItem}>
+        </Box> */}
+      {/* Layer Selector */}
+      {/* <Box sx={styles.selectorItem}>
           <Select
             value={layer}
             onChange={(e) => {
@@ -142,7 +143,64 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
             <MenuItem value="SWIR">SWIR</MenuItem>
             <MenuItem value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</MenuItem>
           </Select>
-        </Box>
+        </Box> */}
+      {/* </Box> */}
+
+      <Box
+        sx={{
+          border: "0px solid white",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          width: "70%",
+        }}
+      >
+        {/* Interval Selector */}
+        <FormControl
+          variant="filled"
+          size="auto"
+          sx={{ minWidth: 120, marginRight: "64px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
+        >
+          <InputLabel id="interval-select-label">Interval</InputLabel>
+          <Select
+            labelId="interval-select-label"
+            defaultValue="Monthly"
+            onChange={handleIntervalChange}
+          >
+            <MenuItem value="Monthly">Monthly</MenuItem>
+            <MenuItem value="Fortnightly">Fortnightly</MenuItem>
+            <MenuItem value="Weekly">Weekly</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Layer Selector */}
+        <FormControl
+          variant="filled"
+          sx={{ minWidth: 120, marginRight: "32px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
+        >
+          <InputLabel id="layer-select-label">Layer</InputLabel>
+          <Select
+            labelId="layer-select-label"
+            value={layer}
+            onChange={(e) => {
+              setLayer(e.target.value);
+              console.log("Layer value is changed");
+            }}
+          >
+            <MenuItem value="AGRICULTURE">Agriculture</MenuItem>
+            <MenuItem value="BATHYMETRIC">Bathymetric</MenuItem>
+            <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
+            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem>
+            <MenuItem value="GEOLOGY">Geology</MenuItem>
+            <MenuItem value="MOISTURE-INDEX">Moisture Index</MenuItem>
+            <MenuItem value="NATURAL-COLOR">
+              Natural color (true color)
+            </MenuItem>
+            <MenuItem value="NDVI">NDVI</MenuItem>
+            <MenuItem value="SWIR">SWIR</MenuItem>
+            <MenuItem value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
       {/* Date Navigator */}
       <Box className="d-flex" sx={styles.dateContainer}>

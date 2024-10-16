@@ -262,7 +262,7 @@ const PermanentDrawer = ({
               {/*________________ */}
 
               {/* 2. MAP TYPE */}
-              <div style={{border: "0px solid blue", marginRight:"32px",display: "flex", justifyContent: "flex-end"}}>
+              {/* <div style={{border: "0px solid blue", marginRight:"32px",display: "flex", justifyContent: "flex-end"}}>
                 <FormControl
                   variant="standard"
                   sx={{ minWidth: 120, marginBottom: "16px" }}
@@ -291,7 +291,7 @@ const PermanentDrawer = ({
                     </MenuItem>
                   </Select>
                 </FormControl>
-              </div>
+              </div> */}
               {/*________________ */}
 
               {/* 3. FIELDS */}

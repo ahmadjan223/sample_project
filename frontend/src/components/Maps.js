@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { DrawingManager, GoogleMap, Polygon } from "@react-google-maps/api";
 import { savePolygon, sendToDb, loadPolygon } from "./apiService";
 import InputModal from "./inputModal";
+import Button from "@mui/material/Button";
+
 const libraries = ["places", "drawing"];
 const Maps = ({
   user,
@@ -18,6 +20,7 @@ const Maps = ({
   addField,
   setAddField,
   mapType,
+  setMapType,
 }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
@@ -458,6 +461,29 @@ const Maps = ({
         // onClick={handleClick} // Changed to handle clicks
         mapContainerStyle={containerStyle}
       >
+        <div style={{margin:"8px 16px"}}>
+          <Button
+            size="small"
+            variant="contained"
+            color="success"
+            onClick={() => setMapType("SATELLITE")}
+            sx={{borderRadius:"4px 0px 0px 4px"}}
+          >
+            SATELLITE
+          </Button>
+
+          <Button
+            size="small"
+            variant="contained"
+            color="success"
+            onClick={() => setMapType("ROADMAP")}
+            sx={{borderRadius:"0px 4px 4px 0px"}}
+
+          >
+            ROAD
+          </Button>
+        </div>
+
         <DrawingManager
           onLoad={(drawingManager) => setDrawingManager(drawingManager)}
           onOverlayComplete={onOverlayComplete}

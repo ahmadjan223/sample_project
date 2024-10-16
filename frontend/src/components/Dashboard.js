@@ -251,6 +251,7 @@ const Dashboard = ({ user }) => {
                 addField={addField}
                 setAddField={setAddField}
                 mapType={mapType}
+                setMapType={setMapType}
                 
               />
             )}
