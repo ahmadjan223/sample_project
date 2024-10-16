@@ -33,7 +33,7 @@ const PermanentDrawer = ({
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedFieldCoords, setSelectedFieldCoords] = useState();
-  const [addField, setAddField] = useState(false);
+  const [addField, setAddField] = useState(true);
 
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
@@ -236,26 +236,34 @@ const PermanentDrawer = ({
                 </Button>
               )}
 
-              <Divider />
+              {/* <Divider /> */}
 
-              <List>
-                {polygonInfo.map((field) => (
-                  <ListItem key={field.name} disablePadding>
-                    <ListItemButton
-                      onClick={() => {
-                        // setSelectedFieldName(field.name);
-                        openDetailsPage(field.name);
-                      }}
-                    >
-                      <ListItemIcon>
-                        <LayersIcon />
-                      </ListItemIcon>
+              <div>
+                {/* Heading */}
+                <Typography variant="primary" sx={{ marginBottom: "16px" }}>
+                  Polygon Fields
+                </Typography>
 
-                      <ListItemText primary={field.name} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
+                {/* List of Items */}
+                <List>
+                  {polygonInfo.map((field) => (
+                    <ListItem key={field.name} disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          // setSelectedFieldName(field.name);
+                          openDetailsPage(field.name);
+                        }}
+                      >
+                        <ListItemIcon>
+                          <LayersIcon />
+                        </ListItemIcon>
+
+                        <ListItemText primary={field.name} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </div>
             </div>
 
             {/* div 2 for user info */}

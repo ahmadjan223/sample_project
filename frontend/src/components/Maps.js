@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DrawingManager, GoogleMap, Polygon } from "@react-google-maps/api";
 import { savePolygon, sendToDb, loadPolygon } from "./apiService";
+import InputModal from "./inputModal";
 const libraries = ["places", "drawing"];
 const Maps = ({
   user,
@@ -19,6 +20,9 @@ const Maps = ({
   const [drawingManager, setDrawingManager] = useState(null);
   const [polygonBoundary, setPolygoneBoundary] = useState([]);
   const [groundOverlay, setGroundOverlay] = useState(null);
+  const [newFieldName, setNewFieldName] = useState("");
+  const [openInputModal, setOpenInputModal] = useState(false);
+  const [overlayEvent, setOverlayEvent] = useState(null);
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 33.639777,
     lng: 72.985718,
@@ -150,7 +154,12 @@ const Maps = ({
     return polygons.some((polygon) => polygon.name === name);
   };
   const onOverlayComplete = async (event) => {
-    const name = prompt("Enter a name for this field:");
+    setOpenInputModal(true);
+    setOverlayEvent(event); // Set the overlay event state
+  };
+  const saveField = async () => {
+    const name = newFieldName;
+    const event = overlayEvent; // Use the state variable
     if (nameExists(name)) {
       alert("name already exists");
       return;
@@ -179,7 +188,6 @@ const Maps = ({
       });
     }
   };
-  // let timer;
 
   const displayImageLayerOnMap = () => {
     if (!map) {
@@ -418,6 +426,12 @@ const Maps = ({
   }
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
+      <InputModal
+        setNewFieldName={setNewFieldName}
+        saveField={saveField}
+        setOpenInputModal={setOpenInputModal}
+        openInputModal={openInputModal}
+      ></InputModal>
       <GoogleMap
         zoom={13}
         center={defaultCenter}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Snackbar from '@mui/material/Snackbar';
+import Snackbar from "@mui/material/Snackbar";
 import {
   DrawingManager,
   GoogleMap,
@@ -177,7 +177,8 @@ const Dashboard = ({ user }) => {
         style={{
           display: "flex",
           backgroundColor: "#f5f5f5",
-          height: "90vh",
+          height: "calc(100vh - 80px)", // Subtract the height of the TopBar
+          width: "calc(100vw - 32px)", // Subtract the width of the SideNav
         }}
       >
         <div
@@ -194,7 +195,7 @@ const Dashboard = ({ user }) => {
             setSelectedFieldName={setSelectedFieldName}
             DataFetch={DataFetch}
             setIsDrawing={setIsDrawing}
-            setSnackBarOpen= {setSnackBarOpen} 
+            setSnackBarOpen={setSnackBarOpen}
           />
         </div>
 
@@ -205,7 +206,6 @@ const Dashboard = ({ user }) => {
             flexDirection: "column",
             // border: "1px solid white", // Solid black border for the right div
             padding: "10px", // Stack the map and BottomBar vertically
-
           }}
         >
           <div
@@ -214,22 +214,18 @@ const Dashboard = ({ user }) => {
               position: "relative",
               borderRadius: "22px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
-              backgroundColor:'green'
-              
+              backgroundColor: "green",
             }}
           >
-            {isLoading && (
-             <Loader></Loader>
-            )}
-          
+            {isLoading && <Loader></Loader>}
             {/* here i need to add jsx for alert */}
-            {/* <UseSnackbar ></UseSnackbar> */}
-            <Snackbar sx={{position:"absolute"}}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            // autoHideDuration={3000}
-            message="Draw your Field on Map"
-            open={snackBarOpen}
-            onClose={() => setSnackBarOpen(false)}
+            <Snackbar
+              sx={{ position: "absolute" }}
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              // autoHideDuration={3000}
+              message="Draw your Field on Map"
+              open={snackBarOpen}
+              onClose={() => setSnackBarOpen(false)}
             ></Snackbar>
             {isLoaded && (
               <Maps
