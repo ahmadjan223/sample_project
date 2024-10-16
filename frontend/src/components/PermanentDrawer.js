@@ -120,6 +120,7 @@ const PermanentDrawer = ({
     setSnackBarOpen(true);
     setIsDrawing(true);
   };
+
   const handleCancelField = () => {
     setAddField(!addField);
     setSnackBarOpen(false);
@@ -142,6 +143,7 @@ const PermanentDrawer = ({
           DataFetch={DataFetch}
           polygons={polygons}
           polygonInfo={polygonInfo}
+          setPolygonInfo={setPolygonInfo}
         />
         <Drawer
           sx={{
@@ -202,7 +204,7 @@ const PermanentDrawer = ({
                     </Box>
                   </div>
                 </div> */}
-              {addField ? (
+              {!addField ? (
                 <Button
                   sx={{
                     color: "white",

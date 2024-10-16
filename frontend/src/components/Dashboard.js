@@ -215,6 +215,7 @@ const Dashboard = ({ user }) => {
               borderRadius: "22px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
               backgroundColor: "green",
+              backgroundColor: "green",
             }}
           >
             {isLoading && <Loader></Loader>}
