@@ -15,6 +15,9 @@ const Maps = ({
   indexValues,
   isDrawing,
   setIsDrawing,
+  addField,
+  setAddField,
+  mapType,
 }) => {
   const [map, setMap] = useState(null);
   const [drawingManager, setDrawingManager] = useState(null);
@@ -155,7 +158,8 @@ const Maps = ({
   };
   const onOverlayComplete = async (event) => {
     setOpenInputModal(true);
-    setOverlayEvent(event); // Set the overlay event state
+    setOverlayEvent(event);
+    setAddField(!addField); // Set the overlay event state
   };
   const saveField = async () => {
     const name = newFieldName;
@@ -424,6 +428,20 @@ const Maps = ({
       hideTooltip(); // Hide tooltip when mouse leaves the map
     });
   }
+
+  const mapTypeMapping = {
+    ROADMAP: window.google.maps.MapTypeId.ROADMAP,
+    SATELLITE: window.google.maps.MapTypeId.SATELLITE,
+    HYBRID: window.google.maps.MapTypeId.HYBRID,
+    TERRAIN: window.google.maps.MapTypeId.TERRAIN,
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      // alert(mapType);
+    }
+  }, [mapType]);
+
   return (
     <div className="map-container" style={{ flex: 1, position: "relative" }}>
       <InputModal
@@ -433,6 +451,7 @@ const Maps = ({
         openInputModal={openInputModal}
       ></InputModal>
       <GoogleMap
+        mapTypeId={mapTypeMapping[mapType]}
         zoom={13}
         center={defaultCenter}
         onLoad={(map) => setMap(map)}

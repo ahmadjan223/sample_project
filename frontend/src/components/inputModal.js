@@ -19,12 +19,17 @@ const style = {
   p: 4,
   justifyContent: "space-between",
   alignItems: "center",
+  borderRadius: "32px",
 };
 
-export default function InputModal({ setNewFieldName, saveField,setOpenInputModal,openInputModal }) {
+export default function InputModal({
+  setNewFieldName,
+  saveField,
+  setOpenInputModal,
+  openInputModal,
+}) {
   const handleClose = () => {
-    setOpenInputModal(false)
-    saveField();
+    setOpenInputModal(false);
     saveField();
   };
 
@@ -44,6 +49,7 @@ export default function InputModal({ setNewFieldName, saveField,setOpenInputModa
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Enter the Name of the Field
           </Typography>
+
           <TextField
             id="standard-basic"
             color="grey"

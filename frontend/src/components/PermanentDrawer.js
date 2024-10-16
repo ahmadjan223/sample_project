@@ -18,6 +18,12 @@ import { createTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
+import InputLabel from "@mui/material/InputLabel";
+
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+
 const drawerWidth = 340;
 const topBarHeight = 64;
 
@@ -29,11 +35,14 @@ const PermanentDrawer = ({
   DataFetch,
   setIsDrawing,
   setSnackBarOpen,
+  addField,
+  setAddField,
+  mapType,
+  setMapType,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedFieldCoords, setSelectedFieldCoords] = useState();
-  const [addField, setAddField] = useState(true);
 
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
@@ -145,6 +154,7 @@ const PermanentDrawer = ({
           polygonInfo={polygonInfo}
           setPolygonInfo={setPolygonInfo}
         />
+
         <Drawer
           sx={{
             width: drawerWidth,
@@ -168,83 +178,135 @@ const PermanentDrawer = ({
               height: "90%", // Ensures the container takes the full height of the sidebar
             }}
           >
-            {/* div 1 for fields info */}
-            <div>
-              {/* this div is for add button */}
+            {/* 001 FUNCTIONALITY */}
+            <div style={{border: "0px solid red"}}
+            >
+              {/* 0. ADD FIELD BUTTON */}
               {/* <div
+                style={{
+                  border: "3px solid violet",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
                   style={{
-                    border: "10px solid transparent",
+                    border: "3px solid transparent",
+                    textAlign: "center",
+                    width: "60%",
+                  }}
+                >
+                  <Typography variant="h6" component="div">
+                    User Fields
+                  </Typography>
+                </div>
+                <div
+                  style={{
                     display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-end",
+                    marginRight: "20px",
+                    border: "0px solid transparent",
                   }}
                 >
-                  <div style={{ border: "5px solid transparent", textAlign:"center", width:"60%"}}>
-                    <Typography variant="h6" component="div" >
-                      User Fields
-                    </Typography>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      marginRight: "20px",
-                      border: "0px solid transparent",
+                  <Box sx={{ "& > :not(style)": { m: 0 } }}>
+                    <Fab
+                      size="small"
+                      color="default"
+                      aria-label="add"
+                      onClick={handleAddField}
+                    >
+                      <AddIcon />
+                    </Fab>
+                  </Box>
+                </div>
+              </div> */}
+              {/*________________ */}
+
+              {/* 1. ADD FIELD BUTTON */}
+              <div style={{border: "0px solid yellow"}}>
+                {addField ? (
+                  <Button
+                    sx={{
+                      color: "white",
+                      backgroundColor: "green",
+                      width: "calc(100% - 32px)", // Adjust width to account for right margin
+                      height: "50px",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      margin: "16px",
                     }}
+                    onClick={handleAddField}
+                    variant="contained"
                   >
-                    <Box sx={{ "& > :not(style)": { m: 0 } }}>
-                      <Fab
-                        size="small"
-                        color="default"
-                        aria-label="add"
-                        onClick={handleAddField}
-                      >
-                        <AddIcon />
-                      </Fab>
-                    </Box>
-                  </div>
-                </div> */}
-              {!addField ? (
-                <Button
-                  sx={{
-                    color: "white",
-                    backgroundColor: "green",
-                    width: "calc(100% - 32px)", // Adjust width to account for right margin
-                    height: "50px",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                    margin: "16px",
-                  }}
-                  onClick={handleAddField}
-                  variant="contained"
-                >
-                  Add new Field
-                </Button>
-              ) : (
-                <Button
-                  sx={{
-                    color: "white",
-                    backgroundColor: "red",
-                    width: "calc(100% - 32px)", // Adjust width to account for right margin
-                    height: "50px",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                    margin: "16px",
-                  }}
-                  onClick={handleCancelField}
-                  variant="contained"
-                >
-                  Cancel
-                </Button>
-              )}
+                    Add new Field
+                  </Button>
+                ) : (
+                  <Button
+                    sx={{
+                      color: "white",
+                      backgroundColor: "red",
+                      width: "calc(100% - 32px)", // Adjust width to account for right margin
+                      height: "50px",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      margin: "16px",
+                    }}
+                    onClick={handleCancelField}
+                    variant="contained"
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+              {/*________________ */}
 
-              {/* <Divider /> */}
+              {/* 2. MAP TYPE */}
+              <div style={{border: "0px solid blue", marginRight:"32px",display: "flex", justifyContent: "flex-end"}}>
+                <FormControl
+                  variant="standard"
+                  sx={{ minWidth: 120, marginBottom: "16px" }}
+                >
+                  <InputLabel id="demo-simple-select-standard-label">
+                    View
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={mapType}
+                    onChange={(event) => setMapType(event.target.value)}
+                    label="View"
+                  >
+                    <MenuItem value={"ROADMAP"}>
+                      ROADMAP
+                    </MenuItem>
+                    <MenuItem value={"SATELLITE"}>
+                      SATELLITE
+                    </MenuItem>
+                    <MenuItem value={"HYBRID"}>
+                      HYBRID
+                    </MenuItem>
+                    <MenuItem value={"TERRAIN"}>
+                      TERRAIN
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+              {/*________________ */}
 
-              <div>
-                {/* Heading */}
-                <Typography variant="primary" sx={{ marginBottom: "16px" }}>
-                  Polygon Fields
-                </Typography>
+              {/* 3. FIELDS */}
+              <div style={{border: "0px solid green"}}>
+                <div
+                  style={{
+                    border: "5px solid transparent",
+                    textAlign: "center",
+                    width: "60%",
+                  }}
+                >
+                  <Typography variant="h6" component="div">
+                    User Fields
+                  </Typography>
+                </div>
 
                 {/* List of Items */}
                 <List>
@@ -252,7 +314,6 @@ const PermanentDrawer = ({
                     <ListItem key={field.name} disablePadding>
                       <ListItemButton
                         onClick={() => {
-                          // setSelectedFieldName(field.name);
                           openDetailsPage(field.name);
                         }}
                       >
@@ -260,17 +321,21 @@ const PermanentDrawer = ({
                           <LayersIcon />
                         </ListItemIcon>
 
-                        <ListItemText primary={field.name} />
+                        <ListItemText variant= "h5" primary={field.name} />
                       </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
               </div>
-            </div>
+              {/*________________ */}
 
-            {/* div 2 for user info */}
+
+            </div>
+            {/*________________ */}
+
+            {/*002 USER DETAILS*/}
             <div>
-              {/* This div is for user info */}
+              {/* 1. INFO*/}
               <div style={{ padding: "16px" }}>
                 <div
                   style={{
@@ -294,6 +359,7 @@ const PermanentDrawer = ({
                 </div>
               </div>
             </div>
+            {/*________________ */}
           </div>
         </Drawer>
       </ThemeProvider>

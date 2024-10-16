@@ -30,6 +30,9 @@ const Dashboard = ({ user }) => {
   const [layer, setLayer] = useState("NDVI");
   const [indexValues, setIndexValues] = useState({});
   const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [addField, setAddField] = useState(true);
+  const [mapType, setMapType] = useState("TERRAIN"); // Default to ROADMAP
+
 
   useEffect(() => {
     DataFetch();
@@ -177,14 +180,14 @@ const Dashboard = ({ user }) => {
         style={{
           display: "flex",
           backgroundColor: "#f5f5f5",
-          height: "calc(100vh - 80px)", // Subtract the height of the TopBar
-          width: "calc(100vw - 32px)", // Subtract the width of the SideNav
+          height: "calc(100vh - 64px)", // Subtract the height of the TopBar
+          width: "calc(100vw)", // Subtract the width of the SideNav
         }}
       >
         <div
           style={{
             flex: "0 0 21.5%",
-            // border: "1px solid black",
+            border: "0px solid black",
             // padding: "1px", // Solid black border for the left div
           }}
         >
@@ -196,6 +199,10 @@ const Dashboard = ({ user }) => {
             DataFetch={DataFetch}
             setIsDrawing={setIsDrawing}
             setSnackBarOpen={setSnackBarOpen}
+            addField={addField}
+            setAddField={setAddField}
+            mapType={mapType}
+            setMapType={setMapType}
           />
         </div>
 
@@ -204,7 +211,7 @@ const Dashboard = ({ user }) => {
             flex: "1 0 77%", // 70% width for the right div
             display: "flex", // Flex to handle layout inside (map and bottom bar)
             flexDirection: "column",
-            // border: "1px solid white", // Solid black border for the right div
+            border: "0px solid red", // Solid black border for the right div
             padding: "10px", // Stack the map and BottomBar vertically
           }}
         >
@@ -241,6 +248,10 @@ const Dashboard = ({ user }) => {
                 indexValues={indexValues}
                 isDrawing={isDrawing}
                 setIsDrawing={setIsDrawing}
+                addField={addField}
+                setAddField={setAddField}
+                mapType={mapType}
+                
               />
             )}
           </div>
