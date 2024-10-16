@@ -33,7 +33,10 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   const getDateLabel = (date) => {
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear() > 2000 ? date.getFullYear() - 2000 : date.getFullYear() - 1900;
+    const year =
+      date.getFullYear() > 2000
+        ? date.getFullYear() - 2000
+        : date.getFullYear() - 1900;
     return `${day} ${month}'${year}`;
   };
 
@@ -104,8 +107,43 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   return (
     <Box sx={styles.bottomBar}>
       {/* Selectors Container */}
-     
+      <Box sx={styles.selectorsContainer}>
+        {/* Interval Selector */}
+        <Box sx={styles.selectorItem}>
+          <Select
+            defaultValue="Monthly"
+            onChange={handleIntervalChange}
+            sx={styles.dropdownMenu}
+          >
+            <MenuItem value="Monthly">Monthly</MenuItem>
+            <MenuItem value="Fortnightly">Fortnightly</MenuItem>
+            <MenuItem value="Weekly">Weekly</MenuItem>
+          </Select>
+        </Box>
 
+        {/* Layer Selector */}
+        <Box sx={styles.selectorItem}>
+          <Select
+            value={layer}
+            onChange={(e) => {
+              setLayer(e.target.value);
+              console.log("Layer value is changed");
+            }}
+            sx={styles.dropdownMenu}
+          >
+            <MenuItem value="AGRICULTURE">Agriculture</MenuItem>
+            <MenuItem value="BATHYMETRIC">Bathymetric</MenuItem>
+            <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
+            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem>
+            <MenuItem value="GEOLOGY">Geology</MenuItem>
+            <MenuItem value="MOISTURE-INDEX">Moisture Index</MenuItem>
+            <MenuItem value="NATURAL-COLOR">Natural color (true color)</MenuItem>
+            <MenuItem value="NDVI">NDVI</MenuItem>
+            <MenuItem value="SWIR">SWIR</MenuItem>
+            <MenuItem value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</MenuItem>
+          </Select>
+        </Box>
+      </Box>
       {/* Date Navigator */}
       <Box className="d-flex" sx={styles.dateContainer}>
         <Button sx={styles.dateNavLeft} onClick={handlePreviousDates}>
@@ -115,7 +153,10 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
           {dates.map((date, index) => (
             <Button
               key={index}
-              sx={styles.dateTile(selectedDate === date, hoveredDateIndex === index)}
+              sx={styles.dateTile(
+                selectedDate === date,
+                hoveredDateIndex === index
+              )}
               onMouseEnter={() => setHoveredDateIndex(index)}
               onMouseLeave={() => setHoveredDateIndex(null)}
               onClick={() => {

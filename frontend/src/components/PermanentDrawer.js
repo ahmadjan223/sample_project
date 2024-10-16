@@ -29,6 +29,7 @@ const PermanentDrawer = ({
   setSelectedFieldName,
   DataFetch,
   setIsDrawing,
+  setSnackBarOpen,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
@@ -116,6 +117,7 @@ const PermanentDrawer = ({
   });
 
   const handleAddField = () => {
+    setSnackBarOpen(true);
     setIsDrawing(true);
   };
 

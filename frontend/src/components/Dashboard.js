@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ThreeCircles } from "react-loader-spinner";
-
+import Snackbar from '@mui/material/Snackbar';
 import {
   DrawingManager,
   GoogleMap,
@@ -14,6 +14,7 @@ import BottomBar from "./bottomBar";
 import TopBar from "./TopBar";
 import { Drawer, Stack } from "@mui/material";
 import PermanentDrawer from "./PermanentDrawer";
+import UseSnackbar from "./snackBar";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -28,6 +29,7 @@ const Dashboard = ({ user }) => {
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
   const [indexValues, setIndexValues] = useState({});
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
 
   useEffect(() => {
     DataFetch();
@@ -174,14 +176,14 @@ const Dashboard = ({ user }) => {
       <div
         style={{
           display: "flex",
-          // border: "1px solid white",
-          // padding: "1px",
+          backgroundColor: "#f5f5f5",
+          height: "90vh",
         }}
       >
         <div
           style={{
             flex: "0 0 21.5%",
-            // border: "1px solid white",
+            // border: "1px solid black",
             // padding: "1px", // Solid black border for the left div
           }}
         >
@@ -192,6 +194,7 @@ const Dashboard = ({ user }) => {
             setSelectedFieldName={setSelectedFieldName}
             DataFetch={DataFetch}
             setIsDrawing={setIsDrawing}
+            setSnackBarOpen= {setSnackBarOpen} 
           />
         </div>
 
@@ -202,41 +205,53 @@ const Dashboard = ({ user }) => {
             flexDirection: "column",
             // border: "1px solid white", // Solid black border for the right div
             padding: "10px", // Stack the map and BottomBar vertically
+
           }}
         >
           <div
             style={{
               flex: 1,
               position: "relative",
-              borderRadius: "32px", // Set the desired border radius here
+              borderRadius: "22px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
+              backgroundColor:'green'
+              
             }}
           >
             {isLoading && (
-  <div
-    style={{
-      position: "fixed", // Ensure the overlay covers the whole screen, even when scrolling
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
-      zIndex: 1300, // Ensure it's above all other elements, including Drawer
-      display: "flex",
-      justifyContent: "center", // Center horizontally
-      alignItems: "center", // Center vertically
-    }}
-  >
-    <ThreeCircles
-      visible={true}
-      height="100"
-      width="100"
-      color="#4fa94d"
-      ariaLabel="three-circles-loading"
-    />
-  </div>
-)}
-
+              <div
+                style={{
+                  position: "fixed", // Ensure the overlay covers the whole screen, even when scrolling
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
+                  zIndex: 1300, // Ensure it's above all other elements, including Drawer
+                  display: "flex",
+                  justifyContent: "center", // Center horizontally
+                  alignItems: "center", // Center vertically
+                }}
+              >
+                <ThreeCircles
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#4fa94d"
+                  ariaLabel="three-circles-loading"
+                />
+              </div>
+            )}
+          
+            {/* here i need to add jsx for alert */}
+            {/* <UseSnackbar ></UseSnackbar> */}
+            <Snackbar sx={{position:"absolute"}}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            // autoHideDuration={3000}
+            message="Draw your Field on Map"
+            open={snackBarOpen}
+            onClose={() => setSnackBarOpen(false)}
+            ></Snackbar>
             {isLoaded && (
               <Maps
                 user={user}
