@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { ThreeCircles } from "react-loader-spinner";
 import Snackbar from '@mui/material/Snackbar';
 import {
   DrawingManager,
@@ -15,6 +14,7 @@ import TopBar from "./TopBar";
 import { Drawer, Stack } from "@mui/material";
 import PermanentDrawer from "./PermanentDrawer";
 import UseSnackbar from "./snackBar";
+import Loader from "./Loader";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -219,28 +219,7 @@ const Dashboard = ({ user }) => {
             }}
           >
             {isLoading && (
-              <div
-                style={{
-                  position: "fixed", // Ensure the overlay covers the whole screen, even when scrolling
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
-                  zIndex: 1300, // Ensure it's above all other elements, including Drawer
-                  display: "flex",
-                  justifyContent: "center", // Center horizontally
-                  alignItems: "center", // Center vertically
-                }}
-              >
-                <ThreeCircles
-                  visible={true}
-                  height="100"
-                  width="100"
-                  color="#4fa94d"
-                  ariaLabel="three-circles-loading"
-                />
-              </div>
+             <Loader></Loader>
             )}
           
             {/* here i need to add jsx for alert */}
