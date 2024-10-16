@@ -1,5 +1,7 @@
 import React from "react";
-import { Drawer, Button, Typography, Divider } from "@mui/material";
+import { useState, useEffect } from "react";
+
+import { Drawer, Button, Typography, Divider, Input } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -18,13 +20,15 @@ const DetailsDrawer = ({
   handleEditField,
   DataFetch,
   polygons,
-  PolygonInfo,
   open,
   setOpen,
   polygonInfo,
+  setPolygonInfo
 }) => {
-  const handleEdit = (name) => {
-    setSelectedFieldName("Field 2");
+  const [editFieldName, setEditFieldName] = useState(null);
+
+  const handleEdit = async (name) => {
+    await setSelectedFieldName("Field 2");
   };
   const handleDelete = async (name) => {
     try {
@@ -42,10 +46,85 @@ const DetailsDrawer = ({
     }
   };
 
-  const [age, setAge] = React.useState("");
+  const handleChange = (name) => {
+    setSelectedFieldName(name);
+  };
 
-  const handleChange = (fieldName) => {
-setSelectedFieldName(fieldName)  };
+  const saveFieldName = async (newName) => {
+    try {
+      // Update the local state with the new name
+      const updatedPolygons = polygonInfo.map((field) =>
+        field.name === editFieldName ? { ...field, name: newName } : field
+      );
+      setPolygonInfo(updatedPolygons);
+  
+      // Send the updated name to the server
+      await fetch(
+        `http://localhost:3000/api/update-field/${encodeURIComponent(editFieldName)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newName }),
+        }
+      );
+  
+      await DataFetch();
+      setSelectedFieldName(newName);
+    } catch (error) {
+      console.error("Error updating field name:", error);
+    }
+  };
+  
+  // const saveFieldName = async (originalName) => {
+  //   try {
+  //     // Update the local state
+  //     const updatedPolygons = polygonInfo.map((field) =>
+  //       field.name === originalName ? { ...field, name: editFieldName } : field
+  //     );
+  //     setPolygonInfo(updatedPolygons);
+  //     setEditFieldIndex(null);
+
+  //     // Send the updated name to the server
+  //     await fetch(
+  //       `http://localhost:3000/api/update-field/${encodeURIComponent(originalName)}`,
+  //       {
+  //         method: "PATCH",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ name: editFieldName }),
+  //       }
+  //     );
+
+  //     // Wait for loadFromDB to finish before calling handleLogPolygons
+  //     await loadFromDB(user.id);
+  //     handleLogPolygons();
+  //   } catch (error) {
+  //     console.error("Error updating field name:", error);
+  //   }
+  // };
+
+  useEffect(() => {
+    if (editFieldName) {
+      const newName = prompt("Enter New Name for the field: ");
+      if (newName ==null){
+        setEditFieldName(null);
+      }
+      else{
+        saveFieldName(newName)
+        //call the function saveFieldName that handles the 
+        //code to update local names, and then sending the names to db, and then laoding the names from db
+        setEditFieldName(null);
+      }
+
+    }
+  }, [editFieldName]);
+
+  const handleEditFieldName = (name) => {
+    setEditFieldName(name);
+  };
 
   return (
     <Drawer
@@ -63,7 +142,7 @@ setSelectedFieldName(fieldName)  };
       variant="temporary"
       anchor="left"
       open={open}
-      ModalProps={{hideBackdrop: true}}
+      ModalProps={{ hideBackdrop: true }}
     >
       <div
         style={{
@@ -104,8 +183,8 @@ setSelectedFieldName(fieldName)  };
               <Select
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
-                value={selectedFieldName}  // Use selectedFieldName as the value for the select
-                onChange={(event) => handleChange(event.target.value)} 
+                value={selectedFieldName} // Use selectedFieldName as the value for the select
+                onChange={(event) => handleChange(event.target.value)}
                 label="Field"
               >
                 <MenuItem value={selectedFieldName}>
@@ -214,7 +293,7 @@ setSelectedFieldName(fieldName)  };
         >
           {/* Add margin to create space above the bottom */}
           <Button
-            onClick={() => handleEdit(selectedFieldName)} // Correct usage
+            onClick={() => handleEditFieldName(selectedFieldName)} // Correct usage
             variant="outlined"
             color="inherit"
             style={{ marginTop: "16px" }}
