@@ -1,11 +1,11 @@
 const styles = {
   bottomBar: {
     position: "absolute",
-    bottom: 25,
+    bottom: 35,
     
     width: "77%",
     // padding: "20px",
-    backgroundColor: "grey  ",
+    backgroundColor: "transparent  ",
     // backgroundColor: "#212930",
     display: "flex",
     flexDirection: "column", // Stack elements vertically
