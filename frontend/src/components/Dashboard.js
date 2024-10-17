@@ -15,6 +15,7 @@ import { Drawer, Stack } from "@mui/material";
 import PermanentDrawer from "./PermanentDrawer";
 import UseSnackbar from "./snackBar";
 import Loader from "./Loader";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -32,7 +33,28 @@ const Dashboard = ({ user }) => {
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [addField, setAddField] = useState(true);
   const [mapType, setMapType] = useState("SATELLITE"); // Default to ROADMAP
+  const [showMenu, setShowMenu] = useState(true);
 
+  const [theme, setTheme] = useState(
+    createTheme({
+      palette: {
+        mode: "dark",
+        primary: {
+          main: "#272727",
+        },
+        secondary: {
+          main: "#fafafa",
+          contrastText: "#000",
+        },
+      },
+
+      typography: {
+        allVariants: {
+          fontFamily: "serif",
+        },
+      },
+    })
+  );
 
   useEffect(() => {
     DataFetch();
@@ -180,7 +202,12 @@ const Dashboard = ({ user }) => {
   return (
     <Stack>
       {/* TopBar */}
-      <TopBar />
+      <TopBar
+        theme={theme}
+        setTheme={setTheme}
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+      />
 
       <div
         style={{
@@ -190,48 +217,51 @@ const Dashboard = ({ user }) => {
           width: "calc(100vw)", // Subtract the width of the SideNav
         }}
       >
-        <div
-          style={{
-            flex: "0 0 21.5%",
-            border: "0px solid black",
-            // padding: "1px", // Solid black border for the left div
-          }}
-        >
-          <PermanentDrawer
-            polygons={polygons}
-            user={user}
-            selectedFieldName={selectedFieldName}
-            setSelectedFieldName={setSelectedFieldName}
-            DataFetch={DataFetch}
-            setIsDrawing={setIsDrawing}
-            setSnackBarOpen={setSnackBarOpen}
-            addField={addField}
-            setAddField={setAddField}
-            mapType={mapType}
-            setMapType={setMapType}
-          />
-        </div>
+        {showMenu && (
+          <div
+            style={{
+              flex: "0 0 21.5%",
+              border: "0px solid black",
+              // padding: "1px", // Solid black border for the left div
+            }}
+          >
+            <PermanentDrawer
+              polygons={polygons}
+              user={user}
+              selectedFieldName={selectedFieldName}
+              setSelectedFieldName={setSelectedFieldName}
+              DataFetch={DataFetch}
+              setIsDrawing={setIsDrawing}
+              setSnackBarOpen={setSnackBarOpen}
+              addField={addField}
+              setAddField={setAddField}
+              mapType={mapType}
+              setMapType={setMapType}
+              theme={theme}
+              setTheme={setTheme}
+            />
+          </div>
+        )}
 
         <div
           style={{
-            flex: "1 0 77.2%", // 70% width for the right div
+            flex: "1 0 77%",
             display: "flex", // Flex to handle layout inside (map and bottom bar)
             flexDirection: "column",
             border: "0px solid red", // Solid black border for the right div
-            padding: "10px", // Stack the map and BottomBar vertically
+            padding: "8px", // Stack the map and BottomBar vertically
           }}
         >
           <div
             style={{
               flex: 1,
               position: "relative",
-              borderRadius: "16px", // Set the desired border radius here
+              borderRadius: "32px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
               backgroundColor: "transparent",
             }}
           >
             {isLoading && <Loader></Loader>}
-            {/* here i need to add jsx for alert */}
             <Snackbar
               sx={{ position: "absolute" }}
               anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -240,7 +270,6 @@ const Dashboard = ({ user }) => {
               open={snackBarOpen}
               onClose={() => setSnackBarOpen(false)}
             ></Snackbar>
-
             {isLoaded && (
               <Maps
                 user={user}
@@ -258,7 +287,6 @@ const Dashboard = ({ user }) => {
                 setAddField={setAddField}
                 mapType={mapType}
                 setMapType={setMapType}
-                
               />
             )}
           </div>

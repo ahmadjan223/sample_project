@@ -503,14 +503,12 @@ const Maps = ({
         mapContainerStyle={containerStyle}
         options={{
           zoomControl: true,
-          fullscreenControl: false, 
-          scaleControl: true, 
-          
-        //   zoomControlOptions: {
-        //     style: window.google.maps.ZoomControlStyle.SMALL
-        // },
+          fullscreenControl: false,
+          scaleControl: true,
 
-
+          //   zoomControlOptions: {
+          //     style: window.google.maps.ZoomControlStyle.SMALL
+          // },
 
           // mapTypeControl: true,
           // mapTypeControlOptions: {
@@ -533,7 +531,10 @@ const Maps = ({
             variant="contained"
             color="success"
             onClick={() => setMapType("SATELLITE")}
-            sx={{ borderRadius: "4px 0px 0px 4px" }}
+            sx={{
+              borderRadius: "4px 0px 0px 4px",
+              // backgroundColor: "#31c58d",
+            }}
           >
             SATELLITE
           </Button>
@@ -543,7 +544,10 @@ const Maps = ({
             variant="contained"
             color="success"
             onClick={() => setMapType("ROADMAP")}
-            sx={{ borderRadius: "0px 4px 4px 0px" }}
+            sx={{
+              borderRadius: "0px 4px 4px 0px",
+              // backgroundColor: "#31c58d"
+            }}
           >
             ROAD
           </Button>

@@ -9,6 +9,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { ThemeContext, ThemeProvider } from "@emotion/react";
 
 const DetailsDrawer = ({
   drawerWidth,
@@ -23,7 +24,8 @@ const DetailsDrawer = ({
   open,
   setOpen,
   polygonInfo,
-  setPolygonInfo
+  setPolygonInfo,
+  theme
 }) => {
   const [editFieldName, setEditFieldName] = useState(null);
 
@@ -131,6 +133,8 @@ const DetailsDrawer = ({
   };
 
   return (
+    <ThemeProvider theme={theme}>
+
     <Drawer
       sx={{
         width: drawerWidth,
@@ -180,8 +184,8 @@ const DetailsDrawer = ({
               variant="standard"
               sx={{ minWidth: 120, marginBottom: "16px" }}
             >
-              <InputLabel id="demo-simple-select-standard-label">
-                All Fields
+              <InputLabel id="demo-simple-select-standard-label" >
+                Current Field
               </InputLabel>
 
               <Select
@@ -192,7 +196,7 @@ const DetailsDrawer = ({
                 label="Field"
               >
                 <MenuItem value={selectedFieldName}>
-                  <em>Current Field</em>
+                  <em>{selectedFieldName}</em>
                 </MenuItem>
                 {polygonInfo.map(
                   (field) =>
@@ -288,10 +292,10 @@ const DetailsDrawer = ({
         {/* This div wraps the buttons to place them at the bottom */}
         <div
           style={{
-            marginBottom: "50px",
+            marginBottom: "48px",
             display: "flex",
             flexDirection: "row",
-            gap: "10px",
+            gap: "8px",
             border: "2px solid  transparent",
           }}
         >
@@ -315,6 +319,8 @@ const DetailsDrawer = ({
         </div>
       </div>
     </Drawer>
+    </ThemeProvider>
+
   );
 };
 

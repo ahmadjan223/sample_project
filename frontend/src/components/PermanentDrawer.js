@@ -41,6 +41,8 @@ const PermanentDrawer = ({
   setAddField,
   mapType,
   setMapType,
+  theme,
+  setTheme,
 }) => {
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
@@ -124,20 +126,7 @@ const PermanentDrawer = ({
     alert(`Editing field ${selectedFieldName}`);
   };
 
-  const darkTheme = createTheme({
-    palette: {
-      mode: "dark",
-      primary: {
-        main: "#2D333A",
-      },
-    },
 
-    typography: {
-      allVariants: {
-        fontFamily: "serif",
-      },
-    },
-  });
 
   const handleAddField = () => {
     setAddField(!addField);
@@ -153,7 +142,7 @@ const PermanentDrawer = ({
 
   return (
     <>
-      <ThemeProvider theme={darkTheme}>
+      <ThemeProvider theme={theme}>
         <DetailsDrawer
           open={open}
           setOpen={setOpen}
@@ -168,6 +157,7 @@ const PermanentDrawer = ({
           polygons={polygons}
           polygonInfo={polygonInfo}
           setPolygonInfo={setPolygonInfo}
+          theme={theme}
         />
 
         <Drawer
@@ -179,6 +169,7 @@ const PermanentDrawer = ({
               width: drawerWidth,
               boxSizing: "border-box",
               marginTop: `${topBarHeight}px`, // Apply margin to drawer paper
+              backgroundColor: (theme) => theme.palette.primary.main,
             },
           }}
           variant="permanent"
@@ -190,62 +181,21 @@ const PermanentDrawer = ({
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              height: "90%", // Ensures the container takes the full height of the sidebar
+              height: "92%",
             }}
           >
             {/* 001 FUNCTIONALITY */}
             <div style={{ border: "0px solid red" }}>
-              {/* 0. ADD FIELD BUTTON */}
-              {/* <div
-                style={{
-                  border: "3px solid violet",
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div
-                  style={{
-                    border: "3px solid transparent",
-                    textAlign: "center",
-                    width: "60%",
-                  }}
-                >
-                  <Typography variant="h6" component="div">
-                    User Fields
-                  </Typography>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    marginRight: "20px",
-                    border: "0px solid transparent",
-                  }}
-                >
-                  <Box sx={{ "& > :not(style)": { m: 0 } }}>
-                    <Fab
-                      size="small"
-                      color="default"
-                      aria-label="add"
-                      onClick={handleAddField}
-                    >
-                      <AddIcon />
-                    </Fab>
-                  </Box>
-                </div>
-              </div> */}
-              {/*________________ */}
-
+              
               {/* 1. ADD FIELD BUTTON */}
               <div style={{ border: "0px solid yellow" }}>
                 {addField ? (
                   <Button
                     sx={{
                       color: "white",
-                      backgroundColor: "green",
+                      backgroundColor: "#31c58d",
                       width: "calc(100% - 32px)", // Adjust width to account for right margin
-                      height: "50px",
+                      height: "48px",
                       fontSize: "18px",
                       fontWeight: "bold",
                       margin: "16px",
@@ -261,7 +211,7 @@ const PermanentDrawer = ({
                       color: "white",
                       backgroundColor: "red",
                       width: "calc(100% - 32px)", // Adjust width to account for right margin
-                      height: "50px",
+                      height: "48px",
                       fontSize: "18px",
                       fontWeight: "bold",
                       margin: "16px",
@@ -275,11 +225,11 @@ const PermanentDrawer = ({
               </div>
               {/*________________ */}
 
-              {/* 4. Search */}
+              {/* 2. Search */}
               <div
                 style={{
                   width: "calc(100%)", // Adjust width to account for right margin
-                  height: "50px",
+                  height: "48px",
                   border: "0px solid blue",
                   display: "flex",
                   flexDirection: "row",
@@ -288,8 +238,8 @@ const PermanentDrawer = ({
               >
                 <SearchBar
                   style={{
-                    backgroundColor: "white",
-                    color: "black",
+                    backgroundColor: theme.palette.secondary.main, // Corrected the typo
+                    color: theme.palette.secondary.contrastText,
                   }}
                   placeholder="Search a field"
                   value={textFieldValue}
@@ -311,38 +261,7 @@ const PermanentDrawer = ({
               </div>
               {/* ______________--- */}
 
-              {/* 3. MAP TYPE */}
-              {/* <div style={{border: "0px solid blue", marginRight:"32px",display: "flex", justifyContent: "flex-end"}}>
-                <FormControl
-                  variant="standard"
-                  sx={{ minWidth: 120, marginBottom: "16px" }}
-                >
-                  <InputLabel id="demo-simple-select-standard-label">
-                    View
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-standard-label"
-                    id="demo-simple-select-standard"
-                    value={mapType}
-                    onChange={(event) => setMapType(event.target.value)}
-                    label="View"
-                  >
-                    <MenuItem value={"ROADMAP"}>
-                      ROADMAP
-                    </MenuItem>
-                    <MenuItem value={"SATELLITE"}>
-                      SATELLITE
-                    </MenuItem>
-                    <MenuItem value={"HYBRID"}>
-                      HYBRID
-                    </MenuItem>
-                    <MenuItem value={"TERRAIN"}>
-                      TERRAIN
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-              </div> */}
-              {/*________________ */}
+              
 
               {/* 3. FIELDS */}
               <Divider></Divider>
@@ -386,18 +305,25 @@ const PermanentDrawer = ({
             {/*002 USER DETAILS*/}
             <div>
               {/* 1. INFO*/}
-              <div style={{ padding: "16px", border:"0px solid purple" }}>
+              <div
+                style={{
+                  padding: "16px",
+                  border: "0px solid purple",
+                  borderRadius:"16px 16px 0px 0px" // Ensures the container takes the full height of the sidebar
+
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
-                   border:"0px solid green"
+                    gap: "16px",
+                    border: "0px solid green",
                   }}
                 >
                   <Avatar src="avatar.png" />
                   <div>
-                    <Typography variant="h6" color="white">
+                    <Typography variant="h6" component="div">
                       {user.displayName}
                     </Typography>
                     <Typography variant="body2" color="gray">

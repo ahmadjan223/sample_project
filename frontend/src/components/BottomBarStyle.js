@@ -1,12 +1,11 @@
 const styles = {
   bottomBar: {
     position: "absolute",
-    bottom: 35,
+    bottom: 32,
     
-    width: "77%",
+    width: "74%",
     // padding: "20px",
     backgroundColor: "transparent  ",
-    // backgroundColor: "#212930",
     display: "flex",
     flexDirection: "column", // Stack elements vertically
     alignItems: "center", // Center align the items
@@ -51,16 +50,26 @@ selectorItem: {
   dateNav: {
     cursor: "pointer",
     padding: "5px 8px",
-    border: "1px solid black", // Add border to make it look like a button
+    border: "1px solid red", // Add border to make it look like a button
     // borderRadius: "0px",
     backgroundColor: "#111418",
     color: "#fafafa",
   },
   dateNavLeft: {
-    borderRadius: "10px 0px 0px 10px",
+    cursor: "pointer",
+    padding: "5px 5px",
+    border: "1px solid black", 
+    backgroundColor: "#111418",
+    color: "#fafafa",
+    borderRadius: "4px 0px 0px 4px",
   },
   dateNavRight: {
-    borderRadius: "0px 10px 10px 0px",
+    cursor: "pointer",
+    padding: "5px 0px",
+    border: "1px solid black", 
+    backgroundColor: "#111418",
+    color: "#fafafa",
+    borderRadius: "0px 4px 4px 0px",
   },
 
   dateTile: (isSelected, isHovered) => ({
@@ -74,7 +83,7 @@ selectorItem: {
       : "#111418",
     // // backgroundColor: isHovered ? "#323d48":"#111418",
     // backgroundColor: selectedDate === date ? "#192c45" : "#111418",
-    color: isSelected ? "#338cf3" : "#fafafa",
+    color: isSelected ? "#31c58d" : "#fafafa",
     textAlign: "center",
     border: "1px solid black", // Add border to make it look like a button
     outline: "none", // Remove the default outline on focus
