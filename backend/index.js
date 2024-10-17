@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 // CORS configuration
 const corsOptions = {
   origin: 'https://densefusion-3001.vercel.app', // Replace with your client's origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
   credentials: true, // Allow credentials (if needed)
 };
