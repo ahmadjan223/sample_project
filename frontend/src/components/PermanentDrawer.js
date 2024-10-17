@@ -157,6 +157,7 @@ const PermanentDrawer = ({
           polygons={polygons}
           polygonInfo={polygonInfo}
           setPolygonInfo={setPolygonInfo}
+          theme={theme}
         />
 
         <Drawer
@@ -194,7 +195,7 @@ const PermanentDrawer = ({
                       color: "white",
                       backgroundColor: "#31c58d",
                       width: "calc(100% - 32px)", // Adjust width to account for right margin
-                      height: "50px",
+                      height: "48px",
                       fontSize: "18px",
                       fontWeight: "bold",
                       margin: "16px",
@@ -210,7 +211,7 @@ const PermanentDrawer = ({
                       color: "white",
                       backgroundColor: "red",
                       width: "calc(100% - 32px)", // Adjust width to account for right margin
-                      height: "50px",
+                      height: "48px",
                       fontSize: "18px",
                       fontWeight: "bold",
                       margin: "16px",
@@ -228,7 +229,7 @@ const PermanentDrawer = ({
               <div
                 style={{
                   width: "calc(100%)", // Adjust width to account for right margin
-                  height: "50px",
+                  height: "48px",
                   border: "0px solid blue",
                   display: "flex",
                   flexDirection: "row",

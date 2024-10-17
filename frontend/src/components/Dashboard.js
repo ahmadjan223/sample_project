@@ -249,14 +249,14 @@ const Dashboard = ({ user }) => {
             display: "flex", // Flex to handle layout inside (map and bottom bar)
             flexDirection: "column",
             border: "0px solid red", // Solid black border for the right div
-            padding: "10px", // Stack the map and BottomBar vertically
+            padding: "8px", // Stack the map and BottomBar vertically
           }}
         >
           <div
             style={{
               flex: 1,
               position: "relative",
-              borderRadius: "22px", // Set the desired border radius here
+              borderRadius: "32px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
               backgroundColor: "transparent",
             }}
