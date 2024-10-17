@@ -107,6 +107,11 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   };
 
   return (
+    <div style={{
+      display:"flex",
+      flexDirection:"row",
+      justifyContent:"center"
+    }}>
     <Box sx={styles.bottomBar}>
       {/* Selectors Container */}
       {/* <Box sx={styles.selectorsContainer}> */}
@@ -152,17 +157,23 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "flex-start",
-          width: "70%",
+          width: "80%",
         }}
       >
         {/* Interval Selector */}
         <FormControl
           variant="filled"
           size="auto"
-          sx={{ minWidth: 120, marginRight: "64px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
+          sx={{
+            minWidth: 120,
+            marginRight: "64px",
+            backgroundColor: "#111418",
+            borderRadius: "8px",
+          }}
         >
-          <InputLabel id="interval-select-label">Interval</InputLabel>
+          <InputLabel id="interval-select-label" sx={{color:"#fafafa"}}>Interval</InputLabel>
           <Select
+          sx={{color:"#fafafa", }}
             labelId="interval-select-label"
             defaultValue="Monthly"
             onChange={handleIntervalChange}
@@ -176,10 +187,16 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
         {/* Layer Selector */}
         <FormControl
           variant="filled"
-          sx={{ minWidth: 120, marginRight: "32px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
+          sx={{
+            minWidth: 120,
+            marginRight: "32px",
+            backgroundColor: "#111418",
+            borderRadius: "8px",
+          }}
         >
-          <InputLabel id="layer-select-label">Layer</InputLabel>
+          <InputLabel id="layer-select-label" sx={{color:"#fafafa"}}>Layer</InputLabel>
           <Select
+          sx={{color:"#fafafa"}}
             labelId="layer-select-label"
             value={layer}
             onChange={(e) => {
@@ -234,6 +251,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
         </Button>
       </Box>
     </Box>
+    </div>
   );
 };
 
