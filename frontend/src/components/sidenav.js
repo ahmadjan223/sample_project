@@ -53,7 +53,7 @@ const SideNav = ({
 
   // Handle logout
   const handleLogout = () => {
-    window.location.href = "http://localhost:3000/api/logout";
+    window.location.href = "https://densefusion.vercel.app/api/logout";
   };
 
   // Function to open the FieldDetails page

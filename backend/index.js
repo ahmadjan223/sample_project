@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 
 // CORS configuration
 const corsOptions = {
-  origin: 'http://localhost:3001', // Replace with your client's origin
+  origin: 'https://densefusion-3001.vercel.app', // Replace with your client's origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
   credentials: true, // Allow credentials (if needed)
@@ -43,7 +43,7 @@ app.use(passport.session());
 connectDB();
 
 app.get('/', (req, res) => {
-  res.send('TEST Dear user, \nWelcome to the DenseFusion backend. \nPlease go to http://localhost:3001 for the website. \n\nThanks!');
+  res.send('TEST Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://densefusion-3001.vercel.app for the website. \n\nThanks!');
 });
 
 

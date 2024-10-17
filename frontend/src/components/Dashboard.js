@@ -89,7 +89,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/sentinel/getImageUrl",
+        "https://densefusion.vercel.app/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -122,7 +122,7 @@ const Dashboard = ({ user }) => {
   const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/sentinel/getIndexValues",
+        "https://densefusion.vercel.app/sentinel/getIndexValues",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -154,7 +154,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/reset/${encodeURIComponent(userId)}`,
+        `https://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }

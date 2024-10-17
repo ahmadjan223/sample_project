@@ -103,7 +103,7 @@ const DrawableMap = ({ user }) => {
   const sendSinglePolygonToDb = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/save-single-polygon",
+        "https://densefusion.vercel.app/api/save-single-polygon",
         {
           method: "POST",
           headers: {
@@ -131,7 +131,7 @@ const DrawableMap = ({ user }) => {
 
   const sendToDb = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/fields", {
+      const response = await fetch("https://densefusion.vercel.app/api/fields", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,7 +171,7 @@ const DrawableMap = ({ user }) => {
   const loadFromDB = async (userId) => {
     try {
       const response = await fetch(
-      `http://localhost:3000/api/load-polygons/${encodeURIComponent(userId)}`
+      `https://densefusion.vercel.app/api/load-polygons/${encodeURIComponent(userId)}`
       );
       if (response.ok) {
         const result = await response.json();
@@ -230,7 +230,7 @@ const DrawableMap = ({ user }) => {
       // Send coordinates to backend to get image URL
       try {
         const response = await fetch(
-          "http://localhost:3000/sentinel/getImageUrl",
+          "https://densefusion.vercel.app/sentinel/getImageUrl",
           {
             method: "POST",
             headers: {

@@ -89,7 +89,7 @@ const PermanentDrawer = ({
   }, [selectedFieldCoords]);
 
   const handleLogout = () => {
-    window.location.href = "http://localhost:3000/api/logout"; // Adjust the logout URL as needed
+    window.location.href = "https://densefusion.vercel.app/api/logout"; // Adjust the logout URL as needed
   };
 
   const getCoords = (field) => {
