@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Box, Select, MenuItem, Button } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 import styles from "./BottomBarStyle"; // Adjust the path as needed
 
 const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
@@ -7,7 +10,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
 
   const [incrementValue, setIncrementValue] = useState(30);
   const initDays = 30;
-  const dateCount = 12;
+  const dateCount = 10;
   const [dates, setDates] = useState([]);
   const [userSelectedIndex, setUserSelectedIndex] = useState("-1");
   const [timeRange, setTimeRange] = useState("");
@@ -15,10 +18,6 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
   // Function to handle date selection
   const handleDate = async (date) => {
     await setSelectedDate(date);
-    // alert(date); // This will show the correct date
-
-    // The next alert will show the old value of selectedDate
-    // So we won't use it immediately here
     const inputDate = new Date(date);
     const DaysBefore = new Date(inputDate);
     DaysBefore.setDate(inputDate.getDate() - incrementValue);
@@ -26,39 +25,23 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
     setDate(formattedDate);
   };
 
-  // Use an effect to alert when selectedDate changes
-  // useEffect(() => {
-  //   if (selectedDate) {
-  //     alert(selectedDate); // This will show the updated selectedDate
-  //   }
-  // }, [selectedDate]);
-
   const format = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based, so add 1
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
-  // Function to get date label
   const getDateLabel = (date) => {
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
-    const years = date.getFullYear();
-    let year = years;
-    if (year > 2000) {
-      year = year - 2000;
-    } else {
-      year = year - 1900;
-    }
-    return (
-      <>
-        {day} {month}'{year}
-      </>
-    );
+    const year =
+      date.getFullYear() > 2000
+        ? date.getFullYear() - 2000
+        : date.getFullYear() - 1900;
+    return `${day} ${month}'${year}`;
   };
 
-  // Functions to navigate through dates
   const handleNextDates = () => {
     setDates((prevDates) => {
       const benchmarkDate = new Date();
@@ -89,6 +72,7 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
       return newDates;
     });
   };
+
   useEffect(() => {
     const generateDates = () => {
       const today = new Date();
@@ -102,16 +86,15 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
       }
       dateArray.reverse();
       setDates(dateArray);
-      // setSelectedDate(dateArray[0]); // Set the default selected date
     };
 
     generateDates();
   }, [incrementValue]);
+
   const handleIntervalChange = async (event) => {
     const value = event.target.value;
     let increment;
-  
-    // Set increment based on the selected interval
+
     if (value === "Weekly") {
       increment = 7;
     } else if (value === "Fortnightly") {
@@ -120,65 +103,115 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
       increment = 28;
     }
 
-    // Update the increment value state
-    await setIncrementValue(increment); // This will trigger the useEffect above
+    await setIncrementValue(increment);
   };
 
   return (
-    <div style={styles.bottomBar}>
+    <Box sx={styles.bottomBar}>
       {/* Selectors Container */}
-      <div style={styles.selectorsContainer}>
+      {/* <Box sx={styles.selectorsContainer}> */}
+      {/* Interval Selector */}
+      {/* <Box sx={styles.selectorItem}>
+          <Select
+            defaultValue="Monthly"
+            onChange={handleIntervalChange}
+            sx={styles.dropdownMenu}
+          >
+            <MenuItem value="Monthly">Monthly</MenuItem>
+            <MenuItem value="Fortnightly">Fortnightly</MenuItem>
+            <MenuItem value="Weekly">Weekly</MenuItem>
+          </Select>
+        </Box> */}
+      {/* Layer Selector */}
+      {/* <Box sx={styles.selectorItem}>
+          <Select
+            value={layer}
+            onChange={(e) => {
+              setLayer(e.target.value);
+              console.log("Layer value is changed");
+            }}
+            sx={styles.dropdownMenu}
+          >
+            <MenuItem value="AGRICULTURE">Agriculture</MenuItem>
+            <MenuItem value="BATHYMETRIC">Bathymetric</MenuItem>
+            <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
+            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem>
+            <MenuItem value="GEOLOGY">Geology</MenuItem>
+            <MenuItem value="MOISTURE-INDEX">Moisture Index</MenuItem>
+            <MenuItem value="NATURAL-COLOR">Natural color (true color)</MenuItem>
+            <MenuItem value="NDVI">NDVI</MenuItem>
+            <MenuItem value="SWIR">SWIR</MenuItem>
+            <MenuItem value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</MenuItem>
+          </Select>
+        </Box> */}
+      {/* </Box> */}
 
-
-        <select
-          className="form-select"
-          style={styles.dropdownMenu}
-          onChange={handleIntervalChange}
-          defaultValue="Monthly" // Set default value here
-
+      <Box
+        sx={{
+          border: "0px solid white",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          width: "70%",
+        }}
+      >
+        {/* Interval Selector */}
+        <FormControl
+          variant="filled"
+          size="auto"
+          sx={{ minWidth: 120, marginRight: "64px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
         >
-          <option value="Monthly">Monthly</option>
-          <option value="Fortnightly">Fortnightly</option>
-          <option value="Weekly">Weekly</option>
-        </select>
+          <InputLabel id="interval-select-label">Interval</InputLabel>
+          <Select
+            labelId="interval-select-label"
+            defaultValue="Monthly"
+            onChange={handleIntervalChange}
+          >
+            <MenuItem value="Monthly">Monthly</MenuItem>
+            <MenuItem value="Fortnightly">Fortnightly</MenuItem>
+            <MenuItem value="Weekly">Weekly</MenuItem>
+          </Select>
+        </FormControl>
 
-
-        <select
-          value={layer}
-          onChange={(e) => {
-            setLayer(e.target.value);
-            console.log("Layer value is changed");
-          }}
-          className="form-select"
-          style={styles.dropdownMenu}
+        {/* Layer Selector */}
+        <FormControl
+          variant="filled"
+          sx={{ minWidth: 120, marginRight: "32px", backgroundColor: "#2d7b31",borderRadius:"8px" }}
         >
-          <option value="AGRICULTURE">Agriculture</option>
-          <option value="BATHYMETRIC">Bathymetric</option>
-          <option value="FALSE-COLOR-URBAN">False color (urban)</option>
-          <option value="FALSE-COLOR">False color (vegetation)</option>
-          <option value="GEOLOGY">Geology</option>
-          <option value="MOISTURE-INDEX">Moisture Index</option>
-          <option value="NATURAL-COLOR">Natural color (true color)</option>
-          <option value="NDVI">NDVI</option>
-          <option value="SWIR">SWIR</option>
-          <option value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</option>
-        </select>
-
-        {/* Additional Selector */}
-      </div>
+          <InputLabel id="layer-select-label">Layer</InputLabel>
+          <Select
+            labelId="layer-select-label"
+            value={layer}
+            onChange={(e) => {
+              setLayer(e.target.value);
+              console.log("Layer value is changed");
+            }}
+          >
+            <MenuItem value="AGRICULTURE">Agriculture</MenuItem>
+            <MenuItem value="BATHYMETRIC">Bathymetric</MenuItem>
+            <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
+            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem>
+            <MenuItem value="GEOLOGY">Geology</MenuItem>
+            <MenuItem value="MOISTURE-INDEX">Moisture Index</MenuItem>
+            <MenuItem value="NATURAL-COLOR">
+              Natural color (true color)
+            </MenuItem>
+            <MenuItem value="NDVI">NDVI</MenuItem>
+            <MenuItem value="SWIR">SWIR</MenuItem>
+            <MenuItem value="TRUE-COLOR-S2L2A">TRUE COLOR S2L2A</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       {/* Date Navigator */}
-      <div className="d-flex" style={styles.dateContainer}>
-        <button
-          style={{ ...styles.dateNav, ...styles.dateNavLeft }}
-          onClick={handlePreviousDates}
-        >
+      <Box className="d-flex" sx={styles.dateContainer}>
+        <Button sx={styles.dateNavLeft} onClick={handlePreviousDates}>
           {"<"}
-        </button>
-        <div style={{ display: "flex", gap: "0px" }}>
+        </Button>
+        <Box sx={{ display: "flex", gap: "0px" }}>
           {dates.map((date, index) => (
-            <button
+            <Button
               key={index}
-              style={styles.dateTile(
+              sx={styles.dateTile(
                 selectedDate === date,
                 hoveredDateIndex === index
               )}
@@ -193,18 +226,14 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
               }}
             >
               {getDateLabel(date)}
-            </button>
+            </Button>
           ))}
-        </div>
-
-        <button
-          style={{ ...styles.dateNav, ...styles.dateNavRight }}
-          onClick={handleNextDates}
-        >
+        </Box>
+        <Button sx={styles.dateNavRight} onClick={handleNextDates}>
           {">"}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

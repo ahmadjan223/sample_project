@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ThreeCircles } from "react-loader-spinner";
-
+import Snackbar from "@mui/material/Snackbar";
 import {
   DrawingManager,
   GoogleMap,
@@ -11,6 +10,11 @@ import SideNav from "./sidenav";
 import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
 import Maps from "./Maps";
 import BottomBar from "./bottomBar";
+import TopBar from "./TopBar";
+import { Drawer, Stack } from "@mui/material";
+import PermanentDrawer from "./PermanentDrawer";
+import UseSnackbar from "./snackBar";
+import Loader from "./Loader";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
@@ -24,10 +28,20 @@ const Dashboard = ({ user }) => {
   const [polygonLayer, setPolygonLayer] = useState([]);
   const [date, setDate] = useState(new Date());
   const [layer, setLayer] = useState("NDVI");
-  const [indexValues,setIndexValues] = useState({});
+  const [indexValues, setIndexValues] = useState({});
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [addField, setAddField] = useState(true);
+  const [mapType, setMapType] = useState("SATELLITE"); // Default to ROADMAP
+
 
   useEffect(() => {
     DataFetch();
+  }, []);
+
+  useEffect(() => {
+    if (polygons == null) {
+      // alert("No Polygons")
+    }
   }, []);
 
   useEffect(() => {
@@ -58,6 +72,7 @@ const Dashboard = ({ user }) => {
     setPolygons([]);
     setFieldNames([]);
   };
+
   const updateImage = async (name, layer, date) => {
     setIsLoading(true);
     const selectedPolygon = polygons.find((polygon) => polygon.name === name);
@@ -74,7 +89,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "https://densefusion.vercel.app/sentinel/getImageUrl",
+        "http://localhost:3000/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -90,6 +105,7 @@ const Dashboard = ({ user }) => {
 
       if (response.ok) {
         const data = await response.json();
+        // window.open(data.imageUrl, "_blank");
         const propsArray = [data.imageUrl, minLat, minLon, maxLat, maxLon];
         setPolygonLayer(propsArray);
         console.log(polygonLayer);
@@ -102,10 +118,11 @@ const Dashboard = ({ user }) => {
       console.error("Error fetching image URL:", error.message);
     }
   };
-  const getIndexValues = async (path,layer,timeRange) => {
+
+  const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
-        "https://densefusion.vercel.app/sentinel/getIndexValues",
+        "http://localhost:3000/sentinel/getIndexValues",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -122,7 +139,7 @@ const Dashboard = ({ user }) => {
 
         // Extract the indexvalue and convert it into an array
         const IndexArray = Object.values(result.indexValues);
-        
+
         // Pass the array to indexvalue
         setIndexValues(IndexArray);
         console.log(result);
@@ -132,12 +149,12 @@ const Dashboard = ({ user }) => {
     } catch (error) {
       console.error("Error:", error);
     }
-  }
+  };
 
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `https://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
+        `http://localhost:3000/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
@@ -154,83 +171,110 @@ const Dashboard = ({ user }) => {
       console.error("Error:", error);
     }
   };
+  useEffect(() => {
+    if (selectedFieldName) {
+      // alert(`Selected Field Name: ${selectedFieldName}`);
+    }
+  }, [selectedFieldName]);
 
   return (
-    <div style={{ display: "flex" }}>
-      <SideNav
-        polygons={polygons}
-        isLoaded={isLoaded}
-        user={user}
-        resetDB={() => resetDB(user.id)}
-        sendToDb={() => {
-          sendToDb(polygons);
+    <Stack>
+      {/* TopBar */}
+      <TopBar />
+
+      <div
+        style={{
+          display: "flex",
+          backgroundColor: "#f5f5f5",
+          height: "calc(100vh - 64px)", // Subtract the height of the TopBar
+          width: "calc(100vw)", // Subtract the width of the SideNav
         }}
-        clearMap={clearMap}
-        selectedFieldName={selectedFieldName}
-        setSelectedFieldName={(name) => {
-          setSelectedFieldName(name);
-        }}
-        isDrawing={isDrawing}
-        setIsDrawing={setIsDrawing}
-        DataFetch={DataFetch}
-      />
-      {isLoading && ( // Add a condition to show the loader
+      >
         <div
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background with transparency
-            zIndex: 999, // Ensure it's above all other elements
-            display: "flex",
-            justifyContent: "center", // Center horizontally
-            alignItems: "center", // Center vertically
+            flex: "0 0 21.5%",
+            border: "0px solid black",
+            // padding: "1px", // Solid black border for the left div
           }}
         >
-          <ThreeCircles
-            visible={true}
-            height="100"
-            width="100"
-            color="#4fa94d"
-            ariaLabel="three-circles-loading"
+          <PermanentDrawer
+            polygons={polygons}
+            user={user}
+            selectedFieldName={selectedFieldName}
+            setSelectedFieldName={setSelectedFieldName}
+            DataFetch={DataFetch}
+            setIsDrawing={setIsDrawing}
+            setSnackBarOpen={setSnackBarOpen}
+            addField={addField}
+            setAddField={setAddField}
+            mapType={mapType}
+            setMapType={setMapType}
           />
         </div>
-      )}
-      <div style={{ flex: 1, flexDirection: "row" }}>
+
         <div
-          className="map-container"
-          style={{ flex: 1, position: "relative" }}
+          style={{
+            flex: "1 0 77%", // 70% width for the right div
+            display: "flex", // Flex to handle layout inside (map and bottom bar)
+            flexDirection: "column",
+            border: "0px solid red", // Solid black border for the right div
+            padding: "10px", // Stack the map and BottomBar vertically
+          }}
         >
-          {isLoaded && (
-            <Maps
-              user={user}
-              polygons={polygons}
-              DataFetch={DataFetch}
-              polygonLayer={polygonLayer}
-        
-              selectedFieldName={selectedFieldName}
+          <div
+            style={{
+              flex: 1,
+              position: "relative",
+              borderRadius: "22px", // Set the desired border radius here
+              overflow: "hidden", // Ensure the content respects the border radius
+              backgroundColor: "green",
+              backgroundColor: "green",
+            }}
+          >
+            {isLoading && <Loader></Loader>}
+            {/* here i need to add jsx for alert */}
+            <Snackbar
+              sx={{ position: "absolute" }}
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              // autoHideDuration={3000}
+              message="Draw your Field on Map"
+              open={snackBarOpen}
+              onClose={() => setSnackBarOpen(false)}
+            ></Snackbar>
+            {isLoaded && (
+              <Maps
+                user={user}
+                polygons={polygons}
+                DataFetch={DataFetch}
+                polygonLayer={polygonLayer}
+                selectedFieldName={selectedFieldName}
+                date={date}
+                layer={layer}
+                setIsLoading={setIsLoading}
+                indexValues={indexValues}
+                isDrawing={isDrawing}
+                setIsDrawing={setIsDrawing}
+                addField={addField}
+                setAddField={setAddField}
+                mapType={mapType}
+                setMapType={setMapType}
+                
+              />
+            )}
+          </div>
+
+          {selectedFieldName && (
+            <BottomBar
               date={date}
               layer={layer}
-              setIsLoading={setIsLoading}
-              indexValues = {indexValues}
-              isDrawing={isDrawing}
-              setIsDrawing={setIsDrawing}
-            ></Maps>
+              setDate={setDate}
+              setLayer={setLayer}
+              selectedFieldName={selectedFieldName}
+            />
           )}
         </div>
-        <div>
-          {selectedFieldName && (<BottomBar
-            date={date}
-            layer={layer}
-            setDate={setDate}
-            setLayer={setLayer}
-            selectedFieldName={selectedFieldName}
-          ></BottomBar>)}
-        </div>
       </div>
-    </div>
+    </Stack>
   );
 };
 

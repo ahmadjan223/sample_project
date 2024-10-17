@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
+import DashboardLayout from './components/DashboardLayout';
 import LandingPage from './components/LandingPage';
 
 
@@ -25,6 +26,8 @@ const App = () => {
     // },[user])
     if (user) {
         return <Dashboard user={user} />;
+        // return <DashboardLayout></DashboardLayout>
+        // return <BasicButtons></BasicButtons>;
     }
 
     return <LandingPage></LandingPage>;

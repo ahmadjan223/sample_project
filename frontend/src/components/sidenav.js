@@ -2,7 +2,19 @@ import React, { useState, useEffect } from "react";
 import "./SideNav.css";
 import SideBarTiles from "./sideBarTile";
 import FieldDetails from "./FieldDetails"; // Import the new component
-
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+import Toolbar from "@mui/material/Toolbar";
+import LayersIcon from "@mui/icons-material/Layers";
+const drawerWidth = 340;
+const topBarHeight = 64;
 // SideNav component
 const SideNav = ({
   polygons,
@@ -34,14 +46,14 @@ const SideNav = ({
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
       index,
-      name: polygon.name || `Field ${index}`, // Use polygon name if available
+      name: polygon.name || `Field ${index}`, 
     }));
     setPolygonInfo(formattedPolygons);
   };
 
   // Handle logout
   const handleLogout = () => {
-    window.location.href = "https://densefusion.vercel.app/api/logout";
+    window.location.href = "http://localhost:3000/api/logout";
   };
 
   // Function to open the FieldDetails page
@@ -342,6 +354,7 @@ const SideNav = ({
         </div>
       )}
     </>
+
   );
 };
 
