@@ -1,5 +1,6 @@
 import DetailsDrawer from "./DetailsDrawer"; // Adjust the path as necessary
 
+
 import React, { useState, useEffect } from "react";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -23,6 +24,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import TypeSearch from "./Search.tsx";
 
 const drawerWidth = 340;
 const topBarHeight = 64;
@@ -179,8 +181,7 @@ const PermanentDrawer = ({
             }}
           >
             {/* 001 FUNCTIONALITY */}
-            <div style={{border: "0px solid red"}}
-            >
+            <div style={{ border: "0px solid red" }}>
               {/* 0. ADD FIELD BUTTON */}
               {/* <div
                 style={{
@@ -224,7 +225,7 @@ const PermanentDrawer = ({
               {/*________________ */}
 
               {/* 1. ADD FIELD BUTTON */}
-              <div style={{border: "0px solid yellow"}}>
+              <div style={{ border: "0px solid yellow" }}>
                 {addField ? (
                   <Button
                     sx={{
@@ -295,7 +296,8 @@ const PermanentDrawer = ({
               {/*________________ */}
 
               {/* 3. FIELDS */}
-              <div style={{border: "0px solid green"}}>
+              <Divider></Divider>
+              <div style={{ border: "0px solid green" }}>
                 <div
                   style={{
                     border: "5px solid transparent",
@@ -307,6 +309,7 @@ const PermanentDrawer = ({
                     User Fields
                   </Typography>
                 </div>
+                <Divider></Divider>
 
                 {/* List of Items */}
                 <List>
@@ -321,7 +324,7 @@ const PermanentDrawer = ({
                           <LayersIcon />
                         </ListItemIcon>
 
-                        <ListItemText variant= "h5" primary={field.name} />
+                        <ListItemText variant="h5" primary={field.name} />
                       </ListItemButton>
                     </ListItem>
                   ))}
@@ -329,7 +332,17 @@ const PermanentDrawer = ({
               </div>
               {/*________________ */}
 
-
+              {/* 4. Search */}
+              <div>
+                {/* <SearchBar
+                cancelOnEscape	
+                  value={selectedFieldName}
+                  onChange={(value) => setState({dataSource: [ value, value+value, value+value+value]})}
+                  // onChange={(newValue) => this.setState({ value: newValue })}
+                  onRequestSearch={() => console.log('onRequestSearch')}
+                  /> */}
+              </div>
+              {/* ______________--- */}
             </div>
             {/*________________ */}
 

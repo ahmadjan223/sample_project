@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Autocomplete } from "@react-google-maps/api";
+import { useRef } from "react";
+
 import { DrawingManager, GoogleMap, Polygon } from "@react-google-maps/api";
 import { savePolygon, sendToDb, loadPolygon } from "./apiService";
 import InputModal from "./inputModal";
@@ -37,12 +40,28 @@ const Maps = ({
   let [cachedImage, setCachedImage] = useState(null); // Store the loaded image globally
   let [cachedCanvas, setCachedCanvas] = useState(null);
 
+  const [autocomplete, setAutocomplete] = useState(null);
+  const inputRef = useRef();
+  const handlePlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.geometry) {
+        const newCenter = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        };
+        setDefaultCenter(newCenter);
+        map.panTo(newCenter);
+      }
+    }
+  };
+
   //map ki height waghera yahan maps se change hogi
   //lekin agar wo scroll bar aana shuru ho jaye
   //right side pe ya neeche ki taraf to wo bottombar mki waja se khap hogi
   const containerStyle = {
     width: "100%",
-    height: "87.9vh",
+    height: "88.3vh",
   };
   const tooltip = document.createElement("div");
   tooltip.style.position = "absolute";
@@ -66,11 +85,7 @@ const Maps = ({
 
   const drawingManagerOptions = {
     polygonOptions: polygonOptions,
-    drawingControl: true,
-    drawingControlOptions: {
-      position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-      drawingModes: [window.google?.maps?.drawing?.OverlayType?.POLYGON],
-    },
+    drawingControl: false,
   };
 
   useEffect(() => {
@@ -78,7 +93,7 @@ const Maps = ({
       if (isDrawing) {
         drawingManager.setOptions({
           drawingMode: window.google.maps.drawing.OverlayType.POLYGON, // Enable drawing mode
-          drawingControl: true, // Show the drawing control when in drawing mode
+          drawingControl: false, // Show the drawing control when in drawing mode
           drawingControlOptions: {
             drawingModes: [window.google.maps.drawing.OverlayType.POLYGON], // Only polygon drawing
           },
@@ -453,21 +468,69 @@ const Maps = ({
         setOpenInputModal={setOpenInputModal}
         openInputModal={openInputModal}
       ></InputModal>
+
+      <Autocomplete
+        onLoad={(autocompleteInstance) => setAutocomplete(autocompleteInstance)}
+        onPlaceChanged={handlePlaceChanged}
+      >
+        <input
+          type="text"
+          placeholder="Search a place"
+          ref={inputRef}
+          style={{
+            position: "absolute",
+
+            top: "8px",
+            right: "16px",
+
+            width: "320px",
+            height: "48px",
+
+            padding: "10px",
+            borderRadius: "4px",
+            zIndex: 1, // Ensure the input is above the map
+          }}
+        />
+      </Autocomplete>
       <GoogleMap
         mapTypeId={mapTypeMapping[mapType]}
         zoom={13}
         center={defaultCenter}
         onLoad={(map) => setMap(map)}
-        // onClick={handleClick} // Changed to handle clicks
         mapContainerStyle={containerStyle}
+        options={{
+          zoomControl: true,
+          fullscreenControl: false, 
+          scaleControl: true, 
+          
+        //   zoomControlOptions: {
+        //     style: window.google.maps.ZoomControlStyle.SMALL
+        // },
+
+
+
+          // mapTypeControl: true,
+          // mapTypeControlOptions: {
+          //   style: window.google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          // },
+          // mapTypeControlOptions: {
+          //   style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+          //   position: window.google.maps.ControlPosition.CENTER,
+          // },
+
+          // streetViewControl: false,
+          // panControl: true,
+          // overviewMapControl: true,
+          // rotateControl: true,
+        }}
       >
-        <div style={{margin:"8px 16px"}}>
+        <div style={{ margin: "8px 16px" }}>
           <Button
             size="small"
             variant="contained"
             color="success"
             onClick={() => setMapType("SATELLITE")}
-            sx={{borderRadius:"4px 0px 0px 4px"}}
+            sx={{ borderRadius: "4px 0px 0px 4px" }}
           >
             SATELLITE
           </Button>
@@ -477,8 +540,7 @@ const Maps = ({
             variant="contained"
             color="success"
             onClick={() => setMapType("ROADMAP")}
-            sx={{borderRadius:"0px 4px 4px 0px"}}
-
+            sx={{ borderRadius: "0px 4px 4px 0px" }}
           >
             ROAD
           </Button>
