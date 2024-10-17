@@ -40,7 +40,7 @@ const Dashboard = ({ user }) => {
 
   useEffect(() => {
     if (polygons == null) {
-      alert("No Polygons")
+      // alert("No Polygons")
     }
   }, []);
 

@@ -346,12 +346,12 @@ const PermanentDrawer = ({
 
               {/* 3. FIELDS */}
               <Divider></Divider>
-              <div style={{ border: "0px solid green" }}>
+              <div style={{ border: "0px solid orange" }}>
                 <div
                   style={{
-                    border: "0px solid transparent",
+                    border: "0px solid pink",
                     textAlign: "center",
-                    width: "60%",
+                    width: "100%",
                   }}
                 >
                   <Typography variant="h6" component="div">
@@ -386,12 +386,13 @@ const PermanentDrawer = ({
             {/*002 USER DETAILS*/}
             <div>
               {/* 1. INFO*/}
-              <div style={{ padding: "16px" }}>
+              <div style={{ padding: "16px", border:"0px solid purple" }}>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
+                   border:"0px solid green"
                   }}
                 >
                   <Avatar src="avatar.png" />
