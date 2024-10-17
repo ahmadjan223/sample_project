@@ -51,12 +51,14 @@ const DetailsDrawer = ({
   };
 
   const saveFieldName = async (newName) => {
+    console.log("updating the field name")
     try {
       // Update the local state with the new name
       const updatedPolygons = polygonInfo.map((field) =>
         field.name === editFieldName ? { ...field, name: newName } : field
       );
       setPolygonInfo(updatedPolygons);
+      console.log("changes made locally")
   
       // Send the updated name to the server
       await fetch(
@@ -71,6 +73,8 @@ const DetailsDrawer = ({
       );
   
       await DataFetch();
+      console.log("changes made backend")
+
       setSelectedFieldName(newName);
     } catch (error) {
       console.error("Error updating field name:", error);
