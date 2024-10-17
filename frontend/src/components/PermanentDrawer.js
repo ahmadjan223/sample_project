@@ -1,5 +1,5 @@
 import DetailsDrawer from "./DetailsDrawer"; // Adjust the path as necessary
-
+import SearchBar from "@mkyy/mui-search-bar";
 
 import React, { useState, useEffect } from "react";
 import Drawer from "@mui/material/Drawer";
@@ -45,6 +45,19 @@ const PermanentDrawer = ({
   const [polygonInfo, setPolygonInfo] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedFieldCoords, setSelectedFieldCoords] = useState();
+
+  const [textFieldValue, setTextFieldValue] = useState(null);
+  const handleSearch = () => {
+    const trimmedValue = textFieldValue.trim(); // Trim whitespace
+    const polygonExists = polygonInfo.some(
+      (field) => field.name === trimmedValue
+    );
+    if (polygonExists) {
+      setSelectedFieldName(trimmedValue);
+    } else {
+      // alert("Polygon not found");
+    }
+  };
 
   const handlePolygons = () => {
     const formattedPolygons = polygons.map((polygon, index) => ({
@@ -262,7 +275,43 @@ const PermanentDrawer = ({
               </div>
               {/*________________ */}
 
-              {/* 2. MAP TYPE */}
+              {/* 4. Search */}
+              <div
+                style={{
+                  width: "calc(100%)", // Adjust width to account for right margin
+                  height: "50px",
+                  border: "0px solid blue",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                <SearchBar
+                  style={{
+                    backgroundColor: "white",
+                    color: "black",
+                  }}
+                  placeholder="Search a field"
+                  value={textFieldValue}
+                  onChange={(newValue) => {
+                    setTextFieldValue(newValue);
+
+                    // Check if the new value matches any polygon name and set it
+                    const match = polygonInfo.find(
+                      (field) => field.name === textFieldValue
+                    );
+                    if (match) {
+                      setSelectedFieldName(match.name); // Update to selected option if found
+                    }
+                  }}
+                  onSearch={handleSearch}
+                  onCancelResearch={() => setTextFieldValue("")} // Clear search on cancel
+                  options={polygonInfo.map((field) => field.name)} // Provide polygon names as autocomplete options
+                />
+              </div>
+              {/* ______________--- */}
+
+              {/* 3. MAP TYPE */}
               {/* <div style={{border: "0px solid blue", marginRight:"32px",display: "flex", justifyContent: "flex-end"}}>
                 <FormControl
                   variant="standard"
@@ -300,7 +349,7 @@ const PermanentDrawer = ({
               <div style={{ border: "0px solid green" }}>
                 <div
                   style={{
-                    border: "5px solid transparent",
+                    border: "0px solid transparent",
                     textAlign: "center",
                     width: "60%",
                   }}
@@ -331,18 +380,6 @@ const PermanentDrawer = ({
                 </List>
               </div>
               {/*________________ */}
-
-              {/* 4. Search */}
-              <div>
-                {/* <SearchBar
-                cancelOnEscape	
-                  value={selectedFieldName}
-                  onChange={(value) => setState({dataSource: [ value, value+value, value+value+value]})}
-                  // onChange={(newValue) => this.setState({ value: newValue })}
-                  onRequestSearch={() => console.log('onRequestSearch')}
-                  /> */}
-              </div>
-              {/* ______________--- */}
             </div>
             {/*________________ */}
 
