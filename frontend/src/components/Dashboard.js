@@ -33,6 +33,7 @@ const Dashboard = ({ user }) => {
   const [addField, setAddField] = useState(true);
   const [mapType, setMapType] = useState("SATELLITE"); // Default to ROADMAP
 
+
   useEffect(() => {
     DataFetch();
   }, []);
@@ -213,7 +214,7 @@ const Dashboard = ({ user }) => {
 
         <div
           style={{
-            flex: "1 0 77%", // 70% width for the right div
+            flex: "1 0 77.2%", // 70% width for the right div
             display: "flex", // Flex to handle layout inside (map and bottom bar)
             flexDirection: "column",
             border: "0px solid red", // Solid black border for the right div
@@ -257,6 +258,7 @@ const Dashboard = ({ user }) => {
                 setAddField={setAddField}
                 mapType={mapType}
                 setMapType={setMapType}
+                
               />
             )}
           </div>
