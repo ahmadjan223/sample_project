@@ -108,7 +108,7 @@ const DetailsDrawer = ({
 
   useEffect(() => {
     if (editFieldName) {
-      const newName = prompt("Enter New Name for the field: ");
+      const newName = prompt("Enter new name for the field: ");
       if (newName ==null){
         setEditFieldName(null);
       }
