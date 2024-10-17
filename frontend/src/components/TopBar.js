@@ -11,7 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Icon } from "@mui/material";
-import Logo from "../images/cm_logo.svg";
+import Logo_dark from "../images/cm_logo.svg";
+import Logo_light from "../images/cm_logo_light.svg";
 
 export default function TopBar({ theme, setTheme, showMenu, setShowMenu }) {
   const [checked, setChecked] = React.useState(true);
@@ -80,7 +81,7 @@ export default function TopBar({ theme, setTheme, showMenu, setShowMenu }) {
 
         <IconButton edge="start" color="inherit" sx={{ mr: 1 }}>
           <img
-            src={Logo}
+            src={checked ? Logo_dark : Logo_light}
             alt="logo"
             style={{
               maxWidth: "110%",
