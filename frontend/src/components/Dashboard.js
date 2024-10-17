@@ -33,7 +33,6 @@ const Dashboard = ({ user }) => {
   const [addField, setAddField] = useState(true);
   const [mapType, setMapType] = useState("SATELLITE"); // Default to ROADMAP
 
-
   useEffect(() => {
     DataFetch();
   }, []);
@@ -225,10 +224,9 @@ const Dashboard = ({ user }) => {
             style={{
               flex: 1,
               position: "relative",
-              borderRadius: "22px", // Set the desired border radius here
+              borderRadius: "16px", // Set the desired border radius here
               overflow: "hidden", // Ensure the content respects the border radius
-              backgroundColor: "green",
-              backgroundColor: "green",
+              backgroundColor: "transparent",
             }}
           >
             {isLoading && <Loader></Loader>}
@@ -241,6 +239,7 @@ const Dashboard = ({ user }) => {
               open={snackBarOpen}
               onClose={() => setSnackBarOpen(false)}
             ></Snackbar>
+
             {isLoaded && (
               <Maps
                 user={user}
@@ -258,7 +257,6 @@ const Dashboard = ({ user }) => {
                 setAddField={setAddField}
                 mapType={mapType}
                 setMapType={setMapType}
-                
               />
             )}
           </div>
