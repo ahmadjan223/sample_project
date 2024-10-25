@@ -301,12 +301,16 @@ const DetailsDrawer = ({
                   Sed do eiusmod tempor incididunt ut labore et dolore magna
                   aliqua.{" "}
                 </Typography>
+                <Typography variant="body2">
+                  Sed do eiusmod tempor incididunt ut labore et dolore magna
+                  aliqua.{" "}
+                </Typography>
               </CardContent>
-              <CardActions>
+              {/* <CardActions>
                 <Button size="small" variant="outlined" color="inherit">
                   + Add Note
                 </Button>
-              </CardActions>
+              </CardActions> */}
             </Card>
           </div>
 
