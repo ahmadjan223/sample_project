@@ -32,7 +32,7 @@ const Dashboard = ({ user }) => {
   const [indexValues, setIndexValues] = useState({});
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [addField, setAddField] = useState(true);
-  const [mapType, setMapType] = useState("SATELLITE"); // Default to ROADMAP
+  const [mapType, setMapType] = useState("ROADMAP"); // Default to ROADMAP
   const [showMenu, setShowMenu] = useState(true);
 
   const [theme, setTheme] = useState(
@@ -59,7 +59,6 @@ const Dashboard = ({ user }) => {
   useEffect(() => {
     DataFetch();
   }, []);
-
   useEffect(() => {
     if (polygons == null) {
       // alert("No Polygons")
@@ -111,7 +110,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "https://densefusion.vercel.app/sentinel/getImageUrl",
+        "http://localhost:3000/sentinel/getImageUrl",
         {
           method: "POST",
           headers: {
@@ -144,7 +143,7 @@ const Dashboard = ({ user }) => {
   const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
-        "https://densefusion.vercel.app/sentinel/getIndexValues",
+        "http://localhost:3000/sentinel/getIndexValues",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -176,7 +175,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `https://densefusion.vercel.app/api/reset/${encodeURIComponent(userId)}`,
+        `http://localhost:3000/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }

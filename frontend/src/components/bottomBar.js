@@ -206,8 +206,8 @@ const BottomBar = ({ layer, date, setDate, setLayer, selectedFieldName }) => {
           >
             <MenuItem value="AGRICULTURE">Agriculture</MenuItem>
             <MenuItem value="BATHYMETRIC">Bathymetric</MenuItem>
-            <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
-            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem>
+            {/* <MenuItem value="FALSE-COLOR-URBAN">False color (urban)</MenuItem>
+            <MenuItem value="FALSE-COLOR">False color (vegetation)</MenuItem> */}
             <MenuItem value="GEOLOGY">Geology</MenuItem>
             <MenuItem value="MOISTURE-INDEX">Moisture Index</MenuItem>
             <MenuItem value="NATURAL-COLOR">

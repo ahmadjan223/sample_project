@@ -525,7 +525,7 @@ const Maps = ({
           // rotateControl: true,
         }}
       >
-        <div style={{ margin: "8px 16px" }}>
+        {/* <div style={{ margin: "8px 16px" }}>
           <Button
             size="small"
             variant="contained"
@@ -551,7 +551,7 @@ const Maps = ({
           >
             ROAD
           </Button>
-        </div>
+        </div> */}
 
         <DrawingManager
           onLoad={(drawingManager) => setDrawingManager(drawingManager)}

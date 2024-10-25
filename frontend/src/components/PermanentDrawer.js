@@ -26,6 +26,11 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TypeSearch from "./Search.tsx";
 
+import { styled } from "@mui/material/styles";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+
 const drawerWidth = 340;
 const topBarHeight = 64;
 
@@ -91,7 +96,7 @@ const PermanentDrawer = ({
   }, [selectedFieldCoords]);
 
   const handleLogout = () => {
-    window.location.href = "https://densefusion.vercel.app/api/logout"; // Adjust the logout URL as needed
+    window.location.href = "http://localhost:3000/api/logout"; // Adjust the logout URL as needed
   };
 
   const getCoords = (field) => {
@@ -126,8 +131,6 @@ const PermanentDrawer = ({
     alert(`Editing field ${selectedFieldName}`);
   };
 
-
-
   const handleAddField = () => {
     setAddField(!addField);
     setSnackBarOpen(true);
@@ -139,6 +142,90 @@ const PermanentDrawer = ({
     setSnackBarOpen(false);
     setIsDrawing(false);
   };
+
+  const [checked, setChecked] = React.useState(false);
+
+  const handleChange = () => {
+    setChecked(!checked)
+  };
+
+  useEffect(
+    ()=>{
+      // alert(`checked is set to ${checked}`)
+      if (checked){
+        setMapType("SATELLITE")
+      }
+      else{
+        setMapType("ROADMAP")
+      }
+
+    },[checked]
+  )
+
+  const IOSSwitch = styled((props) => (
+    <Switch
+      focusVisibleClassName=".Mui-focusVisible"
+      disableRipple
+      {...props}
+    />
+  ))(({ theme }) => ({
+    width: 42,
+    height: 26,
+    padding: 0,
+    "& .MuiSwitch-switchBase": {
+      padding: 0,
+      margin: 2,
+      transitionDuration: "300ms",
+      "&.Mui-checked": {
+        transform: "translateX(16px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          backgroundColor: "#65C466",
+          opacity: 1,
+          border: 0,
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#2ECA45",
+            backgroundColor: "#31c58d",
+          }),
+        },
+        "&.Mui-disabled + .MuiSwitch-track": {
+          opacity: 0.5,
+        },
+      },
+      "&.Mui-focusVisible .MuiSwitch-thumb": {
+        color: "#33cf4d",
+        border: "6px solid #fff",
+      },
+      "&.Mui-disabled .MuiSwitch-thumb": {
+        color: theme.palette.grey[100],
+        ...theme.applyStyles("dark", {
+          color: theme.palette.grey[600],
+        }),
+      },
+      "&.Mui-disabled + .MuiSwitch-track": {
+        opacity: 0.7,
+        ...theme.applyStyles("dark", {
+          opacity: 0.3,
+        }),
+      },
+    },
+    "& .MuiSwitch-thumb": {
+      boxSizing: "border-box",
+      width: 22,
+      height: 22,
+    },
+    "& .MuiSwitch-track": {
+      borderRadius: 26 / 2,
+      backgroundColor: "#E9E9EA",
+      opacity: 1,
+      transition: theme.transitions.create(["background-color"], {
+        duration: 500,
+      }),
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#39393D",
+      }),
+    },
+  }));
 
   return (
     <>
@@ -186,7 +273,6 @@ const PermanentDrawer = ({
           >
             {/* 001 FUNCTIONALITY */}
             <div style={{ border: "0px solid red" }}>
-              
               {/* 1. ADD FIELD BUTTON */}
               <div style={{ border: "0px solid yellow" }}>
                 {addField ? (
@@ -261,21 +347,42 @@ const PermanentDrawer = ({
               </div>
               {/* ______________--- */}
 
-              
-
               {/* 3. FIELDS */}
               <Divider></Divider>
               <div style={{ border: "0px solid orange" }}>
                 <div
                   style={{
-                    border: "0px solid pink",
-                    textAlign: "center",
-                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    // border: "2px solid white",
                   }}
                 >
-                  <Typography variant="h6" component="div">
-                    User Fields
-                  </Typography>
+                  <div
+                    style={{
+                      // border: "2px solid pink",
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <Typography variant="h6" component="div">
+                      User Fields
+                    </Typography>
+                  </div>
+                  <div
+                    style={{
+                      // border: "2px solid pink",
+                      textAlign: "right",
+                      width: "100%",
+                    }}
+                  >
+                    <FormControlLabel
+                      control={<IOSSwitch sx={{ m: 0 }} />}
+                      label=" Satellite Mode"
+                      onChange={handleChange}
+                      checked={checked}
+                    />
+                  </div>
                 </div>
                 <Divider></Divider>
 
@@ -309,8 +416,7 @@ const PermanentDrawer = ({
                 style={{
                   padding: "16px",
                   border: "0px solid purple",
-                  borderRadius:"16px 16px 0px 0px" // Ensures the container takes the full height of the sidebar
-
+                  borderRadius: "16px 16px 0px 0px", // Ensures the container takes the full height of the sidebar
                 }}
               >
                 <div

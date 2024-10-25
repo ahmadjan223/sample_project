@@ -11,6 +11,12 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { ThemeContext, ThemeProvider } from "@emotion/react";
 
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
 const DetailsDrawer = ({
   drawerWidth,
   topBarHeight,
@@ -25,9 +31,10 @@ const DetailsDrawer = ({
   setOpen,
   polygonInfo,
   setPolygonInfo,
-  theme
+  theme,
 }) => {
   const [editFieldName, setEditFieldName] = useState(null);
+  const [deleteField, setDeleteField] = useState(false);
 
   const handleEdit = async (name) => {
     await setSelectedFieldName("Field 2");
@@ -36,7 +43,7 @@ const DetailsDrawer = ({
     try {
       // Call the delete endpoint with the field name
       await fetch(
-        `https://densefusion.vercel.app/api/delete-field/${encodeURIComponent(name)}`,
+        `http://localhost:3000/api/delete-field/${encodeURIComponent(name)}`,
         {
           method: "DELETE",
         }
@@ -53,18 +60,18 @@ const DetailsDrawer = ({
   };
 
   const saveFieldName = async (newName) => {
-    console.log("updating the field name")
+    console.log("updating the field name");
     try {
       // Update the local state with the new name
       const updatedPolygons = polygonInfo.map((field) =>
         field.name === editFieldName ? { ...field, name: newName } : field
       );
       setPolygonInfo(updatedPolygons);
-      console.log("changes made locally")
-  
+      console.log("changes made locally");
+
       // Send the updated name to the server
       await fetch(
-        `https://densefusion.vercel.app/api/update-field/${encodeURIComponent(editFieldName)}`,
+        `http://localhost:3000/api/update-field/${encodeURIComponent(editFieldName)}`,
         {
           method: "PATCH",
           headers: {
@@ -73,16 +80,16 @@ const DetailsDrawer = ({
           body: JSON.stringify({ name: newName }),
         }
       );
-  
+
       await DataFetch();
-      console.log("changes made backend")
+      console.log("changes made backend");
 
       setSelectedFieldName(newName);
     } catch (error) {
       console.error("Error updating field name:", error);
     }
   };
-  
+
   // const saveFieldName = async (originalName) => {
   //   try {
   //     // Update the local state
@@ -94,7 +101,7 @@ const DetailsDrawer = ({
 
   //     // Send the updated name to the server
   //     await fetch(
-  //       `https://densefusion.vercel.app/api/update-field/${encodeURIComponent(originalName)}`,
+  //       `http://localhost:3000/api/update-field/${encodeURIComponent(originalName)}`,
   //       {
   //         method: "PATCH",
   //         headers: {
@@ -115,16 +122,14 @@ const DetailsDrawer = ({
   useEffect(() => {
     if (editFieldName) {
       const newName = prompt("Enter new name for the field: ");
-      if (newName ==null){
+      if (newName == null) {
         setEditFieldName(null);
-      }
-      else{
-        saveFieldName(newName)
-        //call the function saveFieldName that handles the 
+      } else {
+        saveFieldName(newName);
+        //call the function saveFieldName that handles the
         //code to update local names, and then sending the names to db, and then laoding the names from db
         setEditFieldName(null);
       }
-
     }
   }, [editFieldName]);
 
@@ -132,195 +137,248 @@ const DetailsDrawer = ({
     setEditFieldName(name);
   };
 
+  const [showDelete, setShowDelete] = React.useState(false);
+
+  const handleConfirmDelete = () => {
+    setShowDelete(true);
+  };
+
+  const handleClose = () => {
+    setShowDelete(false);
+  };
+
+  useEffect(() => {
+    if (deleteField) {
+      handleDelete(selectedFieldName)
+    }
+    setDeleteField(false);
+  }, [deleteField]);
+
   return (
     <ThemeProvider theme={theme}>
-
-    <Drawer
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        marginTop: `${topBarHeight}px`, // Push drawer below TopBar
-
-        "& .MuiDrawer-paper": {
+      <Drawer
+        sx={{
           width: drawerWidth,
-          boxSizing: "border-box",
-          marginTop: `${topBarHeight}px`, // Apply margin to drawer paper
-        },
-      }}
-      variant="temporary"
-      anchor="left"
-      open={open}
-      ModalProps={{ hideBackdrop: true }}
-    >
-      <div
-        style={{
-          padding: "32px",
+          flexShrink: 0,
+          marginTop: `${topBarHeight}px`, // Push drawer below TopBar
 
-          //NEW
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          justifyContent: "space-between",
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            marginTop: `${topBarHeight}px`, // Apply margin to drawer paper
+          },
         }}
+        variant="temporary"
+        anchor="left"
+        open={open}
+        ModalProps={{ hideBackdrop: true }}
       >
-        <div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Button
-              onClick={goBackToSidebar}
-              variant="outlined"
-              color="inherit"
-              style={{ marginBottom: "32px" }}
-            >
-              Back
-            </Button>
+        <div
+          style={{
+            padding: "32px",
 
-            <FormControl
-              variant="standard"
-              sx={{ minWidth: 120, marginBottom: "16px" }}
+            //NEW
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
             >
-              <InputLabel id="demo-simple-select-standard-label" >
-                Current Field
-              </InputLabel>
-
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedFieldName} // Use selectedFieldName as the value for the select
-                onChange={(event) => handleChange(event.target.value)}
-                label="Field"
+              <Button
+                onClick={goBackToSidebar}
+                variant="outlined"
+                color="inherit"
+                style={{ marginBottom: "32px" }}
               >
-                <MenuItem value={selectedFieldName}>
-                  <em>{selectedFieldName}</em>
-                </MenuItem>
-                {polygonInfo.map(
-                  (field) =>
-                    field.name !== selectedFieldName && (
-                      <MenuItem value={field.name} key={field.name}>
-                        {field.name}
-                      </MenuItem>
-                    )
-                )}
-              </Select>
-            </FormControl>
-          </div>
+                Back
+              </Button>
 
-          <Divider />
+              <FormControl
+                variant="standard"
+                sx={{ minWidth: 120, marginBottom: "16px" }}
+              >
+                <InputLabel id="demo-simple-select-standard-label">
+                  Current Field
+                </InputLabel>
 
-          <Typography
-            variant="h5"
-            color="white"
-            style={{ marginBottom: "16px", border: "2px solid  transparent" }}
-          >
-            {selectedFieldName}
-          </Typography>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedFieldName} // Use selectedFieldName as the value for the select
+                  onChange={(event) => handleChange(event.target.value)}
+                  label="Field"
+                >
+                  <MenuItem value={selectedFieldName}>
+                    <em>{selectedFieldName}</em>
+                  </MenuItem>
+                  {polygonInfo.map(
+                    (field) =>
+                      field.name !== selectedFieldName && (
+                        <MenuItem value={field.name} key={field.name}>
+                          {field.name}
+                        </MenuItem>
+                      )
+                  )}
+                </Select>
+              </FormControl>
+            </div>
 
-          {/* <Divider /> */}
+            <Divider />
 
-          {/* <Typography
+            <Typography
+              variant="h5"
+              color="white"
+              style={{ marginBottom: "16px", border: "2px solid  transparent", color: theme.palette.secondary.main }}
+            >
+              {selectedFieldName}
+            </Typography>
+
+            {/* <Divider /> */}
+
+            {/* <Typography
             variant="body2"
             color="gray"
             style={{ border: "2px solid transparent" }}
           >
             Coordinates: {selectedFieldCoords}
           </Typography> */}
+            <div>
+              <Card sx={{ minWidth: 275 }}>
+                <CardContent>
+                  {/* <Typography
+                gutterBottom
+                sx={{ color: "text.secondary", fontSize: 16 }}
+              >
+                {selectedFieldName} Notes
+              </Typography> */}
+
+                  <Typography variant="h6" component="div">
+                    Coordinates{" "}
+                  </Typography>
+
+                  <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
+                    {selectedFieldCoords}
+                  </Typography>
+
+                  {/* <Typography variant="body2">
+                Sed do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua.{" "}
+              </Typography> */}
+                </CardContent>
+              </Card>
+            </div>
+            <Divider />
+          </div>
+
+          {/*  Field Note*/}
           <div>
             <Card sx={{ minWidth: 275 }}>
               <CardContent>
-                {/* <Typography
-                gutterBottom
-                sx={{ color: "text.secondary", fontSize: 16 }}
-              >
-                {selectedFieldName} Notes
-              </Typography> */}
-
-                <Typography variant="h6" component="div">
-                  Coordinates{" "}
+                <Typography
+                  gutterBottom
+                  sx={{ color: "text.secondary", fontSize: 16 }}
+                >
+                  {selectedFieldName} Notes
                 </Typography>
 
-                <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
-                  {selectedFieldCoords}
-                </Typography>
-
-                {/* <Typography variant="body2">
-                Sed do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua.{" "}
-              </Typography> */}
-              </CardContent>
-            </Card>
-          </div>
-          <Divider />
-        </div>
-
-        {/*  Field Note*/}
-        <div>
-          <Card sx={{ minWidth: 275 }}>
-            <CardContent>
-              <Typography
-                gutterBottom
-                sx={{ color: "text.secondary", fontSize: 16 }}
-              >
-                {selectedFieldName} Notes
-              </Typography>
-
-              {/* <Typography variant="h5" component="div">
+                {/* <Typography variant="h5" component="div">
                 Lorem Ipsum
               </Typography> */}
 
-              {/* <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
+                {/* <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
                 adjective
               </Typography> */}
 
-              <Typography variant="body2">
-                Sed do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua.{" "}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button size="small" variant="outlined" color="inherit">
-                + Add Note
-              </Button>
-            </CardActions>
-          </Card>
-        </div>
+                <Typography variant="body2">
+                  Sed do eiusmod tempor incididunt ut labore et dolore magna
+                  aliqua.{" "}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small" variant="outlined" color="inherit">
+                  + Add Note
+                </Button>
+              </CardActions>
+            </Card>
+          </div>
 
-        {/* This div wraps the buttons to place them at the bottom */}
-        <div
-          style={{
-            marginBottom: "48px",
-            display: "flex",
-            flexDirection: "row",
-            gap: "8px",
-            border: "2px solid  transparent",
-          }}
-        >
-          {/* Add margin to create space above the bottom */}
-          <Button
-            onClick={() => handleEditFieldName(selectedFieldName)} // Correct usage
-            variant="outlined"
-            color="inherit"
-            style={{ marginTop: "16px" }}
+          {/* This div wraps the buttons to place them at the bottom */}
+          <div
+            style={{
+              marginBottom: "48px",
+              display: "flex",
+              flexDirection: "row",
+              gap: "8px",
+              border: "2px solid  transparent",
+            }}
           >
-            Edit Name
-          </Button>
-          <Button
-            onClick={() => handleDelete(selectedFieldName)} // Correct usage
-            variant="outlined"
-            color="inherit"
-            style={{ marginTop: "16px" }}
-          >
-            Delete Field
-          </Button>
+            {/* Add margin to create space above the bottom */}
+            <Button
+              onClick={() => handleEditFieldName(selectedFieldName)} // Correct usage
+              variant="outlined"
+              color="inherit"
+              style={{ marginTop: "16px" }}
+            >
+              Edit Name
+            </Button>
+            <Button
+              onClick={() => handleConfirmDelete()} // Correct usage
+              variant="outlined"
+              color="inherit"
+              style={{ marginTop: "16px" }}
+            >
+              Delete Field
+            </Button>
+          </div>
         </div>
-      </div>
-    </Drawer>
+      </Drawer>
+
+      <Dialog
+        open={showDelete}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Delete?"}</DialogTitle>
+
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are You Sure you want to delete the field?
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDeleteField(false);
+              handleClose();
+            }}
+            style={{ color: theme.palette.secondary.main }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={() => {
+              setDeleteField(true);
+              handleClose();
+            }}
+            style={{ color: theme.palette.secondary.main }}
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
-
   );
 };
 

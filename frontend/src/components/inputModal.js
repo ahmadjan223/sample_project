@@ -65,6 +65,7 @@ export default function InputModal({
             variant="text"
             color="primary"
             onClick={handleClose} // Modal only closes when this button is pressed
+            autoFocus
           >
             Done
           </Button>
