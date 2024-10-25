@@ -43,7 +43,7 @@ const DetailsDrawer = ({
     try {
       // Call the delete endpoint with the field name
       await fetch(
-        `http://localhost:3000/api/delete-field/${encodeURIComponent(name)}`,
+        `https://densefusion.vercel.app/api/delete-field/${encodeURIComponent(name)}`,
         {
           method: "DELETE",
         }
@@ -71,7 +71,7 @@ const DetailsDrawer = ({
 
       // Send the updated name to the server
       await fetch(
-        `http://localhost:3000/api/update-field/${encodeURIComponent(editFieldName)}`,
+        `https://densefusion.vercel.app/api/update-field/${encodeURIComponent(editFieldName)}`,
         {
           method: "PATCH",
           headers: {
@@ -101,7 +101,7 @@ const DetailsDrawer = ({
 
   //     // Send the updated name to the server
   //     await fetch(
-  //       `http://localhost:3000/api/update-field/${encodeURIComponent(originalName)}`,
+  //       `https://densefusion.vercel.app/api/update-field/${encodeURIComponent(originalName)}`,
   //       {
   //         method: "PATCH",
   //         headers: {

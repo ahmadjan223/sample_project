@@ -7,7 +7,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons"; // Correct import
 const LandingPage = () => {
   console.log(process.env.REACT_APP_BACKEND, "Backend URL");
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:3000/auth/google"; // Replace with your backend URL if it's different
+    window.location.href = "https://densefusion.vercel.app/auth/google"; // Replace with your backend URL if it's different
   };
 
   return (
