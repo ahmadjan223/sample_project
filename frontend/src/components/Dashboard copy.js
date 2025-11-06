@@ -18,7 +18,7 @@ const DrawableMap = ({ user }) => {
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDTpcRPc-44RydvSTDu6Oh8lrSuw2vSE_Q",
+    googleMapsApiKey: "AlzaSyCEILyf13a_73SdiQ0Y5Q5f1uapHNNLDYO",
     libraries,
   });
 
