@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 
 // CORS configuration
 const corsOptions = {
-  origin: 'https://sample-project-two-puce.vercel.app/', // Replace with your client's origin
+  origin: 'https://cropmon.vercel.app/', // Replace with your client's origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
   credentials: true, // Allow credentials (if needed)
@@ -43,7 +43,7 @@ app.use(passport.session());
 connectDB();
 
 app.get('/', (req, res) => {
-  res.send('TEST Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://sample-project-two-puce.vercel.app/ for the website. \n\nThanks!');
+  res.send('TEST Dear user, \nWelcome to the DenseFusion backend. \nPlease go to https://cropmon.vercel.app/ for the website. \n\nThanks!');
 });
 
 
