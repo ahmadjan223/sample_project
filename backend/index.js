@@ -66,7 +66,14 @@ app.use(authRoutes);
 app.use(userRoutes);
 //user routes
 app.use(sentinelRoutes);
-// Start the server
+// Ensure CORS preflight (OPTIONS) is handled for all routes
+app.options('*', cors(corsOptions));
+
+// Start the server locally; export app for serverless (Vercel)
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+if (!process.env.VERCEL) {
+  app.listen(port, () => console.log(`Server running on port ${port}`));
+}
+
+module.exports = app;
