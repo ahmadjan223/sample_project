@@ -95,7 +95,7 @@ export default function TopBar({ theme, setTheme, showMenu, setShowMenu }) {
         </Typography>
 
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          MONITOR FIELDS FOR CROPS
+          MONITOR CROP FIELDS
         </Typography>
 
         <FormControlLabel
