@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://densefusion.vercel.app/api/items';
+const API_URL = 'https://sample-project-two-puce.vercel.app/api/items';
 
 export const fetchItems = async () => {
   try {

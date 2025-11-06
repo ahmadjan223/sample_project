@@ -16,7 +16,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'https://densefusion.vercel.app/auth/google/callback'
+    callbackURL: 'https://sample-project-two-puce.vercel.app/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     User.findOne({ googleId: profile.id }).then(existingUser => {
         if (existingUser) {
