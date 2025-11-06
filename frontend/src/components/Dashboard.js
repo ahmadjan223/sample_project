@@ -73,7 +73,7 @@ const Dashboard = ({ user }) => {
 
   //loading maps first and libs for drawing.
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AlzaSyCEILyf13a_73SdiQ0Y5Q5f1uapHNNLDYO",
+    googleMapsApiKey: "AlzaSyCEILyf13a_73SdiQ0Y5Q5f1uapHNNLDY0",
     libraries,
   });
   //fetching polygons from db
