@@ -28,6 +28,7 @@ app.use(bodyParser.json());
 const allowedOrigins = [
   'https://cropmon.vercel.app',
   'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 const corsOptions = {

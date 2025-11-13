@@ -7,7 +7,7 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import SideNav from "./sidenav";
-import { sendSinglePolygonToDb, sendToDb, loadPolygon } from "./apiService";
+import { savePolygon, sendToDb, loadPolygon } from "./apiService";
 import Maps from "./Maps";
 import BottomBar from "./bottomBar";
 import TopBar from "./TopBar";
@@ -81,7 +81,7 @@ const Dashboard = ({ user }) => {
     try {
       const response = await loadPolygon(user.id);
       setPolygons(response);
-      console.log("data fetched from db");
+      console.log("data fetched from db",response);
     } catch (error) {
       console.log(error);
     }

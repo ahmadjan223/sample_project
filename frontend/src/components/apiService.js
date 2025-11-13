@@ -1,7 +1,8 @@
+const baseURL = "http://localhost:3000";
 export const savePolygon = async (coordinates, name, userId) => {
     try {
       const response = await fetch(
-        "https://sample-project-two-puce.vercel.app/api/save-single-polygon",
+        `${baseURL}/api/save-single-polygon`,
         {
           method: "POST",
           headers: {
@@ -30,7 +31,7 @@ export const savePolygon = async (coordinates, name, userId) => {
 
   export const sendToDb = async (polygons) => {
     try {
-      const response = await fetch("https://sample-project-two-puce.vercel.app/api/fields", {
+      const response = await fetch(`${baseURL}/api/fields`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,9 +52,10 @@ export const savePolygon = async (coordinates, name, userId) => {
 export const loadPolygon = async (userId) => {
     try {
       const response = await fetch(
-        `https://sample-project-two-puce.vercel.app/api/load-polygons/${encodeURIComponent(userId)}`
+        `${baseURL}/api/load-polygons/${encodeURIComponent(userId)}`
       );
       if (response.ok) {
+        console.log("Polygons loaded successfully!");
         const result = await response.json();
         const transformedPolygons = result.map((polygon) => ({
           path: polygon.coordinates.map((coord) => ({
