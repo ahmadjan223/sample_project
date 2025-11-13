@@ -98,7 +98,6 @@ exports.getImageUrl = async (req, res) => {
     // Respond with the WMS URL or the saved image path
     res.json({ imageUrl: wmsUrl });
   } catch (error) {
-    console.log("Coordinates at error:", coordinates);
     console.error("Error obtaining image URL:", error.message);
     res.status(500).json({ error: error.message });
   }

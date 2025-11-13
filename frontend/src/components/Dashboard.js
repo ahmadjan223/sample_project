@@ -19,6 +19,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
+  const baseURL = "http://localhost:3000";
   const [isDrawing, setIsDrawing] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -110,7 +111,7 @@ const Dashboard = ({ user }) => {
 
     try {
       const response = await fetch(
-        "https://sample-project-two-puce.vercel.app/sentinel/getImageUrl",
+        `${baseURL}/sentinel/getImageUrl`,
         {
           method: "POST",
           headers: {
@@ -143,7 +144,7 @@ const Dashboard = ({ user }) => {
   const getIndexValues = async (path, layer, timeRange) => {
     try {
       const response = await fetch(
-        "https://sample-project-two-puce.vercel.app/sentinel/getIndexValues",
+        `${baseURL}/sentinel/getIndexValues`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -175,7 +176,7 @@ const Dashboard = ({ user }) => {
   const resetDB = async (userId) => {
     try {
       const response = await fetch(
-        `https://sample-project-two-puce.vercel.app/api/reset/${encodeURIComponent(userId)}`,
+        `${baseURL}/api/reset/${encodeURIComponent(userId)}`,
         {
           method: "POST",
         }
