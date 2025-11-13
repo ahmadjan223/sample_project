@@ -3,7 +3,7 @@ require("dotenv").config(); // Ensure env variables are loaded
 // const GeoTIFF = require('geotiff'); // For parsing GeoTIFF data
 const fs = require("fs"); // For saving GeoTIFF image (optional)
 
-const instance_id = "8ea582ad-8f40-4237-8ef7-eac1ac938858";
+const instance_id = "b0fc2e9e-dae2-4a83-8b20-31d2368d208a";
 
 // Function to get access token
 const getAccessToken = async () => {
@@ -86,6 +86,9 @@ exports.getImageUrl = async (req, res) => {
 
     console.log("Image URL:", wmsUrl);
     console.log("\n" + time);
+    console.log("Request headers:", {
+      Authorization: `Bearer ${accessToken ? "[REDACTED]" : "missing"}`,
+    });
 
     // Make a request to the WMS URL to fetch the image
     const response = await axios.get(wmsUrl, {
@@ -99,6 +102,19 @@ exports.getImageUrl = async (req, res) => {
     res.json({ imageUrl: wmsUrl });
   } catch (error) {
     console.error("Error obtaining image URL:", error.message);
+    if (error.response) {
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+      console.error("Response data:", error.response.data);
+      if (error.response.data) {
+        const body = Buffer.from(error.response.data).toString("utf8");
+        console.error("Sentinel Hub error body:", body);
+      }
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Request setup error:", error.message);
+    }
     res.status(500).json({ error: error.message });
   }
 };
@@ -162,6 +178,9 @@ exports.getIndexValues = async (req, res) => {
     // Construct WMS URL for GeoTIFF
     const geotiffUrl = getGeoTIFFUrl(accessToken, bbox, geometry, layer, time);
     console.log("GeoTIFF URL:", geotiffUrl);
+    console.log("GeoTIFF request headers:", {
+      Authorization: `Bearer ${accessToken ? "[REDACTED]" : "missing"}`,
+    });
 
     // Make a request to the WMS URL to fetch the GeoTIFF image
     const response = await axios.get(geotiffUrl, {
@@ -211,11 +230,35 @@ exports.getIndexValues = async (req, res) => {
       res.json({ message: 'Index values extracted successfully', indexValues });
     } catch (error) {
       console.error("Error extracting INdex values:", error.message);
+      if (error.response) {
+        console.error("GeoTIFF response status:", error.response.status);
+        console.error("GeoTIFF response headers:", error.response.headers);
+        console.error("GeoTIFF response data:", error.response.data);
+        if (error.response.data) {
+          const body = Buffer.from(error.response.data).toString("utf8");
+          console.error("Sentinel Hub GeoTIFF error body:", body);
+        }
+      } else if (error.request) {
+        console.error("GeoTIFF no response received:", error.request);
+      }
       res.status(500).json({ error: 'Error extracting INdex values' });
     }
 
   } catch (error) {
     console.error("Error obtaining GeoTIFF image:", error.message);
+    if (error.response) {
+      console.error("GeoTIFF response status:", error.response.status);
+      console.error("GeoTIFF response headers:", error.response.headers);
+      console.error("GeoTIFF response data:", error.response.data);
+      if (error.response.data) {
+        const body = Buffer.from(error.response.data).toString("utf8");
+        console.error("Sentinel Hub GeoTIFF error body:", body);
+      }
+    } else if (error.request) {
+      console.error("GeoTIFF no response received:", error.request);
+    } else {
+      console.error("GeoTIFF request setup error:", error.message);
+    }
     res.status(500).json({ error: error.message });
   }
 };
