@@ -19,7 +19,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const libraries = ["places", "drawing"];
 const Dashboard = ({ user }) => {
-  const baseURL = "http://localhost:3000";
+  const baseURL = "https://sample-project-two-puce.vercel.app";
+  // const baseURL = "http://localhost:3000";
   const [isDrawing, setIsDrawing] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
