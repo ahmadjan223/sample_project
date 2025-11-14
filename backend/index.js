@@ -24,9 +24,23 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 
-// CORS configuration - allow any origin (useful when deployed on Vercel)
+// CORS configuration
+const allowedOrigins = [
+  'https://cropmon.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
 const corsOptions = {
-  origin: true, // Reflect the request origin, effectively allowing all
+  origin: (origin, callback) => {
+    // Allow non-browser requests or same-origin without Origin header
+    if (!origin) return callback(null, true);
+    const isPreview = /https?:\/\/cropmon-[a-z0-9-]+-.*\.vercel\.app$/i.test(origin);
+    if (allowedOrigins.includes(origin) || isPreview) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
